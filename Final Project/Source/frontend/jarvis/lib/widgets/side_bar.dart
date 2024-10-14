@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/views/all_chats_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 
@@ -8,6 +9,7 @@ class SideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
@@ -26,10 +28,36 @@ class SideBar extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10.0),
-            _buildListTile(icon: Icons.chat_outlined, title: 'All chats'),
-            _buildListTile(icon: Icons.handyman_outlined, title: 'AI Tools'),
-            _buildListTile(icon: Icons.person_outline, title: 'Profile'),
-            _buildListTile(icon: Icons.settings, title: 'Settings'),
+
+            // navigate to all chats screen
+            _buildListTile(
+                icon: Icons.chat_outlined,
+                title: 'All chats',
+                customOnTap: () {
+                  if (Scaffold.of(context).isDrawerOpen) {
+                    Scaffold.of(context).closeDrawer();
+                  }
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AllChatsScreen()));
+                }),
+
+            // navigate to AI Tools screen
+            _buildListTile(
+                icon: Icons.handyman_outlined,
+                title: 'AI Tools',
+                customOnTap: () {}),
+
+            // navigate to Profile screen
+            _buildListTile(
+                icon: Icons.person_outline,
+                title: 'Profile',
+                customOnTap: () {}),
+
+            // navigate to Settings screen
+            _buildListTile(
+                icon: Icons.settings, title: 'Settings', customOnTap: () {}),
           ],
         ),
       ),
@@ -104,16 +132,17 @@ class SideBar extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile({required IconData icon, required String title}) {
+  Widget _buildListTile(
+      {required IconData icon,
+      required String title,
+      required VoidCallback customOnTap}) {
     return ListTile(
       leading: Icon(icon),
       title: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      onTap: () {
-        // Handle your onTap here
-      },
+      onTap: customOnTap,
     );
   }
 }

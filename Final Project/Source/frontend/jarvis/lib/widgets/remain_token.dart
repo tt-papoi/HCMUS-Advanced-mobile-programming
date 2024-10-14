@@ -19,7 +19,8 @@ class _RemainTokenState extends State<RemainToken> {
       padding: const EdgeInsets.all(0),
       margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50), color: Colors.black12),
+          borderRadius: BorderRadius.circular(50),
+          color: const Color.fromARGB(10, 0, 0, 0)),
       child: Row(
         children: [
           const SizedBox(
