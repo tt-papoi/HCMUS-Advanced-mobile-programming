@@ -1,73 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/chat_screen.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 
 class AllChatsScreen extends StatelessWidget {
   AllChatsScreen({super.key});
 
-  final List<ChatInfo> chatMessages = [
+  final List<ChatInfo> chatInfoList = [
     ChatInfo(
-      botName: 'GPT-4o',
-      botId: 'gpt-4o',
       mainContent: 'Drawer Creation',
       latestMessage:
           'Để tránh hiệu ứng bị tràn ra khỏi border khi nhấn vào "Inkwell", bạn...',
       latestActiveDate: DateTime(2024, 10, 11),
+      bot: Bot(
+        name: "Assistant",
+        description: "AI Assistant",
+        imagePath: 'lib/assets/icons/robot.png',
+        id: '',
+      ),
     ),
     ChatInfo(
-      botName: 'BotC06G',
-      botId: 'botc06g',
       mainContent: 'Hello',
       latestMessage:
           'I\'m afraid I don\'t understand. Could you please provide more context?',
       latestActiveDate: DateTime(2024, 10, 8),
+      bot: Bot(
+        name: "GPT-4.0",
+        description: "GPT-4.0",
+        imagePath: 'lib/assets/icons/chatgpt_icon.png',
+        id: '',
+      ),
     ),
     ChatInfo(
-      botName: 'BotC06G',
-      botId: 'botc06g',
+      bot: Bot(
+        name: "GPT-3.5",
+        description: "GPT-3.5",
+        imagePath: 'lib/assets/icons/chatgpt_icon.png',
+        id: '',
+      ),
       mainContent: 'Ajq',
       latestMessage: 'I apologize, but I do not understand the input "Ajq".',
       latestActiveDate: DateTime(2024, 10, 7),
     ),
     ChatInfo(
-      botName: 'Assistant',
-      botId: 'assistant',
+      bot: Bot(
+        name: "GPT-4.0-Turbo",
+        description: "GPT-4.0-Turbo",
+        imagePath: 'lib/assets/icons/chatgpt_icon.png',
+        id: '',
+      ),
       mainContent: 'Laughing',
       latestMessage: 'Hey there! What\'s on your mind?',
       latestActiveDate: DateTime(2024, 10, 7),
-    ),
-    ChatInfo(
-      botName: 'BotC06G',
-      botId: 'botc06g',
-      mainContent: 'Gibberish',
-      latestMessage:
-          'I apologize, but I do not understand what you mean by "Rhrhrbrb"...',
-      latestActiveDate: DateTime(2024, 10, 7),
-    ),
-    ChatInfo(
-      botName: 'GPT-4o',
-      botId: 'gpt-4o',
-      mainContent: 'Tìm ánh sáng',
-      latestMessage:
-          'Tôi xin lỗi vì sự nhầm lẫn trước đó. Dưới đây là các liên kết đến...',
-      latestActiveDate: DateTime(2024, 7, 13),
-    ),
-    ChatInfo(
-      botName: 'GPT-4o',
-      botId: 'gpt-4o',
-      mainContent: 'Bayesian Inference',
-      latestMessage:
-          'Dưới đây là mã Python để thực hiện các bước trên trong Jupyter...',
-      latestActiveDate: DateTime(2024, 5, 27),
-    ),
-    ChatInfo(
-      botName: 'Gemini',
-      botId: 'gemini',
-      mainContent: 'Bayesian Inference',
-      latestMessage: '```python...',
-      latestActiveDate: DateTime(2024, 5, 27),
     ),
   ];
 
@@ -80,6 +67,8 @@ class AllChatsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.white,
         backgroundColor: Colors.white,
         title: const Center(
           child: Text(
@@ -92,7 +81,7 @@ class AllChatsScreen extends StatelessWidget {
         ],
       ),
       body: ListView.separated(
-        itemCount: chatMessages.length,
+        itemCount: chatInfoList.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(0),
@@ -101,13 +90,18 @@ class AllChatsScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const ChatScreen()));
+                    FadeRoute(
+                        page: ChatScreen(
+                      chatInfo: chatInfoList[index],
+                      isNewChat: false,
+                    )));
               },
               leading: CircleAvatar(
                 backgroundColor: Colors.blueAccent,
                 child: Text(
-                  chatMessages[index].botName[0], // First letter of the botName
+                  chatInfoList[index]
+                      .bot
+                      .name[0], // First letter of the botName
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -115,16 +109,16 @@ class AllChatsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    chatMessages[index].botName,
+                    chatInfoList[index].bot.name,
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                   Text(
-                    chatMessages[index].mainContent,
+                    chatInfoList[index].mainContent,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    chatMessages[index].latestMessage,
+                    chatInfoList[index].latestMessage,
                     maxLines: 1, // Truncate if too long
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.black54, fontSize: 14),
@@ -134,7 +128,7 @@ class AllChatsScreen extends StatelessWidget {
               trailing: Column(
                 children: [
                   Text(
-                    formatDate(chatMessages[index].latestActiveDate),
+                    formatDate(chatInfoList[index].latestActiveDate),
                     style: const TextStyle(color: Colors.grey),
                   ),
                   Expanded(

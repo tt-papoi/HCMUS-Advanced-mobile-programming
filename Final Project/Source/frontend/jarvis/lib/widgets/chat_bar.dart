@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
 
-class ChatBar extends StatelessWidget {
-  const ChatBar({super.key});
+class ChatBar extends StatefulWidget {
+  final String hintMessage;
+  final Function(String) onSendMessage; // Accept a message as a parameter
+
+  const ChatBar({
+    super.key,
+    required this.hintMessage,
+    required this.onSendMessage,
+  });
+
+  @override
+  State<ChatBar> createState() => _ChatBarState();
+}
+
+class _ChatBarState extends State<ChatBar> {
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +43,19 @@ class ChatBar extends StatelessWidget {
                 maxHeight: 120, // Limit the height to prevent overflow
               ),
               child: TextField(
+                controller: _messageController,
                 onTapOutside: (event) {
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
-                decoration: const InputDecoration(
-                  fillColor: Color.fromARGB(10, 0, 0, 0),
+                decoration: InputDecoration(
+                  fillColor: const Color.fromARGB(10, 0, 0, 0),
                   filled: true,
-                  hintStyle: TextStyle(
+                  hintStyle: const TextStyle(
                     color: Colors.black38,
                     fontWeight: FontWeight.normal,
                   ),
-                  hintText: 'Start a new chat',
-                  border: OutlineInputBorder(
+                  hintText: widget.hintMessage,
+                  border: const OutlineInputBorder(
                     borderSide: BorderSide.none,
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
@@ -48,7 +69,11 @@ class ChatBar extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.send_rounded),
             onPressed: () {
-              // Define action when send is pressed
+              if (_messageController.text.isNotEmpty) {
+                widget
+                    .onSendMessage(_messageController.text); // Send the message
+                _messageController.clear(); // Clear the input field
+              }
             },
           ),
         ],

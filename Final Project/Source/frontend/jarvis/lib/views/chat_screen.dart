@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  final bool isNewChat;
+  final ChatInfo chatInfo;
+
+  const ChatScreen({
+    super.key,
+    required this.isNewChat,
+    required this.chatInfo,
+  });
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  List<String> messages = [];
+
+  get isNewChat => widget.isNewChat;
+
+  void _sendMessage(String message) {
+    setState(() {
+      messages.add(message); // Add the new message to the list
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    messages.add(widget.chatInfo.latestMessage);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +40,18 @@ class ChatScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Center(
-          child: Text(
-            "Jarvis",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isNewChat ? "New chat" : widget.chatInfo.mainContent,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-          ),
+            Text(
+              widget.chatInfo.bot.name,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
         ),
         actions: const [
           RemainToken(),
@@ -25,11 +59,22 @@ class ChatScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // This Expanded widget is for the top section
+          // Expanded to display chat messages
           Expanded(
-            child: Container(),
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(messages[index]),
+                );
+              },
+            ),
           ),
-          const ChatBar(),
+          // Chat bar for sending messages
+          ChatBar(
+            hintMessage: 'Message',
+            onSendMessage: _sendMessage, // Pass the sending function
+          ),
         ],
       ),
     );

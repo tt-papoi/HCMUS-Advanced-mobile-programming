@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
 
+class Suggestion {
+  final String title;
+  final String subtitle;
+
+  Suggestion({required this.title, required this.subtitle});
+}
+
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  // Define a GlobalKey for BotBar
+  final GlobalKey<BotBarState> botBarKey = GlobalKey<BotBarState>();
+
+  // List of suggestions
+  final List<Suggestion> suggestions = [
+    Suggestion(title: 'Write an email', subtitle: 'to apply for a job'),
+    Suggestion(title: 'Practice for interviews', subtitle: 'for success'),
+    Suggestion(title: 'Translate sentences', subtitle: 'instantly'),
+    Suggestion(title: 'Explain an issue', subtitle: 'why the earth is round'),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +51,13 @@ class HomeScreen extends StatelessWidget {
       drawer: const SideBar(),
       body: Column(
         children: [
-          // This Expanded widget is for the top section
+          // Expanded widget for the top section
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Greeting text
                   const Text(
                     'Hello!',
                     style: TextStyle(
@@ -54,52 +74,58 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  // Fixed 4 suggestions without scrolling
+                  // ListView for suggestions
                   Expanded(
-                    child: ListView(
-                      children: [
-                        SuggestionPrompt(
-                          title: 'Write an email',
-                          subtitle: 'to apply for a job',
+                    child: ListView.separated(
+                      itemCount: suggestions.length,
+                      itemBuilder: (context, index) {
+                        final suggestion = suggestions[index];
+                        return SuggestionPrompt(
+                          title: suggestion.title,
+                          subtitle: suggestion.subtitle,
                           onTap: () {
-                            // Handle what happens when this suggestion is tapped
+                            _startNewChat(context, suggestion.title);
                           },
-                        ),
-                        const SizedBox(height: 16.0),
-                        SuggestionPrompt(
-                          title: 'Practice for interviews',
-                          subtitle: 'for success',
-                          onTap: () {
-                            // Handle what happens when this suggestion is tapped
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        SuggestionPrompt(
-                          title: 'Translate sentences',
-                          subtitle: 'instantly',
-                          onTap: () {
-                            // Handle what happens when this suggestion is tapped
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        SuggestionPrompt(
-                          title: 'Explain an issue',
-                          subtitle: 'why the earth is round',
-                          onTap: () {
-                            // Handle what happens when this suggestion is tapped
-                          },
-                        ),
-                      ],
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16.0),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const BotBar(),
-          const ChatBar(),
+          BotBar(key: botBarKey),
+          ChatBar(
+            hintMessage: 'Start a new chat',
+            onSendMessage: (String message) {
+              _startNewChat(context, message);
+            },
+          ),
         ],
       ),
     );
+  }
+
+  void _startNewChat(BuildContext context, String prompt) {
+    final selectedBot = botBarKey.currentState?.getSelectedBot;
+
+    if (selectedBot != null) {
+      ChatInfo newChatInfo = ChatInfo(
+        bot: selectedBot,
+        mainContent: "New Chat",
+        latestMessage: prompt,
+        latestActiveDate: DateTime.now(),
+      );
+      Navigator.push(
+        context,
+        FadeRoute(page: ChatScreen(isNewChat: true, chatInfo: newChatInfo)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a bot first!')),
+      );
+    }
   }
 }

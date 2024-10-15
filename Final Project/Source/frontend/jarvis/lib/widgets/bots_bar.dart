@@ -5,10 +5,10 @@ class BotBar extends StatefulWidget {
   const BotBar({super.key});
 
   @override
-  State<BotBar> createState() => _BotBarState();
+  State<BotBar> createState() => BotBarState();
 }
 
-class _BotBarState extends State<BotBar> {
+class BotBarState extends State<BotBar> {
   Bot? selectedBot;
 
   // Original list of bots
@@ -17,32 +17,41 @@ class _BotBarState extends State<BotBar> {
       name: "Assistant",
       description: "AI Assistant",
       imagePath: 'lib/assets/icons/robot.png',
+      id: '',
     ),
     Bot(
       name: "GPT-4.0",
       description: "GPT-4.0",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
     ),
     Bot(
       name: "GPT-3.5",
       description: "GPT-3.5",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
     ),
     Bot(
       name: "GPT-4.0-Turbo",
       description: "GPT-4.0-Turbo",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
     ),
   ];
 
   // List for displaying bots
   List<Bot> displayedBots = [];
 
+  Bot? get getSelectedBot => selectedBot;
+
   @override
   void initState() {
     super.initState();
     // Initialize the displayed bots with the first three bots from the original list
     displayedBots = List.from(botList.take(3));
+    if (displayedBots.isNotEmpty) {
+      selectedBot = displayedBots.first;
+    }
   }
 
   @override
@@ -76,6 +85,7 @@ class _BotBarState extends State<BotBar> {
               name: 'More',
               description: 'More options',
               imagePath: 'lib/assets/icons/category.png',
+              id: '',
             ),
             isSelected: false,
             onTap: () {
