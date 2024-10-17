@@ -7,6 +7,7 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
+import 'dart:io'; // Import File for image handling
 
 class Suggestion {
   final String title;
@@ -34,6 +35,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         title: const Center(
           child: Text(
@@ -84,7 +86,8 @@ class HomeScreen extends StatelessWidget {
                           title: suggestion.title,
                           subtitle: suggestion.subtitle,
                           onTap: () {
-                            _startNewChat(context, suggestion.title);
+                            _startNewChat(context, suggestion.title,
+                                null); // Pass null for image
                           },
                         );
                       },
@@ -99,8 +102,11 @@ class HomeScreen extends StatelessWidget {
           BotBar(key: botBarKey),
           ChatBar(
             hintMessage: 'Start a new chat',
-            onSendMessage: (String message) {
-              _startNewChat(context, message);
+            onSendMessage: (String message, File? image) {
+              _startNewChat(context, message, image); // Pass the image
+            },
+            onImageSelected: (File image) {
+              // Handle image selection if needed
             },
           ),
         ],
@@ -108,24 +114,26 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startNewChat(BuildContext context, String prompt) {
+  void _startNewChat(BuildContext context, String prompt, File? image) {
     final selectedBot = botBarKey.currentState?.getSelectedBot;
 
-    if (selectedBot != null) {
-      ChatInfo newChatInfo = ChatInfo(
-        bot: selectedBot,
-        mainContent: "New Chat",
-        latestMessage: prompt,
-        latestActiveDate: DateTime.now(),
-      );
-      Navigator.push(
-        context,
-        FadeRoute(page: ChatScreen(isNewChat: true, chatInfo: newChatInfo)),
-      );
-    } else {
+    if (selectedBot == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a bot first!')),
       );
+      return; // Exit early if no bot is selected
     }
+
+    ChatInfo newChatInfo = ChatInfo(
+      bot: selectedBot,
+      mainContent: "New Chat",
+      latestMessage: prompt,
+      latestActiveDate: DateTime.now(),
+    );
+
+    Navigator.push(
+      context,
+      FadeRoute(page: ChatScreen(isNewChat: true, chatInfo: newChatInfo)),
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
+import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewChat;
@@ -18,20 +19,27 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<String> messages = [];
+  List<Widget> messages = [];
 
   get isNewChat => widget.isNewChat;
 
-  void _sendMessage(String message) {
+  void _sendMessage(String message, File? imageFile) {
     setState(() {
-      messages.add(message); // Add the new message to the list
+      if (imageFile != null) {
+        messages.add(ListTile(
+          title: Image.file(imageFile), // Display the selected image
+        ));
+      }
+      messages.add(ListTile(title: Text(message))); // Add the text message
     });
   }
 
   @override
   void initState() {
     super.initState();
-    messages.add(widget.chatInfo.latestMessage);
+    if (widget.chatInfo.latestMessage.isNotEmpty) {
+      messages.add(ListTile(title: Text(widget.chatInfo.latestMessage)));
+    }
   }
 
   @override
@@ -39,6 +47,8 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.white,
         backgroundColor: Colors.white,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,21 +69,21 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Expanded to display chat messages
           Expanded(
             child: ListView.builder(
               itemCount: messages.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(messages[index]),
-                );
+                return messages[index]; // Display messages
               },
             ),
           ),
-          // Chat bar for sending messages
           ChatBar(
             hintMessage: 'Message',
-            onSendMessage: _sendMessage, // Pass the sending function
+            onSendMessage: _sendMessage, // Send text and image
+            onImageSelected: (File image) {
+              // Handle image selection
+              // Not needed anymore as it's handled in onSendMessage
+            },
           ),
         ],
       ),
