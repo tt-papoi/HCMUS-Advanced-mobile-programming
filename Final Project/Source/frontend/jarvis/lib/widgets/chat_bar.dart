@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:jarvis/models/chat_message.dart';
 
 class ChatBar extends StatefulWidget {
   final String hintMessage;
-  final Function(String, File?)
-      onSendMessage; // Change the callback to accept image
-  final Function(File) onImageSelected;
+  final Function(ChatMessage) onSendMessage;
 
   const ChatBar({
     super.key,
     required this.hintMessage,
     required this.onSendMessage,
-    required this.onImageSelected,
   });
 
   @override
@@ -54,6 +52,13 @@ class _ChatBarState extends State<ChatBar> {
                   _takePhoto();
                 },
               ),
+              ListTile(
+                leading: const Icon(Icons.screenshot),
+                title: const Text('Screenshot'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+              ),
             ],
           ),
         );
@@ -69,7 +74,6 @@ class _ChatBarState extends State<ChatBar> {
       setState(() {
         _selectedImage = imageFile; // Set the selected image
       });
-      widget.onImageSelected(imageFile); // Call callback
     }
   }
 
@@ -81,7 +85,6 @@ class _ChatBarState extends State<ChatBar> {
       setState(() {
         _selectedImage = imageFile; // Set the selected image
       });
-      widget.onImageSelected(imageFile); // Call callback
     }
   }
 
@@ -139,7 +142,7 @@ class _ChatBarState extends State<ChatBar> {
     return Container(
       padding: const EdgeInsets.all(10.0),
       child: Row(
-        children: <Widget>[
+        children: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: _showOptionsMenu,
@@ -180,16 +183,26 @@ class _ChatBarState extends State<ChatBar> {
           IconButton(
             icon: const Icon(Icons.send_rounded),
             onPressed: () {
+              ChatMessage message = ChatMessage(
+                messageType: MessageType.user,
+                sendTime: DateTime.now(),
+                textMessage: '',
+              );
               // Check if the message is not empty
-              if (_messageController.text.isNotEmpty ||
-                  _selectedImage != null) {
-                // Send the message along with the selected image
-                widget.onSendMessage(_messageController.text, _selectedImage);
-                _messageController.clear(); // Clear input after sending
-                setState(() {
-                  _selectedImage = null; // Clear the selected image
-                });
+              if (_messageController.text.isEmpty && (_selectedImage == null)) {
+                return;
               }
+
+              message.textMessage = _messageController.text;
+              message.image = _selectedImage;
+
+              // Callback send message to chat_screen/home_screen
+              widget.onSendMessage(message);
+
+              _messageController.clear(); // Clear input after sending
+              setState(() {
+                _selectedImage = null; // Clear the selected image
+              });
             },
           ),
         ],

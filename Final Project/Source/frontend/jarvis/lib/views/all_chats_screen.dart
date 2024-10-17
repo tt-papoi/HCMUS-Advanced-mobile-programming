@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/chat_screen.dart';
 import 'package:jarvis/widgets/remain_token.dart';
@@ -12,9 +13,12 @@ class AllChatsScreen extends StatelessWidget {
   final List<ChatInfo> chatInfoList = [
     ChatInfo(
       mainContent: 'Drawer Creation',
-      latestMessage:
-          'Để tránh hiệu ứng bị tràn ra khỏi border khi nhấn vào "Inkwell", bạn...',
-      latestActiveDate: DateTime(2024, 10, 11),
+      latestMessage: ChatMessage(
+        messageType: MessageType.bot,
+        textMessage:
+            'Để tránh hiệu ứng bị tràn ra khỏi border khi nhấn vào "Inkwell", bạn...',
+        sendTime: DateTime(2024, 10, 11),
+      ),
       bot: Bot(
         name: "Assistant",
         description: "AI Assistant",
@@ -24,9 +28,12 @@ class AllChatsScreen extends StatelessWidget {
     ),
     ChatInfo(
       mainContent: 'Hello',
-      latestMessage:
-          'I\'m afraid I don\'t understand. Could you please provide more context?',
-      latestActiveDate: DateTime(2024, 10, 8),
+      latestMessage: ChatMessage(
+        messageType: MessageType.bot,
+        textMessage:
+            'I\'m afraid I don\'t understand. Could you please provide more context?',
+        sendTime: DateTime(2024, 10, 8),
+      ),
       bot: Bot(
         name: "GPT-4.0",
         description: "GPT-4.0",
@@ -42,8 +49,12 @@ class AllChatsScreen extends StatelessWidget {
         id: '',
       ),
       mainContent: 'Ajq',
-      latestMessage: 'I apologize, but I do not understand the input "Ajq".',
-      latestActiveDate: DateTime(2024, 10, 7),
+      latestMessage: ChatMessage(
+        messageType: MessageType.bot,
+        textMessage:
+            'I\'m afraid I don\'t understand. Could you please provide more context?',
+        sendTime: DateTime(2024, 10, 7),
+      ),
     ),
     ChatInfo(
       bot: Bot(
@@ -53,8 +64,11 @@ class AllChatsScreen extends StatelessWidget {
         id: '',
       ),
       mainContent: 'Laughing',
-      latestMessage: 'Hey there! What\'s on your mind?',
-      latestActiveDate: DateTime(2024, 10, 7),
+      latestMessage: ChatMessage(
+        messageType: MessageType.bot,
+        textMessage: 'Hey there! What\'s on your mind?',
+        sendTime: DateTime(2024, 10, 7),
+      ),
     ),
   ];
 
@@ -118,7 +132,7 @@ class AllChatsScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    chatInfoList[index].latestMessage,
+                    chatInfoList[index].latestMessage.textMessage,
                     maxLines: 1, // Truncate if too long
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.black54, fontSize: 14),
@@ -128,7 +142,7 @@ class AllChatsScreen extends StatelessWidget {
               trailing: Column(
                 children: [
                   Text(
-                    formatDate(chatInfoList[index].latestActiveDate),
+                    formatDate(chatInfoList[index].latestMessage.sendTime),
                     style: const TextStyle(color: Colors.grey),
                   ),
                   Expanded(

@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
-import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewChat;
@@ -19,27 +21,32 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<Widget> messages = [];
+  List<ChatMessage> listMessages = [];
 
-  get isNewChat => widget.isNewChat;
-
-  void _sendMessage(String message, File? imageFile) {
+  void _sendMessage(ChatMessage message) {
     setState(() {
-      if (imageFile != null) {
-        messages.add(ListTile(
-          title: Image.file(imageFile), // Display the selected image
-        ));
-      }
-      messages.add(ListTile(title: Text(message))); // Add the text message
+      listMessages.add(message);
+    });
+    _receiveMessage();
+  }
+
+  void _receiveMessage() {
+    ChatMessage message = ChatMessage(
+        textMessage: "Coming soon!",
+        messageType: MessageType.bot,
+        sendTime: DateTime.now(),
+        image: null,
+        code: "print('Hello, World!')");
+    setState(() {
+      listMessages.add(message);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.chatInfo.latestMessage.isNotEmpty) {
-      messages.add(ListTile(title: Text(widget.chatInfo.latestMessage)));
-    }
+    listMessages.add(widget.chatInfo.latestMessage);
+    _receiveMessage();
   }
 
   @override
@@ -54,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isNewChat ? "New chat" : widget.chatInfo.mainContent,
+              widget.isNewChat ? "New chat" : widget.chatInfo.mainContent,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             Text(
@@ -71,19 +78,165 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: messages.length,
+              itemCount: listMessages.length,
               itemBuilder: (context, index) {
-                return messages[index]; // Display messages
+                return _displayMessageContainer(listMessages[index]);
               },
             ),
           ),
           ChatBar(
             hintMessage: 'Message',
-            onSendMessage: _sendMessage, // Send text and image
-            onImageSelected: (File image) {
-              // Handle image selection
-              // Not needed anymore as it's handled in onSendMessage
-            },
+            onSendMessage: _sendMessage,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _displayMessageContainer(ChatMessage message) {
+    bool isUserMessage = message.messageType == MessageType.user;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0),
+      child: Column(
+        crossAxisAlignment:
+            isUserMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (isUserMessage) _displayUserInfo() else _displayBotInfo(),
+          _displayMessageContent(message),
+        ],
+      ),
+    );
+  }
+
+  Widget _displayBotInfo() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 0, 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Image.asset(
+            widget.chatInfo.bot.imagePath,
+            width: 30,
+            height: 30,
+          ),
+          const SizedBox(width: 8),
+          Text(widget.chatInfo.bot.name,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _displayUserInfo() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 0, 20, 10),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text("You", style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(width: 8),
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: Colors.blueAccent,
+            child: Icon(
+              Icons.person_2_outlined,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _displayMessageContent(ChatMessage message) {
+    return Column(
+      crossAxisAlignment: message.messageType == MessageType.user
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          decoration: BoxDecoration(
+            color: message.messageType == MessageType.user
+                ? Colors.blue[50]
+                : Colors.grey[300],
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (message.textMessage != "")
+                _displayTextMessage(message.textMessage),
+              if (message.code != null) _displayCode(message.code!),
+              if (message.image != null)
+                _displayImage(message.messageType, message.image!),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _displayTextMessage(String message) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+      child: Text(
+        message,
+        style: const TextStyle(color: Colors.black87),
+      ),
+    );
+  }
+
+  Widget _displayImage(MessageType type, File image) {
+    return type == MessageType.user
+        ? Container(
+            width: 100,
+            height: 100,
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: Image.file(image, fit: BoxFit.cover),
+          )
+        : Container(
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: Image.file(image),
+          );
+  }
+
+  Widget _displayCode(String code) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(200, 0, 0, 0),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            child: const Text(
+              "Code",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+            ),
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              code,
+              style: const TextStyle(
+                  fontFamily: 'monospace',
+                  color: Color.fromARGB(255, 255, 255, 255)),
+            ),
           ),
         ],
       ),

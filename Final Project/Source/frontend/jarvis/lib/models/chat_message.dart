@@ -1,14 +1,19 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
 
 class ChatMessage {
-  String? message;
+  String textMessage;
   final MessageType messageType;
-  ImageProvider? image;
+  File? image;
+  String? code;
+  DateTime sendTime;
 
   ChatMessage({
-    this.message,
+    required this.textMessage,
     required this.messageType,
     this.image,
+    this.code,
+    required this.sendTime,
   });
 }
 

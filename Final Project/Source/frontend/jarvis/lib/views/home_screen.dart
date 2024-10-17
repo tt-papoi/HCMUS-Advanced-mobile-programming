@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
@@ -7,7 +8,7 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
-import 'dart:io'; // Import File for image handling
+// Import File for image handling
 
 class Suggestion {
   final String title;
@@ -86,8 +87,12 @@ class HomeScreen extends StatelessWidget {
                           title: suggestion.title,
                           subtitle: suggestion.subtitle,
                           onTap: () {
-                            _startNewChat(context, suggestion.title,
-                                null); // Pass null for image
+                            ChatMessage chatMessage = ChatMessage(
+                                textMessage:
+                                    "${suggestion.title} ${suggestion.subtitle}",
+                                messageType: MessageType.user,
+                                sendTime: DateTime.now());
+                            _startNewChat(context, chatMessage);
                           },
                         );
                       },
@@ -102,11 +107,8 @@ class HomeScreen extends StatelessWidget {
           BotBar(key: botBarKey),
           ChatBar(
             hintMessage: 'Start a new chat',
-            onSendMessage: (String message, File? image) {
-              _startNewChat(context, message, image); // Pass the image
-            },
-            onImageSelected: (File image) {
-              // Handle image selection if needed
+            onSendMessage: (ChatMessage message) {
+              _startNewChat(context, message);
             },
           ),
         ],
@@ -114,7 +116,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startNewChat(BuildContext context, String prompt, File? image) {
+  void _startNewChat(BuildContext context, ChatMessage message) {
     final selectedBot = botBarKey.currentState?.getSelectedBot;
 
     if (selectedBot == null) {
@@ -127,8 +129,7 @@ class HomeScreen extends StatelessWidget {
     ChatInfo newChatInfo = ChatInfo(
       bot: selectedBot,
       mainContent: "New Chat",
-      latestMessage: prompt,
-      latestActiveDate: DateTime.now(),
+      latestMessage: message,
     );
 
     Navigator.push(
