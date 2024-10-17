@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:jarvis/main.dart';
 
@@ -83,12 +82,17 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shadowColor: Colors.transparent,
                 ),
-                child: Text(isLogin ? 'Login' : 'Register'),
+                child: Text(
+                  isLogin ? 'Login' : 'Register',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(height: 20),
               Text(
@@ -134,12 +138,17 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: isActive ? Colors.blue : Colors.blue[200],
+            backgroundColor: isActive ? Colors.blueAccent : Colors.blueAccent.withOpacity(0.3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shadowColor: Colors.transparent,
           ),
-          child: Text(text),
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
