@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/widgets/icons.dart';
+import 'package:jarvis/widget/icons.dart';
 
 class TokenUsageCard extends StatefulWidget {
-  const TokenUsageCard({super.key});
+  final int currentToken;
+  final int maxToken;
+
+  const TokenUsageCard({super.key, required this.currentToken, required this.maxToken});
 
   @override
   State<TokenUsageCard> createState() => _TokenUsageCardState();
 }
 
 class _TokenUsageCardState extends State<TokenUsageCard> {
-  int _currentToken = 30;
-  final int _maxToken = 50;
+  late int _currentToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentToken = widget.currentToken;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,15 +92,14 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(50.0),
-                    value: _currentToken / _maxToken,
+                    value: _currentToken / widget.maxToken,
                     backgroundColor: Colors.black12,
                     color: Colors.blueAccent,
                     minHeight: 6.0,
                   ),
                 ),
               ),
-              Text('$_maxToken'), // Display max token
+              Text('${widget.maxToken}'), // Display max token
             ],
           ),
         ],
@@ -100,7 +107,6 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
     );
   }
 
-  // update current token
   void updateToken(int newToken) {
     setState(() {
       _currentToken = newToken;

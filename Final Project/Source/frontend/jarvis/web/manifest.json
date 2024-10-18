@@ -1,6 +1,6 @@
 {
-    "name": "jarvis",
-    "short_name": "jarvis",
+    "name": "jarvis_tt",
+    "short_name": "jarvis_tt",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

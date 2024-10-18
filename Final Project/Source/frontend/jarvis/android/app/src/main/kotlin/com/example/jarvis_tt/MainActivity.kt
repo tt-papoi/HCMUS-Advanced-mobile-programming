@@ -1,4 +1,4 @@
-package com.example.jarvis
+package com.example.jarvis_tt
 
 import io.flutter.embedding.android.FlutterActivity
 
