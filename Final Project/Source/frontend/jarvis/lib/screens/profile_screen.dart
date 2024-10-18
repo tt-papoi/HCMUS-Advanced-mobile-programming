@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/screens/login_register_screen.dart';
 import 'package:jarvis/widget/token_usage_card.dart';
-import 'package:jarvis/widget/support_screen.dart';
-
+import 'package:jarvis/screens/support_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,7 +13,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   int currentToken = 30;
   final int maxToken = 50;
-
 
   void _logout(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -110,7 +108,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Điều hướng đến trang Hỗ trợ
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SupportScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const SupportScreen()),
                 );
               },
             ),
@@ -142,8 +141,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-      
     );
   }
 }
-
