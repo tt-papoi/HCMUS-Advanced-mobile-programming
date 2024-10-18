@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/views/home_screen.dart';
+import 'package:jarvis/views/login_register_screen.dart';
 
 void main() {
   runApp(const JarvisApp());
@@ -11,10 +11,10 @@ class JarvisApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Jarvis',
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: LoginRegisterScreen(),
     );
   }
 }
