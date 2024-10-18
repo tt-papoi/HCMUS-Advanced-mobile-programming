@@ -180,6 +180,8 @@ class _ChatBarState extends State<ChatBar> {
               ),
             ),
           ),
+
+          // Send button
           IconButton(
             icon: const Icon(Icons.send_rounded),
             onPressed: () {

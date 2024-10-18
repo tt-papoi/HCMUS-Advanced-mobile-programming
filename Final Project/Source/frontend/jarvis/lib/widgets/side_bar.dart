@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/all_chats_screen.dart';
+import 'package:jarvis/views/mybot_screen.dart';
+import 'package:jarvis/views/profile_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 
@@ -17,7 +19,7 @@ class SideBar extends StatelessWidget {
         child: Column(
           children: [
             const TokenUsageCard(),
-            _buildExploreAndMyBotRow(),
+            _buildExploreAndMyBotRow(context),
             const SizedBox(height: 10.0),
 
             // navigate to all chats screen
@@ -26,7 +28,6 @@ class SideBar extends StatelessWidget {
               title: 'All chats',
               customOnTap: () => _navigateTo(context, AllChatsScreen()),
             ),
-
             // navigate to AI Tools screen
             _buildListTile(
               icon: Icons.handyman_outlined,
@@ -41,7 +42,7 @@ class SideBar extends StatelessWidget {
               icon: Icons.person_outline,
               title: 'Profile',
               customOnTap: () {
-                // Add your navigation logic here
+                _navigateTo(context, const ProfileScreen());
               },
             ),
 
@@ -67,38 +68,36 @@ class SideBar extends StatelessWidget {
     );
   }
 
-  Widget _buildExploreAndMyBotRow() {
+  Widget _buildExploreAndMyBotRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Row(
         children: [
-          _buildExploreContainer(),
+          _buildExploreContainer(context),
           const SizedBox(width: 10.0),
-          _buildMyBotContainer(),
+          _buildMyBotContainer(context),
         ],
       ),
     );
   }
 
-  Widget _buildExploreContainer() {
+  Widget _buildExploreContainer(BuildContext context) {
     return _buildContainer(
       icon: CustomIcons.search,
       text: 'Explore',
       trailingIcon: Icons.arrow_forward_ios,
       onTap: () {
-        // Add your logic here
+        //_navigateTo(context, const ProfileScreen());
       },
     );
   }
 
-  Widget _buildMyBotContainer() {
+  Widget _buildMyBotContainer(BuildContext context) {
     return _buildContainer(
       icon: CustomIcons.robot,
       text: 'My bots',
       trailingIcon: Icons.add,
-      onTap: () {
-        // Add your logic here
-      },
+      onTap: () => _navigateTo(context, const MybotScreen()),
     );
   }
 

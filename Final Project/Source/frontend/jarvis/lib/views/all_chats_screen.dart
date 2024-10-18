@@ -24,6 +24,7 @@ class AllChatsScreen extends StatelessWidget {
         description: "AI Assistant",
         imagePath: 'lib/assets/icons/robot.png',
         id: '',
+        botType: BotType.createdBot,
       ),
     ),
     ChatInfo(
@@ -39,6 +40,7 @@ class AllChatsScreen extends StatelessWidget {
         description: "GPT-4.0",
         imagePath: 'lib/assets/icons/chatgpt_icon.png',
         id: '',
+        botType: BotType.offical,
       ),
     ),
     ChatInfo(
@@ -47,6 +49,7 @@ class AllChatsScreen extends StatelessWidget {
         description: "GPT-3.5",
         imagePath: 'lib/assets/icons/chatgpt_icon.png',
         id: '',
+        botType: BotType.offical,
       ),
       mainContent: 'Ajq',
       latestMessage: ChatMessage(
@@ -62,6 +65,7 @@ class AllChatsScreen extends StatelessWidget {
         description: "GPT-4.0-Turbo",
         imagePath: 'lib/assets/icons/chatgpt_icon.png',
         id: '',
+        botType: BotType.offical,
       ),
       mainContent: 'Laughing',
       latestMessage: ChatMessage(

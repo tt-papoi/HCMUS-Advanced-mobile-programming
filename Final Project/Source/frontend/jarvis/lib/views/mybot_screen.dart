@@ -1,46 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/screens/edit_bot_screen.dart';
+import 'package:jarvis/models/bot.dart';
+import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/create_bot_screen.dart';
+import 'package:jarvis/views/edit_bot_screen.dart';
 
-class MyBotPage extends StatefulWidget {
-  const MyBotPage({super.key});
+class MybotScreen extends StatefulWidget {
+  const MybotScreen({super.key});
 
   @override
-  MyBotPageState createState() => MyBotPageState();
+  MybotScreenState createState() => MybotScreenState();
 }
 
-class MyBotPageState extends State<MyBotPage> {
-  List<Map<String, String>> bots = [
-    {"name": "Assistant", "type": "OFFICIAL", "icon": "lib/assets/logo.jpg"},
-    {"name": "GPT-4o", "type": "OFFICIAL", "icon": "lib/assets/logo.jpg"},
-    {"name": "BotC0G6Y4NFZZ", "type": "NEW", "icon": "lib/assets/logo.jpg"},
-    {"name": "Claude-3-Sonnet", "type": "OFFICIAL", "icon": "lib/assets/logo.jpg"},
-    {"name": "Web-Search", "type": "OFFICIAL", "icon": "lib/assets/logo.jpg"},
-    {"name": "Claude-3.5-Sonnet", "type": "OFFICIAL", "icon": "lib/assets/logo.jpg"},
+class MybotScreenState extends State<MybotScreen> {
+  List<Bot> bots = [
+    Bot(
+      name: "Assistant",
+      description: "AI Assistant",
+      imagePath: 'lib/assets/icons/robot.png',
+      id: '',
+      botType: BotType.createdBot,
+    ),
+    Bot(
+      name: "GPT-4.0",
+      description: "GPT-4.0",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
+      botType: BotType.offical,
+    ),
+    Bot(
+      name: "GPT-3.5",
+      description: "GPT-3.5",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
+      botType: BotType.offical,
+    ),
+    Bot(
+      name: "GPT-4.0-Turbo",
+      description: "GPT-4.0-Turbo",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
+      id: '',
+      botType: BotType.offical,
+    ),
   ];
 
   final TextEditingController searchController = TextEditingController();
 
-  void addBot() {
-    setState(() {
-      bots.add({"name": "New Bot", "type": "NEW", "icon": "lib/assets/logo.jpg"});
-    });
-  }
-
-  void editBot(int index) async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => EditBotPage(
-          initialName: bots[index]["name"] ?? "",
-          initialDescription: bots[index]["description"] ?? "",
-        ),
-      ),
-    );
+  void addBot() async {
+    final result = await Navigator.of(context)
+        .push(FadeRoute(page: const CreateBotScreen()));
 
     if (result != null) {
       setState(() {
-        bots[index]["name"] = result["name"];
-        bots[index]["description"] = result["description"];
+        //bots.add();
       });
+    }
+  }
+
+  void editBot(Bot bot) async {
+    final result = await Navigator.of(context).push(FadeRoute(
+        page: EditBotScreen(
+      bot: bot,
+    )));
+    if (result != null) {
+      setState(() {});
     }
   }
 
@@ -53,7 +75,10 @@ class MyBotPageState extends State<MyBotPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         title: const Text('My Bots'),
       ),
       body: Column(
@@ -70,7 +95,7 @@ class MyBotPageState extends State<MyBotPage> {
                 ),
               ),
               onChanged: (value) {
-                setState(() {}); // Tạo lại UI dựa trên từ khóa tìm kiếm
+                setState(() {}); // Update UI based on search input
               },
             ),
           ),
@@ -78,39 +103,20 @@ class MyBotPageState extends State<MyBotPage> {
             child: ListView.builder(
               itemCount: bots.length,
               itemBuilder: (context, index) {
-                String botName = bots[index]["name"] ?? "";
-                String botType = bots[index]["type"] ?? "";
-                String botIconPath = bots[index]["icon"] ?? "lib/assets/default_icon.png";
-
-                if (searchController.text.isNotEmpty &&
-                    !botName.toLowerCase().contains(searchController.text.toLowerCase())) {
-                  return const SizedBox.shrink();
-                }
-
                 return ListTile(
-                  leading: Image.asset(
-                    botIconPath,
-                    height: 40,
-                    width: 40,
+                  leading: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                    child: Image.asset(
+                      bots[index].imagePath,
+                    ),
                   ),
-                  title: Text(botName),
-                  subtitle: botType.isNotEmpty
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: botType == 'OFFICIAL' ? Colors.blue : Colors.green,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            botType,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
-                        )
-                      : null,
+                  title: Text(bots[index].name),
                   trailing: PopupMenuButton<String>(
+                    color: Colors.white,
                     onSelected: (String result) {
                       if (result == 'Edit') {
-                        editBot(index);
+                        editBot(bots[index]);
                       } else if (result == 'Delete') {
                         deleteBot(index);
                       }
@@ -140,4 +146,3 @@ class MyBotPageState extends State<MyBotPage> {
     );
   }
 }
-

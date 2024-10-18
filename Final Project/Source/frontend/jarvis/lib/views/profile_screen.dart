@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/screens/login_register_screen.dart';
+import 'package:jarvis/views/login_register_screen.dart';
+import 'package:jarvis/views/support_screen.dart';
+import 'package:jarvis/widgets/token_usage_card.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int currentToken = 30;
+  final int maxToken = 50;
 
   void _logout(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -17,23 +27,37 @@ class ProfilePage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Change Password'),
+          backgroundColor: Colors.white,
+          title: const Text('Change Password',
+              style: TextStyle(color: Colors.black87, fontSize: 20)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Email',
+                  hintStyle: const TextStyle(
+                      color: Colors.black45, fontWeight: FontWeight.normal),
                   filled: true,
-                  fillColor: Colors.grey[200],
+                  fillColor: const Color.fromARGB(10, 0, 0, 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'New Password',
+                  hintStyle: const TextStyle(
+                      color: Colors.black45, fontWeight: FontWeight.normal),
                   filled: true,
-                  fillColor: Colors.grey[200],
+                  fillColor: const Color.fromARGB(10, 0, 0, 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 obscureText: true,
               ),
@@ -44,14 +68,20 @@ class ProfilePage extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black54)),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent, elevation: 0),
               onPressed: () {
                 // Xử lý logic đổi mật khẩu tại đây
                 Navigator.pop(context);
               },
-              child: const Text('Change Password'),
+              child: const Text(
+                'Change Password',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -62,82 +92,17 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         title: const Text('Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Card(
-              color: Colors.grey[100],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.grey[400],
-                      child: const Icon(Icons.person, color: Colors.white, size: 30),
-                    ),
-                    const SizedBox(width: 16),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'trantien4868',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'trantien4868@gmail.com',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Card(
-              color: Colors.grey[100],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Token Usage',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text("30", style: TextStyle(fontSize: 14)),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: LinearProgressIndicator(
-                              value: 30 / 50,
-                              backgroundColor: Colors.grey,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                        Text("50", style: TextStyle(fontSize: 14)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const TokenUsageCard(),
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.blue),
@@ -155,21 +120,41 @@ class ProfilePage extends StatelessWidget {
               leading: const Icon(Icons.support, color: Colors.blue),
               title: const Text('Support'),
               onTap: () {
-                // Thêm logic hỗ trợ tại đây
+                // Điều hướng đến trang Hỗ trợ
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SupportScreen()),
+                );
               },
             ),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.info, color: Colors.blue),
               title: const Text('About'),
-              subtitle: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Policy"),
-                  Text("Version 1.0.0"),
-                ],
-              ),
               onTap: () {
-                // Thêm logic xem chính sách và phiên bản tại đây
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: Colors.white,
+                      title: const Text('About'),
+                      content: const Text(
+                          'Jarvis Application\nVersion: 1.0.0\n\nPrivacy Policy and other information.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ],
@@ -178,3 +163,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

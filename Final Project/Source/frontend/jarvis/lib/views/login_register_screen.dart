@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/main.dart';
+import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/home_screen.dart';
 
 class LoginRegisterScreen extends StatefulWidget {
   const LoginRegisterScreen({super.key});
@@ -17,9 +18,9 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue[700],
-        elevation: 0,
+        backgroundColor: Colors.white,
         toolbarHeight: 0,
       ),
       body: SingleChildScrollView(
@@ -29,25 +30,26 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               const SizedBox(height: 40),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('lib/assets/logo.jpg', height: 50),
-                  const SizedBox(width: 10),
-                  const Text(
+                  SizedBox(width: 10),
+                  Text(
                     'Jarvis',
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
+
+              // Sign-in with google
               ElevatedButton.icon(
                 onPressed: () {},
-                icon: const Icon(Icons.login),
                 label: const Text('Sign in with Google'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.white,
+                  elevation: 0,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -56,29 +58,38 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
                 ),
               ),
               const Divider(height: 50, thickness: 1),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildToggleButton('Login', isLogin),
-                  _buildToggleButton('Register', !isLogin),
-                ],
+
+              // Switch button login-signup
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: const Color.fromARGB(148, 68, 137, 255)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildToggleButton('Login', isLogin),
+                    _buildToggleButton('Register', !isLogin),
+                  ],
+                ),
               ),
+
               const SizedBox(height: 20),
+
               if (!isLogin)
-                _buildTextField('Username', 'Enter your username', false, usernameController),
-              _buildTextField('Email', 'Enter your email address', false, emailController),
-              _buildTextField('Password', 'Enter your password', true, passwordController),
+                _buildTextField('Username', 'Enter your username', false,
+                    usernameController),
+              _buildTextField(
+                  'Email', 'Enter your email address', false, emailController),
+              _buildTextField(
+                  'Password', 'Enter your password', true, passwordController),
               const SizedBox(height: 20),
+
+              // Login button
               ElevatedButton(
                 onPressed: () {
                   if (isLogin) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ChatScreen()),
-                    );
-                  } else {
-                    // Thêm logic đăng ký tại đây
-                  }
+                    Navigator.push(context, FadeRoute(page: HomeScreen()));
+                  } else {}
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
@@ -87,18 +98,13 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shadowColor: Colors.transparent,
+                  elevation: 0,
                 ),
                 child: Text(
                   isLogin ? 'Login' : 'Register',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'By continuing, you agree to our Privacy policy',
-                style: TextStyle(color: Colors.grey[600]),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -107,17 +113,21 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, bool isPassword, TextEditingController controller) {
+  Widget _buildTextField(String label, String hint, bool isPassword,
+      TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
+          hintStyle: const TextStyle(color: Colors.black38),
           labelText: label,
+          labelStyle: const TextStyle(
+              color: Colors.black54, fontWeight: FontWeight.bold),
           hintText: hint,
           filled: true,
-          fillColor: Colors.grey[200],
+          fillColor: const Color.fromARGB(10, 0, 0, 0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,
@@ -129,8 +139,8 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
   Widget _buildToggleButton(String text, bool isActive) {
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
         child: ElevatedButton(
           onPressed: () {
             setState(() {
@@ -138,16 +148,17 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: isActive ? Colors.blueAccent : Colors.blueAccent.withOpacity(0.3),
+            backgroundColor:
+                isActive ? Colors.blueAccent : const Color.fromARGB(0, 0, 0, 0),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(50),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shadowColor: Colors.transparent,
+            elevation: 0,
           ),
           child: Text(
             text,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ),

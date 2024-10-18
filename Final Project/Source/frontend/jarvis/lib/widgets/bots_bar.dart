@@ -18,24 +18,28 @@ class BotBarState extends State<BotBar> {
       description: "AI Assistant",
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
+      botType: BotType.createdBot,
     ),
     Bot(
       name: "GPT-4.0",
       description: "GPT-4.0",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
+      botType: BotType.offical,
     ),
     Bot(
       name: "GPT-3.5",
       description: "GPT-3.5",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
+      botType: BotType.offical,
     ),
     Bot(
       name: "GPT-4.0-Turbo",
       description: "GPT-4.0-Turbo",
       imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
+      botType: BotType.offical,
     ),
   ];
 
@@ -86,6 +90,7 @@ class BotBarState extends State<BotBar> {
               description: 'More options',
               imagePath: 'lib/assets/icons/category.png',
               id: '',
+              botType: BotType.offical,
             ),
             isSelected: false,
             onTap: () {
