@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
 import 'package:jarvis/models/bot.dart';
+import 'package:jarvis/utils/add_kb_confluence.dart';
+import 'package:jarvis/utils/add_kb_gg_drive.dart';
+import 'package:jarvis/utils/add_kb_local_file.dart';
+import 'package:jarvis/utils/add_kb_slack.dart';
+import 'package:jarvis/utils/add_kb_web.dart';
 
 class EditBotScreen extends StatefulWidget {
   final Bot bot;
@@ -25,6 +28,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
     super.initState();
     nameController = TextEditingController(text: widget.bot.name);
     promptController = TextEditingController(text: widget.bot.prompt);
+    dataSources = [];
   }
 
   @override
@@ -39,326 +43,42 @@ class _EditBotScreenState extends State<EditBotScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController nameController = TextEditingController();
-        TextEditingController urlController = TextEditingController();
-
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.language),
-              SizedBox(width: 8),
-              Text('Website'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  hintText: 'Enter website name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'Web URL',
-                  hintText: 'Enter website URL',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (!mounted) return; // Guard with mounted check
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  dataSources
-                      .add('${nameController.text} (${urlController.text})');
-                });
-                if (!mounted) return; // Guard with mounted check
-                Navigator.of(context).pop();
-              },
-              child: const Text('Connect'),
-            ),
-          ],
+        return WebsiteDialog(
+          onConnect: (name, url) {
+            setState(() {
+              dataSources.add('$name ($url)');
+            });
+          },
         );
       },
     );
   }
-
   // Dialog to add a local file as a knowledge source
-  void _showLocalFileDialog() {
-    TextEditingController nameController =
-        TextEditingController(); // Controller cho trường Name
-    PlatformFile? selectedFile; // Để lưu thông tin tệp đã chọn
 
+  void _showLocalFileDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.upload_file),
-                  SizedBox(width: 8),
-                  Text('Local file'),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Trường nhập Name
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter a name for this file',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Hộp upload file giống như phần Google Drive
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '* Upload local file:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.red),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () async {
-                          // Sử dụng FilePicker để chọn tệp từ thiết bị
-                          final result = await FilePicker.platform
-                              .pickFiles(type: FileType.any);
-                          if (result != null && result.files.isNotEmpty) {
-                            setState(() {
-                              selectedFile = result.files
-                                  .single; // Cập nhật thông tin tệp đã chọn
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 100,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: selectedFile != null
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Selected file: ${selectedFile!.name}', // Hiển thị tên tệp đã chọn
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black54),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Type: ${selectedFile!.extension?.toUpperCase() ?? "Unknown"}', // Hiển thị định dạng tệp
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black45),
-                                      ),
-                                      Text(
-                                        'Size: ${_formatFileSize(selectedFile!.size)}', // Hiển thị kích thước tệp
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black45),
-                                      ),
-                                    ],
-                                  )
-                                : const Text(
-                                    'Click or drag file to this area to upload',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black54),
-                                    textAlign: TextAlign.center,
-                                  ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Support for single or bulk upload. Strictly prohibit from uploading restricted or banned files.',
-                        style: TextStyle(color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Cancel
-                  },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        selectedFile != null) {
-                      setState(() {
-                        dataSources.add(
-                            'Local file: ${nameController.text} (File: ${selectedFile!.name}, Type: ${selectedFile!.extension?.toUpperCase()}, Size: ${_formatFileSize(selectedFile!.size)})'); // Thêm dữ liệu vào danh sách
-                      });
-                    }
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Connect
-                  },
-                  child: const Text('Connect'),
-                ),
-              ],
-            );
+        return LocalFileDialog(
+          onConnect: (name, file) {
+            setState(() {
+              dataSources.add('Local file: $name (File: ${file.name})');
+            });
           },
         );
       },
     );
   }
 
-// Hàm chuyển đổi kích thước file từ bytes sang KB, MB
-  String _formatFileSize(int size) {
-    if (size < 1024) {
-      return '$size B'; // Hiển thị byte nếu kích thước nhỏ hơn 1KB
-    } else if (size < 1024 * 1024) {
-      return '${(size / 1024).toStringAsFixed(2)} KB'; // Hiển thị KB nếu kích thước nhỏ hơn 1MB
-    } else {
-      return '${(size / (1024 * 1024)).toStringAsFixed(2)} MB'; // Hiển thị MB nếu kích thước lớn hơn 1MB
-    }
-  }
-
   void _showGoogleDriveDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController nameController = TextEditingController();
-        String? selectedFile; // To hold selected file name
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.drive_folder_upload),
-                  SizedBox(width: 8),
-                  Text('Google Drive'),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Name field
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter your name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Google Drive Credential upload box
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '* Google Drive Credential:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.red),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () async {
-                          // Use file picker to select the Google Drive credentials file
-                          final result = await FilePicker.platform
-                              .pickFiles(type: FileType.any);
-                          if (result != null && result.files.isNotEmpty) {
-                            setState(() {
-                              selectedFile = result.files.single
-                                  .name; // Update selected file name
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 100,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              selectedFile != null
-                                  ? 'Selected file: $selectedFile' // Display selected file
-                                  : 'Click or drag file to this area to upload',
-                              style: const TextStyle(
-                                  fontSize: 16, color: Colors.black54),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Support for a single or bulk upload. Strictly prohibit from uploading company data or other banned files.',
-                        style: TextStyle(color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (!mounted) return; // Guard with mounted check
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add selected file to dataSources with Google Drive info
-                    if (nameController.text.isNotEmpty &&
-                        selectedFile != null) {
-                      setState(() {
-                        dataSources.add(
-                            'Google Drive: ${nameController.text} (File: $selectedFile)');
-                      });
-                    }
-                    if (!mounted) return; // Guard with mounted check
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text('Connect'),
-                ),
-              ],
-            );
+        return GoogleDriveDialog(
+          onConnect: (name, fileName) {
+            setState(() {
+              dataSources.add('Google Drive: $name (File: $fileName)');
+            });
           },
         );
       },
@@ -366,110 +86,15 @@ class _EditBotScreenState extends State<EditBotScreen> {
   }
 
   void _showConfluenceDialog() {
-    TextEditingController nameController =
-        TextEditingController(); // Controller cho trường Name
-    TextEditingController urlController =
-        TextEditingController(); // Controller cho trường URL
-    TextEditingController usernameController =
-        TextEditingController(); // Controller cho trường Username
-    TextEditingController tokenController =
-        TextEditingController(); // Controller cho trường Access Token
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.link), // Biểu tượng Confluence
-                  SizedBox(width: 8),
-                  Text('Confluence'),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Trường nhập Name
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter a name for this connection',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trường nhập Wiki Page URL
-                  TextField(
-                    controller: urlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Wiki Page URL',
-                      hintText: 'Enter the Confluence page URL',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trường nhập Confluence Username
-                  TextField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Confluence Username',
-                      hintText: 'Enter your Confluence username',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trường nhập Confluence Access Token
-                  TextField(
-                    controller: tokenController,
-                    obscureText: true, // Để bảo mật cho token
-                    decoration: const InputDecoration(
-                      labelText: 'Confluence Access Token',
-                      hintText: 'Enter your Confluence access token',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Cancel
-                  },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        urlController.text.isNotEmpty &&
-                        usernameController.text.isNotEmpty &&
-                        tokenController.text.isNotEmpty) {
-                      setState(() {
-                        // Thêm thông tin Confluence vào danh sách dataSources
-                        dataSources.add(
-                          'Confluence: ${nameController.text} (URL: ${urlController.text}, Username: ${usernameController.text})',
-                        );
-                      });
-                    }
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Connect
-                  },
-                  child: const Text('Connect'),
-                ),
-              ],
-            );
+        return ConfluenceDialog(
+          onConnect: (name, url, username, token) {
+            setState(() {
+              dataSources
+                  .add('Confluence: $name (URL: $url, Username: $username)');
+            });
           },
         );
       },
@@ -477,96 +102,14 @@ class _EditBotScreenState extends State<EditBotScreen> {
   }
 
   void _showSlackDialog() {
-    TextEditingController nameController =
-        TextEditingController(); // Controller cho trường Name
-    TextEditingController workspaceController =
-        TextEditingController(); // Controller cho trường Workspace
-    TextEditingController tokenController =
-        TextEditingController(); // Controller cho trường Bot Token
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.message), // Biểu tượng Slack
-                  SizedBox(width: 8),
-                  Text('Slack'),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Trường nhập Name
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter a name for this connection',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trường nhập Slack Workspace
-                  TextField(
-                    controller: workspaceController,
-                    decoration: const InputDecoration(
-                      labelText: 'Slack Workspace',
-                      hintText: 'Enter your Slack workspace',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trường nhập Slack Bot Token
-                  TextField(
-                    controller: tokenController,
-                    obscureText: true, // Để bảo mật cho token
-                    decoration: const InputDecoration(
-                      labelText: 'Slack Bot Token',
-                      hintText: 'Enter your Slack bot token',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Cancel
-                  },
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        workspaceController.text.isNotEmpty &&
-                        tokenController.text.isNotEmpty) {
-                      setState(() {
-                        // Thêm thông tin Slack vào danh sách dataSources
-                        dataSources.add(
-                          'Slack: ${nameController.text} (Workspace: ${workspaceController.text})',
-                        );
-                      });
-                    }
-                    if (!mounted) {
-                      return; // Kiểm tra nếu widget còn đang mounted
-                    }
-                    Navigator.of(context)
-                        .pop(); // Đóng hộp thoại khi nhấn Connect
-                  },
-                  child: const Text('Connect'),
-                ),
-              ],
-            );
+        return SlackDialog(
+          onConnect: (name, workspace, token) {
+            setState(() {
+              dataSources.add('Slack: $name (Workspace: $workspace)');
+            });
           },
         );
       },
