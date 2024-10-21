@@ -16,7 +16,6 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12.0),
-      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: const Color.fromARGB(10, 0, 0, 0),
         borderRadius: BorderRadius.circular(12.0),

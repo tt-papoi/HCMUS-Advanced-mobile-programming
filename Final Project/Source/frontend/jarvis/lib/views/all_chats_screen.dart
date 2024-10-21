@@ -88,12 +88,11 @@ class AllChatsScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
         shadowColor: Colors.white,
         backgroundColor: Colors.white,
-        title: const Center(
-          child: Text(
-            "All chats",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ),
+        title: const Text(
+          "All chats",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
+        centerTitle: true,
         actions: const [
           RemainToken(),
         ],
@@ -101,73 +100,71 @@ class AllChatsScreen extends StatelessWidget {
       body: ListView.separated(
         itemCount: chatInfoList.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(0),
-            child: ListTile(
-              //Navigate to thread chat.
-              onTap: () {
-                Navigator.push(
-                    context,
-                    FadeRoute(
-                        page: ChatScreen(
-                      chatInfo: chatInfoList[index],
-                      isNewChat: false,
-                    )));
-              },
-              leading: CircleAvatar(
-                backgroundColor: Colors.blueAccent,
-                child: Text(
-                  chatInfoList[index]
-                      .bot
-                      .name[0], // First letter of the botName
-                  style: const TextStyle(color: Colors.white),
+          return ListTile(
+            contentPadding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
+            //Navigate to thread chat.
+            onTap: () {
+              Navigator.push(
+                  context,
+                  FadeRoute(
+                      page: ChatScreen(
+                    chatInfo: chatInfoList[index],
+                    isNewChat: false,
+                  )));
+            },
+            leading: CircleAvatar(
+              backgroundColor: Colors.blueAccent,
+              child: Text(
+                chatInfoList[index].bot.name[0], // First letter of the botName
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  chatInfoList[index].bot.name,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    chatInfoList[index].bot.name,
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                Text(
+                  chatInfoList[index].mainContent,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Text(
+                  chatInfoList[index].latestMessage.textMessage,
+                  maxLines: 1, // Truncate if too long
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.black54, fontSize: 14),
+                ),
+              ],
+            ),
+            trailing: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  formatDate(chatInfoList[index].latestMessage.sendTime),
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                Expanded(
+                  child: PopupMenuButton<String>(
+                    color: Colors.white,
+                    icon: const Icon(Icons.more_horiz),
+                    onSelected: (value) {
+                      if (value == 'delete') {
+                        _showDeleteConfirmationDialog(context, index);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text('Delete'),
+                      ),
+                    ],
                   ),
-                  Text(
-                    chatInfoList[index].mainContent,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    chatInfoList[index].latestMessage.textMessage,
-                    maxLines: 1, // Truncate if too long
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 14),
-                  ),
-                ],
-              ),
-              trailing: Column(
-                children: [
-                  Text(
-                    formatDate(chatInfoList[index].latestMessage.sendTime),
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                  Expanded(
-                    child: PopupMenuButton<String>(
-                      color: Colors.white,
-                      icon: const Icon(Icons.more_horiz),
-                      onSelected: (value) {
-                        if (value == 'delete') {
-                          _showDeleteConfirmationDialog(context, index);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Text('Delete'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

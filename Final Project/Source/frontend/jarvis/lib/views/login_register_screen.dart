@@ -6,14 +6,21 @@ class LoginRegisterScreen extends StatefulWidget {
   const LoginRegisterScreen({super.key});
 
   @override
-  LoginRegisterScreenState createState() => LoginRegisterScreenState();
+  State<LoginRegisterScreen> createState() => _LoginRegisterScreenState();
 }
 
-class LoginRegisterScreenState extends State<LoginRegisterScreen> {
+class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
   bool isLogin = true;
+  bool isPasswordVisible = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
+
+  void _clearTextFields() {
+    emailController.clear();
+    passwordController.clear();
+    usernameController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,45 +32,94 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               const SizedBox(height: 40),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: 10),
-                  Text(
+                  Image.asset(
+                    "lib/assets/icons/logo_blueAccent.png",
+                    height: 35,
+                    width: 35,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
                     'Jarvis',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
 
-              // Sign-in with google
-              ElevatedButton.icon(
-                onPressed: () {},
-                label: const Text('Sign in with Google'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              // Sign-in with Google
+              InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () {
+                  // Handle Google Sign-in
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.black),
                   ),
-                  side: const BorderSide(color: Colors.grey),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "lib/assets/icons/google.png",
+                        height: 20,
+                        width: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'Sign in with Google',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const Divider(height: 50, thickness: 1),
+              const SizedBox(height: 20),
+              const Center(
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey,
+                        thickness: 1,
+                        endIndent: 10,
+                      ),
+                    ),
+                    Text('or'),
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey,
+                        thickness: 1,
+                        indent: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
 
               // Switch button login-signup
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: const Color.fromARGB(148, 68, 137, 255)),
+                  borderRadius: BorderRadius.circular(50),
+                  color: const Color.fromARGB(43, 68, 137, 255),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -82,31 +138,70 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
                   'Email', 'Enter your email address', false, emailController),
               _buildTextField(
                   'Password', 'Enter your password', true, passwordController),
-              const SizedBox(height: 20),
 
-              // Login button
-              ElevatedButton(
-                onPressed: () {
+              const SizedBox(height: 5),
+
+              if (isLogin) _buildForgotPasswordButton(),
+
+              const SizedBox(height: 15),
+              // Login/Register button
+              InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () {
                   if (isLogin) {
                     Navigator.push(context, FadeRoute(page: HomeScreen()));
-                  } else {}
+                  } else {
+                    // Handle Register
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.blueAccent,
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  elevation: 0,
-                ),
-                child: Text(
-                  isLogin ? 'Login' : 'Register',
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                  child: Center(
+                    child: Text(
+                      isLogin ? 'Login' : 'Register',
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(height: 20),
+              if (!isLogin)
+                const Text(
+                  "By continuing, you agree to our Privacy policy",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black45),
+                ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForgotPasswordButton() {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        // Handle forgot password
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: const Color.fromARGB(0, 0, 0, 0),
+        ),
+        child: const Center(
+          child: Text(
+            "Forgot password?",
+            style:
+                TextStyle(fontWeight: FontWeight.bold, color: Colors.black45),
           ),
         ),
       ),
@@ -118,13 +213,17 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
+        onTapOutside: (event) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword && !isPasswordVisible,
         decoration: InputDecoration(
-          hintStyle: const TextStyle(color: Colors.black38),
+          hintStyle: const TextStyle(
+              color: Colors.black45, fontWeight: FontWeight.normal),
           labelText: label,
           labelStyle: const TextStyle(
-              color: Colors.black54, fontWeight: FontWeight.bold),
+              color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 14),
           hintText: hint,
           filled: true,
           fillColor: const Color.fromARGB(10, 0, 0, 0),
@@ -132,6 +231,19 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,
           ),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.black26,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isPasswordVisible = !isPasswordVisible;
+                    });
+                  },
+                )
+              : null,
         ),
       ),
     );
@@ -139,26 +251,30 @@ class LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
   Widget _buildToggleButton(String text, bool isActive) {
     return Expanded(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ElevatedButton(
-          onPressed: () {
-            setState(() {
-              isLogin = text == 'Login';
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor:
-                isActive ? Colors.blueAccent : const Color.fromARGB(0, 0, 0, 0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            elevation: 0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(50),
+        onTap: () {
+          setState(() {
+            isLogin = text == 'Login';
+            _clearTextFields(); // Clear text fields on toggle
+          });
+        },
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: isActive ? Colors.blueAccent : Colors.transparent,
+            borderRadius: BorderRadius.circular(50),
           ),
-          child: Text(
-            text,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                  color: isActive
+                      ? const Color.fromARGB(255, 255, 255, 255)
+                      : const Color.fromARGB(255, 0, 0, 0),
+                  fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ),

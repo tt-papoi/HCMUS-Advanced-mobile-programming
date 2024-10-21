@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
-import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/create_bot_screen.dart';
-import 'package:jarvis/views/edit_bot_screen.dart';
 
-class MybotScreen extends StatefulWidget {
-  const MybotScreen({super.key});
+class ExploreScreen extends StatefulWidget {
+  const ExploreScreen({super.key});
 
   @override
-  MybotScreenState createState() => MybotScreenState();
+  State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class MybotScreenState extends State<MybotScreen> {
-  List<Bot> botList = [
+class _ExploreScreenState extends State<ExploreScreen> {
+  final List<Bot> botList = [
     Bot(
       name: "Assistant",
       description: "AI Assistant",
@@ -21,56 +18,29 @@ class MybotScreenState extends State<MybotScreen> {
       botType: BotType.createdBot,
     ),
     Bot(
-      name: "Supper Hero",
-      description: "Supper Hero",
-      imagePath: 'lib/assets/icons/robot.png',
+      name: "GPT-4.0",
+      description: "GPT-4.0",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
-      botType: BotType.createdBot,
+      botType: BotType.offical,
     ),
     Bot(
-      name: "AI Luto",
-      description: "AI Luto",
-      imagePath: 'lib/assets/icons/robot.png',
+      name: "GPT-3.5",
+      description: "GPT-3.5",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
-      botType: BotType.createdBot,
+      botType: BotType.offical,
     ),
     Bot(
-      name: "Turbo",
-      description: "Turbo",
-      imagePath: 'lib/assets/icons/robot.png',
+      name: "GPT-4.0-Turbo",
+      description: "GPT-4.0-Turbo",
+      imagePath: 'lib/assets/icons/chatgpt_icon.png',
       id: '',
-      botType: BotType.createdBot,
+      botType: BotType.offical,
     ),
   ];
 
   final TextEditingController searchController = TextEditingController();
-
-  void addBot() async {
-    final result = await Navigator.of(context)
-        .push(FadeRoute(page: const CreateBotScreen()));
-
-    if (result != null) {
-      setState(() {
-        //bots.add();
-      });
-    }
-  }
-
-  void editBot(Bot bot) async {
-    final result = await Navigator.of(context).push(FadeRoute(
-        page: EditBotScreen(
-      bot: bot,
-    )));
-    if (result != null) {
-      setState(() {});
-    }
-  }
-
-  void deleteBot(int index) {
-    setState(() {
-      botList.removeAt(index);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +50,7 @@ class MybotScreenState extends State<MybotScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: const Text(
-          'My Bots',
+          'Explore',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -156,25 +126,7 @@ class MybotScreenState extends State<MybotScreen> {
                         ),
                       ],
                     ),
-                    trailing: PopupMenuButton<String>(
-                      color: Colors.white,
-                      onSelected: (String result) {
-                        if (result == 'Edit') {
-                          editBot(botList[index]);
-                        } else if (result == 'Delete') {
-                          deleteBot(index);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem(
-                          value: 'Delete',
-                          child: Text('Delete'),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      editBot(botList[index]);
-                    },
+                    onTap: () {},
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(
@@ -186,15 +138,6 @@ class MybotScreenState extends State<MybotScreen> {
               ),
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addBot,
-        backgroundColor: Colors.blue,
-        child: const Icon(
-          Icons.add,
-          size: 30,
-          color: Colors.white,
         ),
       ),
     );

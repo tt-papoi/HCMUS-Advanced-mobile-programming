@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/all_chats_screen.dart';
+import 'package:jarvis/views/explore_screen.dart';
 import 'package:jarvis/views/mybot_screen.dart';
 import 'package:jarvis/views/profile_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
@@ -18,7 +19,11 @@ class SideBar extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            const TokenUsageCard(),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: const TokenUsageCard(),
+            ),
+
             _buildExploreAndMyBotRow(context),
             const SizedBox(height: 10.0),
 
@@ -43,15 +48,6 @@ class SideBar extends StatelessWidget {
               title: 'Profile',
               customOnTap: () {
                 _navigateTo(context, const ProfileScreen());
-              },
-            ),
-
-            // navigate to Settings screen
-            _buildListTile(
-              icon: Icons.settings,
-              title: 'Settings',
-              customOnTap: () {
-                // Add your navigation logic here
               },
             ),
           ],
@@ -87,7 +83,7 @@ class SideBar extends StatelessWidget {
       text: 'Explore',
       trailingIcon: Icons.arrow_forward_ios,
       onTap: () {
-        //_navigateTo(context, const ProfileScreen());
+        _navigateTo(context, const ExploreScreen());
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/login_register_screen.dart';
 import 'package:jarvis/views/support_screen.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
@@ -94,68 +95,215 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text('Profile'),
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Profile",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const TokenUsageCard(),
             const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.blue),
-              title: const Text('Log out'),
-              onTap: () => _logout(context),
+            const Text(
+              "Account",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.lock, color: Colors.blue),
-              title: const Text('Change Password'),
-              onTap: () => _changePassword(context),
+            const SizedBox(height: 10),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.blueAccent),
+                title: const Text(
+                  'Log out',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                onTap: () => _logout(context),
+              ),
             ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.support, color: Colors.blue),
-              title: const Text('Support'),
-              onTap: () {
-                // Điều hướng đến trang Hỗ trợ
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SupportScreen()),
-                );
-              },
+            const Divider(
+              indent: 0,
+              thickness: 0,
+              endIndent: 0,
+              height: 0,
             ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.info, color: Colors.blue),
-              title: const Text('About'),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: Colors.white,
-                      title: const Text('About'),
-                      content: const Text(
-                          'Jarvis Application\nVersion: 1.0.0\n\nPrivacy Policy and other information.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Close',
-                            style: TextStyle(color: Colors.black54),
-                          ),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.lock, color: Colors.blueAccent),
+                title: const Text(
+                  'Change Password',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                onTap: () => _changePassword(context),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Support",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(12),
+                  topLeft: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.settings, color: Colors.blueAccent),
+                title: const Text(
+                  'Settings',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                onTap: () => (context),
+              ),
+            ),
+            const Divider(
+              indent: 0,
+              thickness: 0,
+              endIndent: 0,
+              height: 0,
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.help, color: Colors.blueAccent),
+                title: const Text(
+                  'Help',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                onTap: () => Navigator.push(
+                    context, FadeRoute(page: const SupportScreen())),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "About",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading:
+                    const Icon(Icons.privacy_tip, color: Colors.blueAccent),
+                title: const Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.white,
+                        title: const Text(
+                          'Privacy Policy',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                      ],
-                    );
-                  },
-                );
-              },
+                        content: const Text(
+                            'JPrivacy Policy and other information.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              'Close',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const Divider(
+              indent: 0,
+              thickness: 0,
+              endIndent: 0,
+              height: 0,
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(10, 0, 0, 0),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: ListTile(
+                leading: Image.asset(
+                  "lib/assets/icons/logo_blueAccent.png",
+                  height: 20,
+                  width: 20,
+                ),
+                title: const Text(
+                  'Version',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                trailing: const Text(
+                  "1.0.0",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+              ),
             ),
           ],
         ),
@@ -163,4 +311,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
