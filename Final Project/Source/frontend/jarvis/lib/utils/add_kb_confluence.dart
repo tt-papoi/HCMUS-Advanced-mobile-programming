@@ -28,46 +28,49 @@ class ConfluenceDialogState extends State<ConfluenceDialog> {
           Text('Confluence'),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Enter a name for this connection',
-              border: OutlineInputBorder(),
+      content: SingleChildScrollView(
+        // Add this to prevent overflow
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                hintText: 'Enter a name for this connection',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: urlController,
-            decoration: const InputDecoration(
-              labelText: 'Wiki Page URL',
-              hintText: 'Enter the Confluence page URL',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                labelText: 'Wiki Page URL',
+                hintText: 'Enter the Confluence page URL',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: usernameController,
-            decoration: const InputDecoration(
-              labelText: 'Confluence Username',
-              hintText: 'Enter your Confluence username',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Confluence Username',
+                hintText: 'Enter your Confluence username',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: tokenController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Confluence Access Token',
-              hintText: 'Enter your Confluence access token',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: tokenController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Confluence Access Token',
+                hintText: 'Enter your Confluence access token',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
