@@ -16,10 +16,53 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
 
+  String? emailError;
+  String? passwordError;
+
   void _clearTextFields() {
     emailController.clear();
     passwordController.clear();
     usernameController.clear();
+  }
+
+  bool _validateEmail(String email) {
+    final RegExp emailRegExp = RegExp(
+      r'^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
+    );
+    if (email.isEmpty || !emailRegExp.hasMatch(email)) {
+      setState(() {
+        emailError = 'Please enter a valid email address';
+      });
+      return false;
+    }
+    setState(() {
+      emailError = null;
+    });
+    return true;
+  }
+
+  bool _validatePassword(String password) {
+    if (password.isEmpty || password.length < 6) {
+      setState(() {
+        passwordError = 'Password must be at least 6 characters';
+      });
+      return false;
+    }
+    setState(() {
+      passwordError = null;
+    });
+    return true;
+  }
+
+  void _onSubmit() {
+    if (isLogin) {
+      Navigator.push(context, FadeRoute(page: HomeScreen()));
+    } else {
+      if (_validateEmail(emailController.text) &&
+          _validatePassword(passwordController.text)) {
+        // Handle Register
+      }
+    }
   }
 
   @override
@@ -135,9 +178,11 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                 _buildTextField('Username', 'Enter your username', false,
                     usernameController),
               _buildTextField(
-                  'Email', 'Enter your email address', false, emailController),
+                  'Email', 'Enter your email address', false, emailController,
+                  errorText: emailError),
               _buildTextField(
-                  'Password', 'Enter your password', true, passwordController),
+                  'Password', 'Enter your password', true, passwordController,
+                  errorText: passwordError),
 
               const SizedBox(height: 5),
 
@@ -147,13 +192,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
               // Login/Register button
               InkWell(
                 borderRadius: BorderRadius.circular(20),
-                onTap: () {
-                  if (isLogin) {
-                    Navigator.push(context, FadeRoute(page: HomeScreen()));
-                  } else {
-                    // Handle Register
-                  }
-                },
+                onTap: _onSubmit,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   width: double.infinity,
@@ -209,7 +248,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
   }
 
   Widget _buildTextField(String label, String hint, bool isPassword,
-      TextEditingController controller) {
+      TextEditingController controller,
+      {String? errorText}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
@@ -244,6 +284,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                   },
                 )
               : null,
+          errorText: errorText,
         ),
       ),
     );
