@@ -23,18 +23,43 @@ class LocalFileDialogState extends State<LocalFileDialog> {
         children: [
           Icon(Icons.upload_file),
           SizedBox(width: 8),
-          Text('Local file'),
+          Text(
+            'Local file',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Enter a name for this file',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Name",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter a name for this file",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -49,33 +74,46 @@ class LocalFileDialogState extends State<LocalFileDialog> {
               }
             },
             child: Container(
-              height: 100,
+              padding: const EdgeInsets.all(10),
               width: double.infinity,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
+                border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: selectedFile != null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Selected file: ${selectedFile!.name}',
-                              style: const TextStyle(
-                                  fontSize: 16, color: Colors.black54)),
-                          const SizedBox(height: 8),
-                          Text(
-                              'Type: ${selectedFile!.extension?.toUpperCase() ?? "Unknown"}',
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black45)),
-                          Text('Size: ${_formatFileSize(selectedFile!.size)}',
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black45)),
-                        ],
+                    ? Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Selected file: ${selectedFile!.name}',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.black54)),
+                            const SizedBox(height: 8),
+                            Text(
+                                'Type: ${selectedFile!.extension?.toUpperCase() ?? "Unknown"}',
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black45)),
+                            Text('Size: ${_formatFileSize(selectedFile!.size)}',
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black45)),
+                          ],
+                        ),
                       )
-                    : const Text(
-                        'Click or drag file to this area to upload',
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                    : const Expanded(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.upload_file,
+                              color: Colors.black45,
+                            ),
+                            Text(
+                              'Click or drag file to upload',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.black54),
+                            ),
+                          ],
+                        ),
                       ),
               ),
             ),
@@ -87,9 +125,19 @@ class LocalFileDialogState extends State<LocalFileDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: Colors.black54),
+          ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent, // Màu nền của nút
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Bo góc nút
+            ),
+          ),
           onPressed: () {
             if (nameController.text.isNotEmpty && selectedFile != null) {
               widget.onConnect(nameController.text, selectedFile!);
@@ -102,8 +150,12 @@ class LocalFileDialogState extends State<LocalFileDialog> {
               );
             }
           },
-          child: const Text('Connect'),
-        ),
+          child: const Text(
+            'Add',
+            style: TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        )
       ],
     );
   }

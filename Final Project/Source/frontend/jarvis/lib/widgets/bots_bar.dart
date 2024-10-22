@@ -112,6 +112,9 @@ class BotBarState extends State<BotBar> {
           child: Column(
             children: [
               TextField(
+                onTapOutside: (event) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 decoration: InputDecoration(
                   hintText: "Search for more bots",
                   prefixIcon: const Icon(Icons.search),

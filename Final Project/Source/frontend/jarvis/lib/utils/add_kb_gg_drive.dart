@@ -23,18 +23,43 @@ class GoogleDriveDialogState extends State<GoogleDriveDialog> {
         children: [
           Icon(Icons.drive_folder_upload),
           SizedBox(width: 8),
-          Text('Google Drive'),
+          Text(
+            'Google Drive',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Enter your name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Name",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter a name",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -49,19 +74,38 @@ class GoogleDriveDialogState extends State<GoogleDriveDialog> {
               }
             },
             child: Container(
-              height: 100,
+              padding: const EdgeInsets.all(10),
               width: double.infinity,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
+                border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Text(
-                  selectedFile != null
-                      ? 'Selected file: $selectedFile'
-                      : 'Click or drag file to this area to upload',
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
-                ),
+                child: selectedFile != null
+                    ? Expanded(
+                        child: Text(
+                          'Selected file: $selectedFile',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      )
+                    : const Expanded(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.upload_file,
+                              color: Colors.black45,
+                            ),
+                            Text(
+                              'Click or drag file to upload',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ),
           ),

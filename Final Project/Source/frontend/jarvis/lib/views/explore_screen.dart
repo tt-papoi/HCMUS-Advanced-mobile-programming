@@ -87,6 +87,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               onChanged: (value) {
                 // You can implement filtering logic here based on the value
               },
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
             ),
             Expanded(
               child: ListView.separated(
