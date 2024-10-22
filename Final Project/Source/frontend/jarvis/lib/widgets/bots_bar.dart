@@ -104,36 +104,102 @@ class BotBarState extends State<BotBar> {
 
   void _showBotList(BuildContext context) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: const EdgeInsets.all(16.0),
-          height: 400,
-          child: ListView.builder(
-            itemCount: botList.length,
-            itemBuilder: (context, index) {
-              final bot = botList[index];
-              return ListTile(
-                leading: Image.asset(bot.imagePath, width: 24.0, height: 24.0),
-                title: Text(bot.name),
-                subtitle: Text(bot.description),
-                onTap: () {
-                  setState(() {
-                    selectedBot = bot;
-                    // Check if the selected bot is already in the displayed list
-                    if (!displayedBots.contains(selectedBot)) {
-                      // Move the selected bot to the front of the displayed list
-                      displayedBots.insert(0, selectedBot!);
-                      // Ensure displayedBots contains only three bots
-                      if (displayedBots.length > 3) {
-                        displayedBots.removeLast();
-                      }
-                    }
-                  });
-                  Navigator.pop(context);
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "Search for more bots",
+                  prefixIcon: const Icon(Icons.search),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 10.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 1.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide:
+                        const BorderSide(color: Colors.blueAccent, width: 1.0),
+                  ),
+                ),
+                onChanged: (value) {
+                  // You can implement filtering logic here based on the value
                 },
-              );
-            },
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: botList.length,
+                  itemBuilder: (context, index) {
+                    final bot = botList[index];
+                    return ListTile(
+                      leading:
+                          Image.asset(bot.imagePath, width: 45.0, height: 45.0),
+                      title: Text(
+                        bot.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius:
+                                  BorderRadius.circular(5), // Rounded corners
+                            ),
+                            child: Text(
+                              bot.botType == BotType.offical
+                                  ? 'OFFICIAL'
+                                  : "MY BOT",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        setState(() {
+                          selectedBot = bot;
+                          // Check if the selected bot is already in the displayed list
+                          if (!displayedBots.contains(selectedBot)) {
+                            // Move the selected bot to the front of the displayed list
+                            displayedBots.insert(0, selectedBot!);
+                            // Ensure displayedBots contains only three bots
+                            if (displayedBots.length > 3) {
+                              displayedBots.removeLast();
+                            }
+                          }
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) => const Divider(
+                    indent: 0,
+                    thickness: 0,
+                    endIndent: 0,
+                    height: 0,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

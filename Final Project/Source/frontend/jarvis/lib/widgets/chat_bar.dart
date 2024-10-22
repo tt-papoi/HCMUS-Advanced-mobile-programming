@@ -31,11 +31,14 @@ class _ChatBarState extends State<ChatBar> {
   // Show options menu for image, file, etc.
   void _showOptionsMenu() {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
+        return Container(
+          padding: const EdgeInsets.all(10),
+          height: 200,
+          child: Column(
+            children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Upload Image'),
@@ -150,7 +153,7 @@ class _ChatBarState extends State<ChatBar> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(50),
                   color: const Color.fromARGB(10, 0, 0, 0)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

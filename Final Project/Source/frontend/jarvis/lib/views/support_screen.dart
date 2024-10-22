@@ -8,31 +8,30 @@ class SupportScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text('Support'),
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Help",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Need Help?',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               'For any issues or support inquiries, please contact us at advancemobile.hcmus.@example.com or visit our help center HCMUS.',
               style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Gửi email hoặc điều hướng đến trang web hỗ trợ
-              },
-              child: const Text('Contact Support'),
-            ),
+            SizedBox(height: 20),
           ],
         ),
       ),

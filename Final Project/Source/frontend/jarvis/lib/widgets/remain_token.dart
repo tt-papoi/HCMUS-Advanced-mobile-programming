@@ -28,7 +28,7 @@ class _RemainTokenState extends State<RemainToken> {
           ),
           Text(
               style: const TextStyle(
-                  color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                  color: Colors.black87, fontWeight: FontWeight.bold),
               '$_tokenCount'),
           const SizedBox(
             width: 5,

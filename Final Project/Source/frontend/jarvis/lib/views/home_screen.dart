@@ -38,14 +38,27 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
-        title: const Center(
-          child: Text(
-            "Jarvis",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "lib/assets/icons/logo.png",
+              height: 25,
+              width: 25,
             ),
-          ),
+            const SizedBox(
+              width: 5,
+            ),
+            const Text(
+              "Jarvis",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: Colors.black,
+              ),
+            ),
+          ],
         ),
         actions: const [
           RemainToken(),
@@ -57,14 +70,20 @@ class HomeScreen extends StatelessWidget {
           // Expanded widget for the top section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Image.asset(
+                    "lib/assets/icons/hand.png",
+                    height: 50,
+                    width: 50,
+                  ),
                   const Text(
-                    'Hello!',
+                    "Hi, there!",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 25,
+                      color: Colors.black87,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
