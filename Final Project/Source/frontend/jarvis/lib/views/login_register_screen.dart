@@ -55,11 +55,11 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
   }
 
   void _onSubmit() {
-    if (_validateEmail(emailController.text) &&
-        _validatePassword(passwordController.text)) {
-      if (isLogin) {
-        Navigator.push(context, FadeRoute(page: HomeScreen()));
-      } else {
+    if (isLogin) {
+      Navigator.push(context, FadeRoute(page: HomeScreen()));
+    } else {
+      if (_validateEmail(emailController.text) &&
+          _validatePassword(passwordController.text)) {
         // Handle Register
       }
     }
