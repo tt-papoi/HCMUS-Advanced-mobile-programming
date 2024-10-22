@@ -93,6 +93,9 @@ class MybotScreenState extends State<MybotScreen> {
         child: Column(
           children: [
             TextField(
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               decoration: InputDecoration(
                 hintText: "Search for more bots",
                 prefixIcon: const Icon(Icons.search),
@@ -190,7 +193,8 @@ class MybotScreenState extends State<MybotScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: addBot,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blueAccent,
+        shape: const CircleBorder(),
         child: const Icon(
           Icons.add,
           size: 30,

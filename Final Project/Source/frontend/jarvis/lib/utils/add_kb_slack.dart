@@ -21,39 +21,101 @@ class SlackDialogState extends State<SlackDialog> {
       surfaceTintColor: Colors.white,
       title: const Row(
         children: [
-          Icon(Icons.message),
+          Icon(Icons.folder),
           SizedBox(width: 8),
-          Text('Slack'),
+          Text(
+            'Slack',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Enter a name for this connection',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Name",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter a name",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: workspaceController,
-            decoration: const InputDecoration(
-              labelText: 'Workspace URL',
-              hintText: 'Enter the Slack workspace URL',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Workspace URL",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter the Slack workspace URL",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: tokenController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Access Token',
-              hintText: 'Enter your Slack access token',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Access Token",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter your Slack access token",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
         ],
@@ -63,9 +125,19 @@ class SlackDialogState extends State<SlackDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: Colors.black54),
+          ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent, // Màu nền của nút
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Bo góc nút
+            ),
+          ),
           onPressed: () {
             if (nameController.text.isNotEmpty &&
                 workspaceController.text.isNotEmpty &&
@@ -84,8 +156,12 @@ class SlackDialogState extends State<SlackDialog> {
               );
             }
           },
-          child: const Text('Connect'),
-        ),
+          child: const Text(
+            'Add',
+            style: TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        )
       ],
     );
   }

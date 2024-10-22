@@ -97,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
     bool isUserMessage = message.messageType == MessageType.user;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       child: Column(
         crossAxisAlignment:
             isUserMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,

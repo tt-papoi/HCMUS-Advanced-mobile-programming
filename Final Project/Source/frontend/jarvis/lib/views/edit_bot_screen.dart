@@ -121,7 +121,11 @@ class _EditBotScreenState extends State<EditBotScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add Data Sources'),
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Add Data Sources',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -174,7 +178,10 @@ class _EditBotScreenState extends State<EditBotScreen> {
                 if (!mounted) return; // Guard with mounted check
                 Navigator.of(context).pop();
               },
-              child: const Text('Close'),
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Colors.black45),
+              ),
             ),
           ],
         );
@@ -187,52 +194,179 @@ class _EditBotScreenState extends State<EditBotScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: Text(widget.bot.name),
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Edit bot",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Bot Name',
-                border: OutlineInputBorder(),
+            // Name with asterisk
+            const Text.rich(
+              TextSpan(
+                text: 'Name',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 8),
+            TextField(
+              minLines: 1,
+              maxLines: null,
+              controller: nameController,
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                hintText:
+                    '4–20 characters: letters, numbers, dashes, periods, underscores.',
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
+              ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+            ),
             const SizedBox(height: 16),
+            // Prompt with asterisk
+            const Text.rich(
+              TextSpan(
+                text: 'Prompt',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
             TextField(
               controller: promptController,
-              minLines: 3,
-              maxLines: null,
-              decoration: const InputDecoration(
-                labelText: 'Prompt',
-                border: OutlineInputBorder(),
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
                 hintText:
                     'Describe bot behavior and response. Be clear and specific.',
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
             ),
             const SizedBox(height: 16),
             const Text(
-              'Knowledge Base',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Knowledge sources',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black),
             ),
+
             const SizedBox(height: 8),
             const Text(
               'Provide custom knowledge that your bot will access to inform its responses.',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.black54, fontSize: 16),
             ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: _showKnowledgeSourceDialog,
-              icon: const Icon(Icons.add),
-              label: const Text('Add knowledge source'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[300],
-                foregroundColor: Colors.black,
-                minimumSize: const Size.fromHeight(50),
+            const SizedBox(height: 16),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                _showKnowledgeSourceDialog();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.black54, width: 1.0)),
+                child: const Center(
+                  child: Text(
+                    'Add knowledge source',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                // Logic to create bot
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.blueAccent,
+                ),
+                child: const Center(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

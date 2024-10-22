@@ -17,27 +17,71 @@ class WebsiteDialog extends StatelessWidget {
         children: [
           Icon(Icons.language),
           SizedBox(width: 8),
-          Text('Website'),
+          Text(
+            'Website',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Enter website name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Name",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter a name",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             controller: urlController,
-            decoration: const InputDecoration(
-              labelText: 'Web URL',
-              hintText: 'Enter website URL',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.normal),
+              labelText: "Website URL",
+              labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
+              hintText: "Enter a Website URL",
+              filled: true,
+              fillColor: const Color.fromARGB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.black54, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide:
+                    const BorderSide(color: Colors.blueAccent, width: 1.0),
+              ),
             ),
           ),
         ],
@@ -47,9 +91,19 @@ class WebsiteDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: Colors.black54),
+          ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent, // Màu nền của nút
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Bo góc nút
+            ),
+          ),
           onPressed: () {
             if (nameController.text.isNotEmpty ||
                 urlController.text.isNotEmpty) {
@@ -63,8 +117,12 @@ class WebsiteDialog extends StatelessWidget {
               );
             }
           },
-          child: const Text('Connect'),
-        ),
+          child: const Text(
+            'Add',
+            style: TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        )
       ],
     );
   }

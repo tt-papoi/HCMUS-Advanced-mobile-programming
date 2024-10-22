@@ -14,7 +14,6 @@ class CreateBotScreenState extends State<CreateBotScreen> {
   final TextEditingController promptController = TextEditingController();
   final TextEditingController greetingController = TextEditingController();
   String? selectedBaseBot;
-  final List<String> baseBots = ['Claude-3-Haiku', 'Other'];
   Uint8List? imageData;
 
   @override
@@ -36,65 +35,6 @@ class CreateBotScreenState extends State<CreateBotScreen> {
     }
   }
 
-  void _showKnowledgeSourceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Add Data Sources'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.insert_drive_file),
-                title: const Text('Local files'),
-                onTap: () {
-                  // Handle local file selection
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.web),
-                title: const Text('Website'),
-                onTap: () {
-                  // Handle website selection
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.code),
-                title: const Text('Confluence'),
-                onTap: () {
-                  // Handle Confluence selection
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.folder),
-                title: const Text('Google Drive'),
-                onTap: () {
-                  // Handle Google Drive selection
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.folder),
-                title: const Text('Slack'),
-                onTap: () {
-                  // Handle Slack selection
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +42,14 @@ class CreateBotScreenState extends State<CreateBotScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text('Create a Bot'),
+        title: const Text(
+          'Create a bot',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -111,127 +58,135 @@ class CreateBotScreenState extends State<CreateBotScreen> {
             Center(
               child: CircleAvatar(
                 radius: 40,
-                backgroundColor: Colors.grey[300],
+                backgroundColor: Colors.blueAccent,
                 backgroundImage:
                     imageData != null ? MemoryImage(imageData!) : null,
                 child: imageData == null
                     ? IconButton(
                         icon: const Icon(Icons.add_a_photo),
+                        color: Colors.white,
                         onPressed: _pickImage,
                       )
                     : null,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Name',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            // Name with asterisk
+            RichText(
+              text: const TextSpan(
+                text: 'Name',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               minLines: 1,
               maxLines: null,
               controller: nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
                 hintText:
                     '4–20 characters: letters, numbers, dashes, periods, underscores.',
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Base bot',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              value: selectedBaseBot,
-              items: baseBots.map((bot) {
-                return DropdownMenuItem(
-                  value: bot,
-                  child: Text(bot),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedBaseBot = value;
-                });
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
               },
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Prompt',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            // Prompt with asterisk
+            RichText(
+              text: const TextSpan(
+                text: 'Prompt',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: promptController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
                 hintText:
                     'Describe bot behavior and response. Be clear and specific.',
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Knowledge Base',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Provide custom knowledge that your bot will access to inform its responses.',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: _showKnowledgeSourceDialog,
-              icon: const Icon(Icons.add),
-              label: const Text('Add knowledge source'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[300],
-                foregroundColor: Colors.black,
-                minimumSize: const Size.fromHeight(50),
-                elevation: 0, // No shadow effect
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Greeting Message',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'The bot will send this message at the beginning of every conversation.',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              minLines: 1,
-              maxLines: null,
-              controller: greetingController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText:
-                    'Hi there! I\'m your travel assistant. How can I help you plan your next adventure today?',
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
                 // Logic to create bot
               },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.blueAccent,
-                elevation: 0,
-              ),
-              child: const Text(
-                'Create Bot',
-                style: TextStyle(color: Colors.white),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.blueAccent,
+                ),
+                child: const Center(
+                  child: Text(
+                    'Create Bot',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

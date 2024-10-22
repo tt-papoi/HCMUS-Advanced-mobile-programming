@@ -23,9 +23,15 @@ class ConfluenceDialogState extends State<ConfluenceDialog> {
       surfaceTintColor: Colors.white,
       title: const Row(
         children: [
-          Icon(Icons.link),
+          Icon(Icons.code),
           SizedBox(width: 8),
-          Text('Confluence'),
+          Text(
+            'Confluence',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -34,39 +40,118 @@ class ConfluenceDialogState extends State<ConfluenceDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                hintText: 'Enter a name for this connection',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelText: "Name",
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                hintText: "Enter a name",
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               controller: urlController,
-              decoration: const InputDecoration(
-                labelText: 'Wiki Page URL',
-                hintText: 'Enter the Confluence page URL',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelText: "Confluence Page URL",
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                hintText: "Enter a Confluence Page URL",
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Confluence Username',
-                hintText: 'Enter your Confluence username',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelText: "Confluence Username",
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                hintText: "Enter a Confluence username",
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               controller: tokenController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confluence Access Token',
-                hintText: 'Enter your Confluence access token',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                    color: Colors.black45, fontWeight: FontWeight.normal),
+                labelText: "Confluence Access Token",
+                labelStyle: const TextStyle(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                hintText: "Enter a Confluence Access Token",
+                filled: true,
+                fillColor: const Color.fromARGB(0, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.black54, width: 1.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                      const BorderSide(color: Colors.blueAccent, width: 1.0),
+                ),
               ),
             ),
           ],
@@ -77,9 +162,19 @@ class ConfluenceDialogState extends State<ConfluenceDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: Colors.black54),
+          ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent, // Màu nền của nút
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Bo góc nút
+            ),
+          ),
           onPressed: () {
             if (nameController.text.isNotEmpty &&
                 urlController.text.isNotEmpty &&
@@ -100,8 +195,12 @@ class ConfluenceDialogState extends State<ConfluenceDialog> {
               );
             }
           },
-          child: const Text('Connect'),
-        ),
+          child: const Text(
+            'Add',
+            style: TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        )
       ],
     );
   }

@@ -153,7 +153,7 @@ class _ChatBarState extends State<ChatBar> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(20),
                   color: const Color.fromARGB(10, 0, 0, 0)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
