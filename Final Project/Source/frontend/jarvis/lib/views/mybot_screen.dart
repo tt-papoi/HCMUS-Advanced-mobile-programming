@@ -5,6 +5,7 @@ import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/create_bot_screen.dart';
 import 'package:jarvis/views/create_knowledge_source_screen.dart';
 import 'package:jarvis/views/edit_bot_screen.dart';
+import 'package:jarvis/views/edit_knowledge_source.dart';
 
 class MybotScreen extends StatefulWidget {
   const MybotScreen({super.key});
@@ -62,11 +63,13 @@ class MybotScreenState extends State<MybotScreen> {
 
   void editBot(Bot bot) async {
     final result = await Navigator.of(context).push(FadeRoute(
-        page: EditBotScreen(
-      bot: bot,
-    )));
+      page: EditBotScreen(
+        bot: bot,
+        knowledgeSourceList: knowledgeSourceList, // Truyền knowledge sources
+      ),
+    ));
     if (result != null) {
-      setState(() {});
+      setState(() {}); // Nếu có kết quả trả về, cập nhật lại màn hình.
     }
   }
 
@@ -277,6 +280,16 @@ class MybotScreenState extends State<MybotScreen> {
     );
   }
 
+  void editKnowledgeSource(KnowledgeSource knowledgesource) async {
+    final result = await Navigator.of(context).push(FadeRoute(
+        page: EditKnowledgeSourceScreen(
+      knowledgeSource: knowledgesource,
+    )));
+    if (result != null) {
+      setState(() {});
+    }
+  }
+
   Widget _buildKnowledgeSourcesScreen(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -345,7 +358,7 @@ class MybotScreenState extends State<MybotScreen> {
                     ],
                   ),
                   onTap: () {
-                    editBot(botList[index]);
+                    editKnowledgeSource(knowledgeSourceList[index]);
                   },
                 );
               },

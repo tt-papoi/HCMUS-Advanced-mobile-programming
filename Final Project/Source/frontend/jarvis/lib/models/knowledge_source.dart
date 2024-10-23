@@ -14,12 +14,14 @@ class KnowledgeSource {
 class Unit {
   String id;
   String name;
+  bool? isEnabled;
   Unit({
     required this.id,
     required this.name,
     required this.unitType,
+    this.isEnabled = true,
   });
   UnitType unitType;
 }
 
-enum UnitType { file, googleDrive, slack, website, confluence }
+enum UnitType { localfile, googleDrive, slack, website, confluence }
