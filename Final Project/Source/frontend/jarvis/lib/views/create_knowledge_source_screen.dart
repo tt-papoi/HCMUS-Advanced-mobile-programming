@@ -12,13 +12,11 @@ class _CreateKnowledgeSourceScreenState
     extends State<CreateKnowledgeSourceScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController greetingController = TextEditingController();
 
   @override
   void dispose() {
     nameController.dispose();
     descriptionController.dispose();
-    greetingController.dispose();
     super.dispose();
   }
 

@@ -1,17 +1,17 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
-import 'package:jarvis/utils/add_kb_confluence.dart';
-import 'package:jarvis/utils/add_kb_gg_drive.dart';
-import 'package:jarvis/utils/add_kb_local_file.dart';
-import 'package:jarvis/utils/add_kb_slack.dart';
-import 'package:jarvis/utils/add_kb_web.dart';
+import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/create_bot_screen.dart';
 
 class EditBotScreen extends StatefulWidget {
   final Bot bot;
+  final List<KnowledgeSource> knowledgeSourceList;
+
   const EditBotScreen({
     super.key,
     required this.bot,
+    required this.knowledgeSourceList,
   });
 
   @override
@@ -21,7 +21,7 @@ class EditBotScreen extends StatefulWidget {
 class _EditBotScreenState extends State<EditBotScreen> {
   late TextEditingController nameController;
   late TextEditingController promptController;
-  late List<String> dataSources;
+  late List<KnowledgeSource> dataSources;
 
   @override
   void initState() {
@@ -38,150 +38,61 @@ class _EditBotScreenState extends State<EditBotScreen> {
     super.dispose();
   }
 
-  // Dialog to add a website knowledge source
-  void _showWebsiteDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return WebsiteDialog(
-          onConnect: (name, url) {
-            setState(() {
-              dataSources.add('$name ($url)');
-            });
-          },
-        );
-      },
-    );
-  }
-  // Dialog to add a local file as a knowledge source
-
-  void _showLocalFileDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return LocalFileDialog(
-          onConnect: (name, file) {
-            setState(() {
-              dataSources.add('Local file: $name (File: ${file.name})');
-            });
-          },
-        );
-      },
-    );
-  }
-
-  void _showGoogleDriveDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return GoogleDriveDialog(
-          onConnect: (name, fileName) {
-            setState(() {
-              dataSources.add('Google Drive: $name (File: $fileName)');
-            });
-          },
-        );
-      },
-    );
-  }
-
-  void _showConfluenceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ConfluenceDialog(
-          onConnect: (name, url, username, token) {
-            setState(() {
-              dataSources
-                  .add('Confluence: $name (URL: $url, Username: $username)');
-            });
-          },
-        );
-      },
-    );
-  }
-
-  void _showSlackDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SlackDialog(
-          onConnect: (name, workspace, token) {
-            setState(() {
-              dataSources.add('Slack: $name (Workspace: $workspace)');
-            });
-          },
-        );
-      },
-    );
-  }
-
   void _showKnowledgeSourceDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text(
-            'Add Data Sources',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ListTile(
-                leading: const Icon(Icons.upload_file),
-                title: const Text('Local files'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showLocalFileDialog(); // Show local file dialog
+              const Text('Add Knowledge Source'),
+              FloatingActionButton(
+                backgroundColor: Colors.blueAccent,
+                shape: const CircleBorder(),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Đóng hộp thoại trước
+                  Navigator.push(
+                    context,
+                    FadeRoute(page: const CreateBotScreen()),
+                  );
                 },
-              ),
-              ListTile(
-                leading: const Icon(Icons.language),
-                title: const Text('Website'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showWebsiteDialog();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.code),
-                title: const Text('Confluence'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showConfluenceDialog();
-                  // Handle Confluence selection
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.drive_folder_upload),
-                title: const Text('Google Drive'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showGoogleDriveDialog(); // Show Google Drive dialog
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.folder),
-                title: const Text('Slack'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showSlackDialog();
-                },
+                mini: true,
+                child: const Icon(
+                  Icons.add,
+                  size: 30,
+                  color: Colors.white,
+                ), // Thu nhỏ kích thước nút
               ),
             ],
           ),
-          actions: [
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: widget.knowledgeSourceList.length,
+              itemBuilder: (context, index) {
+                final knowledgeSource = widget.knowledgeSourceList[index];
+                return ListTile(
+                  title: Text(knowledgeSource.name),
+                  onTap: () {
+                    setState(() {
+                      if (!dataSources.contains(knowledgeSource)) {
+                        dataSources.add(knowledgeSource);
+                      }
+                    });
+                    Navigator.of(context).pop(); // Đóng hộp thoại
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
             TextButton(
               onPressed: () {
-                if (!mounted) return; // Guard with mounted check
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Đóng hộp thoại mà không chọn gì
               },
-              child: const Text(
-                'Close',
-                style: TextStyle(color: Colors.black45),
-              ),
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -277,7 +188,6 @@ class _EditBotScreenState extends State<EditBotScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 8),
             TextField(
               controller: promptController,
@@ -316,12 +226,50 @@ class _EditBotScreenState extends State<EditBotScreen> {
                   fontSize: 16,
                   color: Colors.black),
             ),
-
             const SizedBox(height: 8),
             const Text(
               'Provide custom knowledge that your bot will access to inform its responses.',
               style: TextStyle(color: Colors.black54, fontSize: 16),
             ),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: dataSources.length,
+              itemBuilder: (context, index) {
+                final knowledgeSource = dataSources[index];
+                return ListTile(
+                  leading: const Icon(
+                    Icons.file_copy_rounded,
+                    color: Colors.blueAccent,
+                  ),
+                  title: Text(
+                    knowledgeSource.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Description: ${knowledgeSource.description}",
+                        selectionColor: Colors.black87,
+                      ), // Hiển thị thêm mô tả nếu có
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        dataSources.removeAt(index);
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(20),
@@ -345,6 +293,9 @@ class _EditBotScreenState extends State<EditBotScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            // Display selected knowledge sources
+
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(20),
