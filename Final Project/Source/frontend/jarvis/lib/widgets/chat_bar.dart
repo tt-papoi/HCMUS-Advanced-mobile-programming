@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/widgets/icons.dart';
+import 'package:jarvis/widgets/prompt_library.dart';
 
 class ChatBar extends StatefulWidget {
   final String hintMessage;
@@ -33,10 +35,14 @@ class _ChatBarState extends State<ChatBar> {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10),
+        ),
+      ),
       builder: (BuildContext context) {
-        return Container(
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(10),
-          height: 200,
           child: Column(
             children: [
               ListTile(
@@ -55,9 +61,26 @@ class _ChatBarState extends State<ChatBar> {
                   _takePhoto();
                 },
               ),
+              const Divider(
+                height: 0,
+              ),
               ListTile(
-                leading: const Icon(Icons.screenshot),
-                title: const Text('Screenshot'),
+                leading: const Icon(
+                  CustomIcons.terminal_1,
+                  size: 15,
+                ),
+                title: const Text('Prompt'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _buildPromptLibrary();
+                },
+              ),
+              const Divider(
+                height: 0,
+              ),
+              ListTile(
+                leading: const Icon(Icons.email_outlined),
+                title: const Text('Email reply'),
                 onTap: () {
                   Navigator.of(context).pop();
                 },
@@ -138,6 +161,21 @@ class _ChatBarState extends State<ChatBar> {
     return Container(
       height: 0,
     ); // Return an empty container if no image is selected
+  }
+
+  void _buildPromptLibrary() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return const PromptLibrary();
+      },
+    );
   }
 
   @override

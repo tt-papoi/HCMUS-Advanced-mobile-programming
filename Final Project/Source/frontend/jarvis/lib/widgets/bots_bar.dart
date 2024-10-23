@@ -104,6 +104,11 @@ class BotBarState extends State<BotBar> {
 
   void _showBotList(BuildContext context) {
     showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10),
+        ),
+      ),
       backgroundColor: Colors.white,
       context: context,
       builder: (BuildContext context) {
@@ -123,17 +128,17 @@ class BotBarState extends State<BotBar> {
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 15.0, horizontal: 10.0),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(10.0),
                     borderSide:
                         const BorderSide(color: Colors.black12, width: 1.0),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(10.0),
                     borderSide:
                         const BorderSide(color: Colors.black12, width: 1.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(10.0),
                     borderSide:
                         const BorderSide(color: Colors.blueAccent, width: 1.0),
                   ),
