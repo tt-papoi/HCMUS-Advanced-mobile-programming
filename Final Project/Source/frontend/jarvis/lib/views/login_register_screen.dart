@@ -111,15 +111,15 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black26),
+                    border: Border.all(color: Colors.black12),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
                         "lib/assets/icons/google.png",
-                        height: 20,
-                        width: 20,
+                        height: 15,
+                        width: 15,
                       ),
                       const SizedBox(width: 10),
                       const Text(
