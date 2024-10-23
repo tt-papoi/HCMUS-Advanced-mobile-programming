@@ -1,37 +1,25 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
-class CreateBotScreen extends StatefulWidget {
-  const CreateBotScreen({super.key});
+class CreateKnowledgeSourceScreen extends StatefulWidget {
+  const CreateKnowledgeSourceScreen({super.key});
 
   @override
-  State<CreateBotScreen> createState() => _CreateBotScreenState();
+  State<CreateKnowledgeSourceScreen> createState() =>
+      _CreateKnowledgeSourceScreenState();
 }
 
-class _CreateBotScreenState extends State<CreateBotScreen> {
+class _CreateKnowledgeSourceScreenState
+    extends State<CreateKnowledgeSourceScreen> {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController promptController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController greetingController = TextEditingController();
-  Uint8List? imageData;
 
   @override
   void dispose() {
     nameController.dispose();
-    promptController.dispose();
+    descriptionController.dispose();
     greetingController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      final Uint8List data = await image.readAsBytes();
-      setState(() {
-        imageData = data;
-      });
-    }
   }
 
   @override
@@ -42,7 +30,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: const Text(
-          'Create a bot',
+          'Create Knowledge Source',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -54,22 +42,6 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Center(
-              child: CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.blueAccent,
-                backgroundImage:
-                    imageData != null ? MemoryImage(imageData!) : null,
-                child: imageData == null
-                    ? IconButton(
-                        icon: const Icon(Icons.add_a_photo),
-                        color: Colors.white,
-                        onPressed: _pickImage,
-                      )
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 16),
             // Name with asterisk
             RichText(
               text: const TextSpan(
@@ -98,8 +70,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    '4–20 characters: letters, numbers, dashes, periods, underscores.',
+                hintText: '4–20 characters',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
@@ -121,22 +92,16 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             // Prompt with asterisk
             RichText(
               text: const TextSpan(
-                text: 'Prompt',
+                text: 'Description',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     color: Colors.black),
-                children: [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
               ),
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: promptController,
+              controller: descriptionController,
               maxLines: 3,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -145,8 +110,6 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    'Describe bot behavior and response. Be clear and specific.',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
@@ -179,7 +142,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Create Bot',
+                    'Create Knowledge Source',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

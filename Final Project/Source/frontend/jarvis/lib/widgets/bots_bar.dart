@@ -117,18 +117,20 @@ class BotBarState extends State<BotBar> {
                 },
                 decoration: InputDecoration(
                   hintText: "Search for more bots",
+                  hintStyle: const TextStyle(
+                      fontWeight: FontWeight.normal, color: Colors.black45),
                   prefixIcon: const Icon(Icons.search),
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 15.0, horizontal: 10.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 1.0),
+                        const BorderSide(color: Colors.black12, width: 1.0),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 1.0),
+                        const BorderSide(color: Colors.black12, width: 1.0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
