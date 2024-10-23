@@ -111,7 +111,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(color: Colors.black26),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -292,6 +292,12 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
   Widget _buildToggleButton(String text, bool isActive) {
     return Expanded(
+        child: Container(
+      margin: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: isActive ? Colors.blueAccent : Colors.transparent,
+        borderRadius: BorderRadius.circular(50),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(50),
         onTap: () {
@@ -301,11 +307,6 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
           });
         },
         child: Container(
-          margin: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: isActive ? Colors.blueAccent : Colors.transparent,
-            borderRadius: BorderRadius.circular(50),
-          ),
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Center(
             child: Text(
@@ -313,12 +314,12 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
               style: TextStyle(
                   color: isActive
                       ? const Color.fromARGB(255, 255, 255, 255)
-                      : const Color.fromARGB(255, 0, 0, 0),
+                      : Colors.black54,
                   fontWeight: FontWeight.bold),
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 }
