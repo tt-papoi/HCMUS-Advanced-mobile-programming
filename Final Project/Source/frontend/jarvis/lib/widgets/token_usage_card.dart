@@ -17,7 +17,7 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(10, 0, 0, 0),
+        color: const Color.fromARGB(15, 0, 0, 0),
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Column(
@@ -28,7 +28,7 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
               // Profile Icon
               CircleAvatar(
                 radius: 24,
-                backgroundColor: Colors.blueGrey,
+                backgroundColor: Colors.blueAccent,
                 child: Icon(Icons.person, color: Colors.white),
               ),
               SizedBox(width: 12.0),

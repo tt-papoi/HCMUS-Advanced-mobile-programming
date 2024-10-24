@@ -5,6 +5,7 @@ class Prompt {
   String name;
   Category category;
   PromptType promptType;
+  bool isMine;
   bool isFavorite;
   List<Map<String, String>>? placeholders; //  placeholder and value
 
@@ -13,6 +14,7 @@ class Prompt {
     required this.prompt,
     required this.category,
     required this.promptType,
+    required this.isMine,
     required this.name,
     required this.isFavorite,
   }) {
@@ -31,6 +33,18 @@ class Prompt {
       String placeholder = match.group(1)!; // Lấy placeholder
       return {placeholder: ''}; // Giá trị mặc định là chuỗi rỗng
     }).toList();
+  }
+
+  String getFinalPrompt() {
+    String finalPrompt = prompt;
+
+    for (var placeholder in placeholders!) {
+      String key = placeholder.keys.first;
+      String value = placeholder[key] ?? '';
+      finalPrompt = finalPrompt.replaceAll('[$key]', value);
+    }
+
+    return finalPrompt;
   }
 }
 

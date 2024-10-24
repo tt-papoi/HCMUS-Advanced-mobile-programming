@@ -229,8 +229,10 @@ class BotBarState extends State<BotBar> {
         decoration: BoxDecoration(
           color: isSelected
               ? Colors.blueAccent
-              : Colors.transparent, // Change background color
-          border: isSelected ? null : Border.all(color: Colors.grey.shade300),
+              : const Color.fromARGB(15, 0, 0, 0), // Change background color
+          border: isSelected
+              ? null
+              : Border.all(color: const Color.fromARGB(0, 0, 0, 0)),
           borderRadius: BorderRadius.circular(20.0),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),

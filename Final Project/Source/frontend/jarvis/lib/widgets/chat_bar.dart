@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/email_reply_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/prompt_library.dart';
 
@@ -83,6 +85,10 @@ class _ChatBarState extends State<ChatBar> {
                 title: const Text('Email reply'),
                 onTap: () {
                   Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    FadeRoute(page: const EmailReplyScreen()),
+                  );
                 },
               ),
             ],
@@ -163,8 +169,8 @@ class _ChatBarState extends State<ChatBar> {
     ); // Return an empty container if no image is selected
   }
 
-  void _buildPromptLibrary() {
-    showModalBottomSheet(
+  Future<void> _buildPromptLibrary() async {
+    final result = await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -176,6 +182,11 @@ class _ChatBarState extends State<ChatBar> {
         return const PromptLibrary();
       },
     );
+    if (result != null) {
+      setState(() {
+        _messageController.text = result;
+      });
+    }
   }
 
   @override
@@ -192,7 +203,7 @@ class _ChatBarState extends State<ChatBar> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(10, 0, 0, 0)),
+                  color: const Color.fromARGB(15, 0, 0, 0)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -215,7 +226,8 @@ class _ChatBarState extends State<ChatBar> {
                       ),
                     ),
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    maxLines: 5,
+                    minLines: 1,
                   ),
                 ],
               ),

@@ -33,14 +33,6 @@ class SideBar extends StatelessWidget {
               title: 'All chats',
               customOnTap: () => _navigateTo(context, AllChatsScreen()),
             ),
-            // navigate to AI Tools screen
-            _buildListTile(
-              icon: Icons.handyman_outlined,
-              title: 'AI Tools',
-              customOnTap: () {
-                // Add your navigation logic here
-              },
-            ),
 
             // navigate to Profile screen
             _buildListTile(
@@ -48,6 +40,15 @@ class SideBar extends StatelessWidget {
               title: 'Profile',
               customOnTap: () {
                 _navigateTo(context, const ProfileScreen());
+              },
+            ),
+
+            // navigate to Subcribe screen
+            _buildListTile(
+              icon: Icons.assistant_rounded,
+              title: 'Subscribe',
+              customOnTap: () {
+                // Add your navigation logic here
               },
             ),
           ],
@@ -108,7 +109,7 @@ class SideBar extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0),
+            color: const Color.fromARGB(15, 0, 0, 0),
             borderRadius: BorderRadius.circular(12.0),
           ),
           padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
