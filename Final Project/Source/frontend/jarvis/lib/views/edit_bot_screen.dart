@@ -22,6 +22,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
   late TextEditingController nameController;
   late TextEditingController promptController;
   late List<KnowledgeSource> dataSources;
+  Set<KnowledgeSource> selectedSources = {};
 
   @override
   void initState() {
@@ -42,59 +43,151 @@ class _EditBotScreenState extends State<EditBotScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Add Knowledge Source'),
-              FloatingActionButton(
-                backgroundColor: Colors.blueAccent,
-                shape: const CircleBorder(),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Đóng hộp thoại trước
-                  Navigator.push(
-                    context,
-                    FadeRoute(page: const CreateBotScreen()),
-                  );
-                },
-                mini: true,
-                child: const Icon(
-                  Icons.add,
-                  size: 30,
-                  color: Colors.white,
-                ), // Thu nhỏ kích thước nút
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            String searchQuery = ''; // Track search input
+
+            return AlertDialog(
+              title: const Text('Add Knowledge Source'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Row for Search bar and Create button
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onTapOutside: (event) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Search for more sources",
+                            hintStyle: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black45),
+                            prefixIcon: const Icon(Icons.search),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15.0, horizontal: 10.0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.black12, width: 1.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.black12, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.blueAccent, width: 1.0),
+                            ),
+                          ),
+                          onChanged: (value) {
+                            setStateDialog(() {
+                              searchQuery = value
+                                  .toLowerCase(); // Update the search query
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                          width: 10), // Spacing between search and button
+                      Material(
+                        color: Colors.transparent,
+                        child: Ink(
+                          decoration: const ShapeDecoration(
+                            color: Colors.blueAccent,
+                            shape: CircleBorder(),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.add,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                FadeRoute(page: const CreateBotScreen()),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                      height: 16), // Add spacing after search and create button
+
+                  // List of knowledge sources (filtered by search)
+                  Expanded(
+                    child: SizedBox(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: widget.knowledgeSourceList.length,
+                        itemBuilder: (context, index) {
+                          final knowledgeSource =
+                              widget.knowledgeSourceList[index];
+                          final isSelected =
+                              selectedSources.contains(knowledgeSource);
+
+                          // Filter knowledge sources based on search query
+                          if (searchQuery.isNotEmpty &&
+                              !knowledgeSource.name
+                                  .toLowerCase()
+                                  .contains(searchQuery)) {
+                            return const SizedBox
+                                .shrink(); // Hide if not matching search
+                          }
+
+                          return ListTile(
+                            title: Text(knowledgeSource.name),
+                            tileColor: isSelected
+                                ? Colors.blueAccent.withOpacity(0.8)
+                                : null,
+                            selectedTileColor:
+                                Colors.blueAccent.withOpacity(0.8),
+                            onTap: () {
+                              setStateDialog(() {
+                                if (isSelected) {
+                                  selectedSources.remove(knowledgeSource);
+                                } else {
+                                  selectedSources.add(knowledgeSource);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.knowledgeSourceList.length,
-              itemBuilder: (context, index) {
-                final knowledgeSource = widget.knowledgeSourceList[index];
-                return ListTile(
-                  title: Text(knowledgeSource.name),
-                  onTap: () {
-                    setState(() {
-                      if (!dataSources.contains(knowledgeSource)) {
-                        dataSources.add(knowledgeSource);
-                      }
-                    });
-                    Navigator.of(context).pop(); // Đóng hộp thoại
+              actions: <Widget>[
+                if (selectedSources.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        dataSources.addAll(selectedSources);
+                      });
+                      selectedSources.clear();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Add Selected'),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Đóng hộp thoại mà không chọn gì
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -258,13 +351,23 @@ class _EditBotScreenState extends State<EditBotScreen> {
                       ), // Hiển thị thêm mô tả nếu có
                     ],
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        dataSources.removeAt(index);
-                      });
+                  trailing: PopupMenuButton<String>(
+                    color: Colors.white,
+                    onSelected: (String result) {
+                      if (result == 'Delete') {
+                        setState(() {
+                          dataSources.removeAt(index);
+                        });
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem(
+                        value: 'Delete',
+                        child: Text(
+                          'Delete',
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
