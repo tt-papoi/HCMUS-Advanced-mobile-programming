@@ -88,9 +88,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
           children: [
             InkWell(
               onTap: () {
-                if (isPrivatePrompt) {
-                  _showCreatePrivatePromptDialog(context);
-                }
+                _showCreatePromptDialog(context);
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -334,27 +332,85 @@ class _PromptLibraryState extends State<PromptLibrary> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!isPrivatePrompt)
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  promptList[index].isFavorite = !promptList[index].isFavorite;
-                });
-              },
-              icon: prompt.isFavorite
-                  ? const Icon(Icons.star_rounded, color: Colors.blueAccent)
-                  : const Icon(Icons.star_border_rounded),
-            ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.mode_edit_outlined),
-          ),
-          IconButton(
-            onPressed: () {
-              // Action for delete button
-            },
-            icon: const Icon(Icons.delete_outlined),
-          ),
+          isPrivatePrompt
+              ? IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.mode_edit_outlined),
+                )
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      promptList[index].isFavorite =
+                          !promptList[index].isFavorite;
+                    });
+                  },
+                  icon: prompt.isFavorite
+                      ? const Icon(Icons.star_rounded, color: Colors.blueAccent)
+                      : const Icon(Icons.star_border_rounded),
+                ),
+          isPrivatePrompt
+              ? IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: const Text(
+                            'Delete Prompt',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          content: const Text(
+                            'Are you sure you want to delete this prompt?',
+                          ),
+                          actions: [
+                            TextButton(
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black45),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                ),
+                              ),
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Đóng hộp thoại
+                                _deletePrompt(index); // Gọi hàm xóa mục
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.delete_outlined),
+                )
+              : IconButton(
+                  onPressed: () {
+                    // View info
+                  },
+                  icon: const Icon(Icons.info_outline),
+                ),
         ],
       ),
     );
@@ -414,7 +470,11 @@ class _PromptLibraryState extends State<PromptLibrary> {
     );
   }
 
-  Future<void> _showCreatePrivatePromptDialog(BuildContext context) async {
+  Future<void> _showCreatePromptDialog(BuildContext context) async {
+    Category? selectedDropdownCategory = Category.Other;
+    TextEditingController nameController = TextEditingController();
+    TextEditingController promptController = TextEditingController();
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // User must tap a button to close the dialog
@@ -426,162 +486,257 @@ class _PromptLibraryState extends State<PromptLibrary> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min, // Adjust the size to fit content
-              children: <Widget>[
-                // Title
-                // Name with asterisk
-                const Text(
-                  "New Private prompt",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                const Text.rich(
-                  TextSpan(
-                    text: 'Name',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  minLines: 1,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintStyle: const TextStyle(
-                        color: Colors.black45, fontWeight: FontWeight.normal),
-                    labelStyle: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                    hintText: 'Name of the prompt',
-                    filled: true,
-                    fillColor: const Color.fromARGB(10, 0, 0, 0),
-                    focusColor: const Color.fromARGB(0, 0, 0, 0),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0), width: 1.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Colors.blueAccent, width: 1.0),
-                    ),
-                  ),
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
-
-                const SizedBox(height: 15),
-                // Prompt with asterisk
-                const Text.rich(
-                  TextSpan(
-                    text: 'Prompt',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-                TextField(
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintStyle: const TextStyle(
-                        color: Colors.black45, fontWeight: FontWeight.normal),
-                    labelStyle: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                    hintText: 'Use square brackets [ ] to specify user input.',
-                    filled: true,
-                    fillColor: const Color.fromARGB(10, 0, 0, 0),
-                    focusColor: const Color.fromARGB(0, 0, 0, 0),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0), width: 1.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Colors.blueAccent, width: 1.0),
-                    ),
-                  ),
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Buttons "Cancel" and "Create"
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize:
+                      MainAxisSize.min, // Adjust the size to fit content
                   children: <Widget>[
-                    // Cancel button
-                    TextButton(
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black45),
+                    // Title
+                    Text(
+                      isPrivatePrompt
+                          ? "New Private prompt"
+                          : "New Public Prompt",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
                     ),
-                    const SizedBox(
-                      width: 10,
+                    const SizedBox(height: 15),
+
+                    // Name of the prompt
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Name',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    // Create button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: nameController,
+                      minLines: 1,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        labelStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        hintText: 'Name of the prompt',
+                        filled: true,
+                        fillColor: const Color.fromARGB(10, 0, 0, 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(0, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Create',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      onPressed: () {
-                        // Handle the create action here
-                        Navigator.of(context).pop();
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
                       },
+                    ),
+
+                    // Category field
+                    isPrivatePrompt
+                        ? Container()
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 15),
+                              const Text.rich(
+                                TextSpan(
+                                  text: 'Category',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: ' *',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              DropdownButtonFormField<Category>(
+                                menuMaxHeight: 200,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: const Color.fromARGB(10, 0, 0, 0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(0, 0, 0, 0),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(0, 0, 0, 0),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                ),
+                                dropdownColor: Colors.white,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16),
+                                value: selectedDropdownCategory,
+                                hint: const Text('Select a category'),
+                                onChanged: (Category? newValue) {
+                                  setState(() {
+                                    selectedDropdownCategory = newValue;
+                                  });
+                                },
+                                items: Category.values
+                                    .map<DropdownMenuItem<Category>>(
+                                        (Category value) {
+                                  return DropdownMenuItem<Category>(
+                                    value: value,
+                                    child: Text(value.name),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+
+                    const SizedBox(height: 15),
+
+                    // Prompt field
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Prompt',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: promptController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        labelStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        hintText:
+                            'Use square brackets [ ] to specify user input.',
+                        filled: true,
+                        fillColor: const Color.fromARGB(10, 0, 0, 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(0, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black45),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Create',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () {
+                            Prompt prompt = Prompt(
+                                id: "id",
+                                prompt: promptController.text,
+                                category: selectedDropdownCategory!,
+                                promptType: isPrivatePrompt
+                                    ? PromptType.private
+                                    : PromptType.public,
+                                name: nameController.text,
+                                isFavorite: false);
+                            Navigator.of(context).pop();
+                            _addPrompt(prompt);
+                          },
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
         );
@@ -589,178 +744,15 @@ class _PromptLibraryState extends State<PromptLibrary> {
     );
   }
 
-  Future<void> _showCreatePublicPromptDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap a button to close the dialog
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0), // Rounded corners
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min, // Adjust the size to fit content
-              children: <Widget>[
-                // Title
-                // Name with asterisk
-                const Text(
-                  "New Private prompt",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                const Text.rich(
-                  TextSpan(
-                    text: 'Name',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  minLines: 1,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintStyle: const TextStyle(
-                        color: Colors.black45, fontWeight: FontWeight.normal),
-                    labelStyle: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                    hintText: 'Name of the prompt',
-                    filled: true,
-                    fillColor: const Color.fromARGB(10, 0, 0, 0),
-                    focusColor: const Color.fromARGB(0, 0, 0, 0),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0), width: 1.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Colors.blueAccent, width: 1.0),
-                    ),
-                  ),
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
+  void _addPrompt(Prompt prompt) {
+    setState(() {
+      promptList.add(prompt);
+    });
+  }
 
-                const SizedBox(height: 15),
-                // Prompt with asterisk
-                const Text.rich(
-                  TextSpan(
-                    text: 'Prompt',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-                TextField(
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintStyle: const TextStyle(
-                        color: Colors.black45, fontWeight: FontWeight.normal),
-                    labelStyle: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
-                    hintText: 'Use square brackets [ ] to specify user input.',
-                    filled: true,
-                    fillColor: const Color.fromARGB(10, 0, 0, 0),
-                    focusColor: const Color.fromARGB(0, 0, 0, 0),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Color.fromARGB(0, 0, 0, 0), width: 1.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                          color: Colors.blueAccent, width: 1.0),
-                    ),
-                  ),
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Buttons "Cancel" and "Create"
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    // Cancel button
-                    TextButton(
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black45),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    // Create button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Create',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      onPressed: () {
-                        // Handle the create action here
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  void _deletePrompt(int index) {
+    setState(() {
+      promptList.removeAt(index);
+    });
   }
 }
