@@ -356,7 +356,14 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      unit.unitType.toString().split('.').last,
+                      {
+                            "localfile": "Local File",
+                            "googledrive": "Google Drive",
+                            "slack": "Slack",
+                            "website": "Website",
+                            "confluence": "Confluence"
+                          }[unit.unitType.toString().split('.').last] ??
+                          unit.unitType.toString().split('.').last,
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
