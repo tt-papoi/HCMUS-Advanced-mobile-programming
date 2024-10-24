@@ -21,7 +21,7 @@ class SuggestionPrompt extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(10, 0, 0, 0),
+          color: const Color.fromARGB(15, 0, 0, 0),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

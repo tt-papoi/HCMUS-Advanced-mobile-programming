@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/prompt.dart';
+import 'package:jarvis/widgets/used_prompt_dialog.dart';
 
 class PromptLibrary extends StatefulWidget {
   const PromptLibrary({super.key});
@@ -9,7 +10,7 @@ class PromptLibrary extends StatefulWidget {
 }
 
 class _PromptLibraryState extends State<PromptLibrary> {
-  bool isPrivatePrompt = true;
+  bool isShowMyPrompt = true;
   bool isActiveFavoriteFilter = false;
   Category selectedCategory = Category.All;
   bool isShowAllCategories = false;
@@ -19,10 +20,11 @@ class _PromptLibraryState extends State<PromptLibrary> {
         id: "0",
         prompt:
             "You are a machine that check all language grammar mistake and make the sentence more fluent.You take all the user input and auto correct it. Just reply to user input with correct grammar\nyou: correct tex\nuser:Grammatically correct text\nyou: Sounds good.\nUser input is : [Text]",
-        category: Category.Writing,
+        category: Category.Education,
         promptType: PromptType.private,
         name: 'Grammar corrector',
-        isFavorite: false),
+        isFavorite: false,
+        isMine: true),
     Prompt(
         id: "1",
         prompt:
@@ -30,15 +32,17 @@ class _PromptLibraryState extends State<PromptLibrary> {
         category: Category.Writing,
         promptType: PromptType.public,
         name: 'Essay outline',
-        isFavorite: false),
+        isFavorite: false,
+        isMine: false),
     Prompt(
         id: "2",
         prompt:
             "I want you to act as a resume editor . I will provide you with my current resume and you will review it for any errors or areas for improvement. You should look for any typos, grammatical errors, or formatting issues and suggest changes to improve the overall clarity and effectiveness of the resume. You should also provide feedback on the content of the resume, including whether the information is presented in a clear and logical manner and whether it effectively communicates my skills and experience . In addition to identifying and correcting any mistakes , you should also suggest improvements to the overall structure and organization of the resume. Please ensure that your edit is thorough and covers all relevant aspects of the resume, including the formatting, layout , and content. Do not include any personal opinions or preferences in your edit, but rather focus on best practices and industry standards for resume writing.\nHere is my resume: [Resume]",
-        category: Category.Writing,
+        category: Category.Career,
         promptType: PromptType.public,
         name: 'Resume Editing',
-        isFavorite: false),
+        isFavorite: false,
+        isMine: false),
     Prompt(
         id: "3",
         prompt:
@@ -46,14 +50,16 @@ class _PromptLibraryState extends State<PromptLibrary> {
         category: Category.Writing,
         promptType: PromptType.public,
         name: 'SOLVE PROBLEM',
-        isFavorite: false),
+        isFavorite: false,
+        isMine: false),
     Prompt(
         id: "4",
-        prompt: "Tell me a story about [Topic]",
-        category: Category.Writing,
+        prompt: "Please tell me a story about [characters] related to [Topic]",
+        category: Category.Fun,
         promptType: PromptType.private,
         name: 'Tell a story',
-        isFavorite: false),
+        isFavorite: false,
+        isMine: true),
   ];
 
   @override
@@ -117,17 +123,17 @@ class _PromptLibraryState extends State<PromptLibrary> {
 
   Widget _buildToggleButtonRow() {
     return Container(
-      width: 200,
+      width: 250,
       margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        color: const Color.fromARGB(10, 0, 0, 0),
+        color: const Color.fromARGB(15, 0, 0, 0),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildToggleButton('Private', isPrivatePrompt),
-          _buildToggleButton('Public', !isPrivatePrompt),
+          _buildToggleButton('My prompts', isShowMyPrompt),
+          _buildToggleButton('Public prompts', !isShowMyPrompt),
         ],
       ),
     );
@@ -144,7 +150,8 @@ class _PromptLibraryState extends State<PromptLibrary> {
           borderRadius: BorderRadius.circular(50),
           onTap: () {
             setState(() {
-              isPrivatePrompt = text == 'Private';
+              isShowMyPrompt = text == 'My prompts';
+              selectedCategory = Category.All;
             });
           },
           child: Container(
@@ -166,7 +173,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
   }
 
   Widget _buildSearchBar() {
-    return isPrivatePrompt
+    return isShowMyPrompt
         ? _buildSearchField()
         : Column(
             children: [
@@ -263,7 +270,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
       },
       child: Container(
         decoration: BoxDecoration(
-            color: const Color.fromARGB(10, 0, 0, 0),
+            color: const Color.fromARGB(15, 0, 0, 0),
             borderRadius: BorderRadius.circular(5)),
         child: Icon(
           isShowAllCategories ? Icons.arrow_drop_up : Icons.arrow_drop_down,
@@ -280,30 +287,33 @@ class _PromptLibraryState extends State<PromptLibrary> {
         itemBuilder: (context, index) {
           Prompt prompt = promptList[index];
 
-          // Private/Public Filter
-          // If the user has selected "Private" prompts,
-          // this checks if the current prompt is not private.
-          // If true, it skips the prompt by returning an empty Container
+          if (
+              // My prompts/Public prompts Filter
+              // If the user has selected "My prompts",
+              // this checks if the current prompt is not mine.
+              // If true, it skips the prompt by returning an empty Container
+              isShowMyPrompt && !prompt.isMine ||
 
-          if (isPrivatePrompt && prompt.promptType != PromptType.private ||
+                  // If the user has selected "Public" prompts,
+                  // this checks if the current prompt is not public.
+                  // If true, it skips the prompt
+                  !isShowMyPrompt && prompt.promptType != PromptType.public ||
 
-              // If the user has selected "Public" prompts,
-              // this checks if the current prompt is not public.
-              // If true, it skips the prompt
-              !isPrivatePrompt && prompt.promptType != PromptType.public) {
+                  // Favorite filter
+                  // Applies only when public prompts are selected.
+                  // Checks if the favorite filter is active and
+                  // the current prompt is not marked as favorite.
+                  // If both conditions are true, it skips the prompt
+                  !isShowMyPrompt &&
+                      isActiveFavoriteFilter &&
+                      !prompt.isFavorite ||
+
+                  // Category filter
+                  selectedCategory != Category.All &&
+                      selectedCategory != prompt.category) {
             return Container();
           }
 
-          // Favorite filter
-          // Applies only when public prompts are selected.
-          // Checks if the favorite filter is active and
-          // the current prompt is not marked as favorite.
-          // If both conditions are true, it skips the prompt
-          if (!isPrivatePrompt &&
-              isActiveFavoriteFilter &&
-              !prompt.isFavorite) {
-            return Container();
-          }
           return _buildPromptTile(prompt, index);
         },
         separatorBuilder: (BuildContext context, int index) {
@@ -316,9 +326,26 @@ class _PromptLibraryState extends State<PromptLibrary> {
     );
   }
 
+  void _showPromptInput(Prompt prompt) async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return UsedPromptDialog(
+          prompt: prompt,
+        );
+      },
+    );
+
+    if (mounted) {
+      Navigator.pop(context, result);
+    }
+  }
+
   Widget _buildPromptTile(Prompt prompt, int index) {
     return ListTile(
-      onTap: () {},
+      onTap: () {
+        _showPromptInput(prompt);
+      },
       contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
       title: Text(
         prompt.name,
@@ -332,10 +359,14 @@ class _PromptLibraryState extends State<PromptLibrary> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          isPrivatePrompt
+          isShowMyPrompt
+              // edit prompt
               ? IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.mode_edit_outlined),
+                  onPressed: () {
+                    _showEditPromptDialog(context, index);
+                  },
+                  icon: const Icon(Icons.mode_edit_outlined,
+                      size: 20, color: Colors.black54),
                 )
               : IconButton(
                   onPressed: () {
@@ -345,10 +376,18 @@ class _PromptLibraryState extends State<PromptLibrary> {
                     });
                   },
                   icon: prompt.isFavorite
-                      ? const Icon(Icons.star_rounded, color: Colors.blueAccent)
-                      : const Icon(Icons.star_border_rounded),
+                      ? const Icon(
+                          Icons.star_rounded,
+                          size: 20,
+                          color: Colors.blueAccent,
+                        )
+                      : const Icon(
+                          Icons.star_border_rounded,
+                          size: 20,
+                          color: Colors.black54,
+                        ),
                 ),
-          isPrivatePrompt
+          isShowMyPrompt
               ? IconButton(
                   onPressed: () {
                     showDialog(
@@ -394,8 +433,8 @@ class _PromptLibraryState extends State<PromptLibrary> {
                                     color: Colors.white),
                               ),
                               onPressed: () {
-                                Navigator.of(context).pop(); // Đóng hộp thoại
-                                _deletePrompt(index); // Gọi hàm xóa mục
+                                Navigator.of(context).pop();
+                                _deletePrompt(index);
                               },
                             ),
                           ],
@@ -403,13 +442,22 @@ class _PromptLibraryState extends State<PromptLibrary> {
                       },
                     );
                   },
-                  icon: const Icon(Icons.delete_outlined),
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
                 )
               : IconButton(
                   onPressed: () {
                     // View info
+                    _showPublicPromptInfo(context, index);
                   },
-                  icon: const Icon(Icons.info_outline),
+                  icon: const Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: Colors.blueAccent,
+                  ),
                 ),
         ],
       ),
@@ -456,7 +504,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
         decoration: BoxDecoration(
           color: selectedCategory == category
               ? Colors.blueAccent
-              : const Color.fromARGB(10, 0, 0, 0),
+              : const Color.fromARGB(15, 0, 0, 0),
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(
@@ -471,34 +519,391 @@ class _PromptLibraryState extends State<PromptLibrary> {
   }
 
   Future<void> _showCreatePromptDialog(BuildContext context) async {
-    Category? selectedDropdownCategory = Category.Other;
+    Category selectedDropdownCategory = Category.Other;
     TextEditingController nameController = TextEditingController();
     TextEditingController promptController = TextEditingController();
+    bool isPrivatePrompt = true;
+
+    String? nameError;
+    String? promptError;
 
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap a button to close the dialog
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0), // Rounded corners
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize:
-                      MainAxisSize.min, // Adjust the size to fit content
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     // Title
-                    Text(
-                      isPrivatePrompt
-                          ? "New Private prompt"
-                          : "New Public Prompt",
-                      style: const TextStyle(
+
+                    const Text(
+                      "New Prompt",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Radio<bool>(
+                              value: true,
+                              groupValue: isPrivatePrompt,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isPrivatePrompt = value!;
+                                });
+                              },
+                              activeColor: Colors.blueAccent,
+                            ),
+                            const Text(
+                              "Private",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio<bool>(
+                              value: false,
+                              groupValue: isPrivatePrompt,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isPrivatePrompt = value!;
+                                  selectedDropdownCategory = Category.Other;
+                                });
+                              },
+                              activeColor: Colors.blueAccent,
+                            ),
+                            const Text(
+                              "Public",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    // Name of the prompt
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Name',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: nameController,
+                      minLines: 1,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        labelStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        hintText: 'Name of the prompt',
+                        filled: true,
+                        fillColor: const Color.fromARGB(15, 0, 0, 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(0, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                    ),
+                    if (nameError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          nameError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+
+                    // Category field
+                    if (!isPrivatePrompt) ...[
+                      const SizedBox(height: 15),
+                      const Text.rich(
+                        TextSpan(
+                          text: 'Category',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<Category>(
+                        menuMaxHeight: 200,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color.fromARGB(15, 0, 0, 0),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(0, 0, 0, 0),
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(0, 0, 0, 0),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                        dropdownColor: Colors.white,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16),
+                        value: selectedDropdownCategory,
+                        hint: const Text('Select a category'),
+                        onChanged: (Category? newValue) {
+                          setState(() {
+                            selectedDropdownCategory = newValue!;
+                          });
+                        },
+                        items: Category.values
+                            .where((category) => category != Category.All)
+                            .map<DropdownMenuItem<Category>>((Category value) {
+                          return DropdownMenuItem<Category>(
+                            value: value,
+                            child: Text(value.name),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+
+                    const SizedBox(height: 15),
+
+                    // Prompt field
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Prompt',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: promptController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        labelStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        hintText:
+                            'Use square brackets [ ] to specify user input.',
+                        filled: true,
+                        fillColor: const Color.fromARGB(15, 0, 0, 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(0, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                    ),
+                    if (promptError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          promptError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black45),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Create',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              nameError = null; // Reset error
+                              promptError = null; // Reset error
+
+                              if (nameController.text.isEmpty) {
+                                nameError = 'The field is required.';
+                              }
+                              if (promptController.text.isEmpty) {
+                                promptError = 'The field is required.';
+                              }
+
+                              // check empty field
+                              if (nameError == null && promptError == null) {
+                                Prompt prompt = Prompt(
+                                  id: "id",
+                                  prompt: promptController.text,
+                                  category: selectedDropdownCategory,
+                                  promptType: isPrivatePrompt
+                                      ? PromptType.private
+                                      : PromptType.public,
+                                  name: nameController.text,
+                                  isFavorite: false,
+                                  isMine: true,
+                                );
+                                Navigator.of(context).pop();
+                                _addPrompt(prompt);
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showEditPromptDialog(BuildContext context, int index) async {
+    Category? selectedDropdownCategory = Category.Other;
+    TextEditingController nameController = TextEditingController();
+    TextEditingController promptController = TextEditingController();
+
+    nameController.text = promptList[index].name;
+    promptController.text = promptList[index].prompt;
+
+    String? nameError;
+    String? promptError;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    // Title
+
+                    const Text(
+                      "Edit prompt",
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: Colors.black,
@@ -541,7 +946,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         ),
                         hintText: 'Name of the prompt',
                         filled: true,
-                        fillColor: const Color.fromARGB(10, 0, 0, 0),
+                        fillColor: const Color.fromARGB(15, 0, 0, 0),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: const BorderSide(
@@ -561,75 +966,78 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         FocusManager.instance.primaryFocus?.unfocus();
                       },
                     ),
+                    if (nameError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          nameError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
 
                     // Category field
-                    isPrivatePrompt
-                        ? Container()
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 15),
-                              const Text.rich(
-                                TextSpan(
-                                  text: 'Category',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: ' *',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              DropdownButtonFormField<Category>(
-                                menuMaxHeight: 200,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color.fromARGB(10, 0, 0, 0),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(
-                                      color: Color.fromARGB(0, 0, 0, 0),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(
-                                      color: Color.fromARGB(0, 0, 0, 0),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                ),
-                                dropdownColor: Colors.white,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16),
-                                value: selectedDropdownCategory,
-                                hint: const Text('Select a category'),
-                                onChanged: (Category? newValue) {
-                                  setState(() {
-                                    selectedDropdownCategory = newValue;
-                                  });
-                                },
-                                items: Category.values
-                                    .map<DropdownMenuItem<Category>>(
-                                        (Category value) {
-                                  return DropdownMenuItem<Category>(
-                                    value: value,
-                                    child: Text(value.name),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
+                    if (promptList[index].promptType == PromptType.public) ...[
+                      const SizedBox(height: 15),
+                      const Text.rich(
+                        TextSpan(
+                          text: 'Category',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
                           ),
+                          children: [
+                            TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<Category>(
+                        menuMaxHeight: 200,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color.fromARGB(15, 0, 0, 0),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(0, 0, 0, 0),
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(0, 0, 0, 0),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                        dropdownColor: Colors.white,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16),
+                        value: selectedDropdownCategory,
+                        hint: const Text('Select a category'),
+                        onChanged: (Category? newValue) {
+                          setState(() {
+                            selectedDropdownCategory = newValue!;
+                          });
+                        },
+                        items: Category.values
+                            .where((category) => category != Category.All)
+                            .map<DropdownMenuItem<Category>>((Category value) {
+                          return DropdownMenuItem<Category>(
+                            value: value,
+                            child: Text(value.name),
+                          );
+                        }).toList(),
+                      ),
+                    ],
 
                     const SizedBox(height: 15),
 
@@ -654,7 +1062,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: promptController,
-                      maxLines: 3,
+                      maxLines: 5,
                       decoration: InputDecoration(
                         hintStyle: const TextStyle(
                           color: Colors.black45,
@@ -668,7 +1076,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         hintText:
                             'Use square brackets [ ] to specify user input.',
                         filled: true,
-                        fillColor: const Color.fromARGB(10, 0, 0, 0),
+                        fillColor: const Color.fromARGB(15, 0, 0, 0),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: const BorderSide(
@@ -688,6 +1096,15 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         FocusManager.instance.primaryFocus?.unfocus();
                       },
                     ),
+                    if (promptError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          promptError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -713,23 +1130,148 @@ class _PromptLibraryState extends State<PromptLibrary> {
                             ),
                           ),
                           child: const Text(
-                            'Create',
+                            'Edit',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           ),
                           onPressed: () {
-                            Prompt prompt = Prompt(
-                                id: "id",
-                                prompt: promptController.text,
-                                category: selectedDropdownCategory!,
-                                promptType: isPrivatePrompt
-                                    ? PromptType.private
-                                    : PromptType.public,
-                                name: nameController.text,
-                                isFavorite: false);
+                            setState(() {
+                              nameError = null; // Reset error
+                              promptError = null; // Reset error
+
+                              if (nameController.text.isEmpty) {
+                                nameError = 'The field is required.';
+                              }
+                              if (promptController.text.isEmpty) {
+                                promptError = 'The field is required.';
+                              }
+
+                              if (nameError == null && promptError == null) {
+                                Prompt prompt = Prompt(
+                                  id: promptList[index].id,
+                                  prompt: promptController.text,
+                                  category: selectedDropdownCategory!,
+                                  promptType: promptList[index].promptType,
+                                  name: nameController.text,
+                                  isFavorite: promptList[index].isFavorite,
+                                  isMine: promptList[index].isMine,
+                                );
+                                Navigator.of(context).pop();
+                                _editPrompt(prompt, index);
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showPublicPromptInfo(BuildContext context, int index) async {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController promptController = TextEditingController();
+
+    nameController.text = promptList[index].name;
+    promptController.text = promptList[index].prompt;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    // Title
+
+                    Text(
+                      promptList[index].name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+                    // Prompt field
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Prompt',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      readOnly: true,
+                      controller: promptController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        labelStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        filled: true,
+                        fillColor: const Color.fromARGB(15, 0, 0, 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(0, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                    ),
+
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black45),
+                          ),
+                          onPressed: () {
                             Navigator.of(context).pop();
-                            _addPrompt(prompt);
                           },
                         ),
                       ],
@@ -747,6 +1289,12 @@ class _PromptLibraryState extends State<PromptLibrary> {
   void _addPrompt(Prompt prompt) {
     setState(() {
       promptList.add(prompt);
+    });
+  }
+
+  void _editPrompt(Prompt newPrompt, int index) {
+    setState(() {
+      promptList[index] = newPrompt;
     });
   }
 

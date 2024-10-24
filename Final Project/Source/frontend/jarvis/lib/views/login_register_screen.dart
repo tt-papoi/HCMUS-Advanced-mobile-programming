@@ -266,7 +266,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
               color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 14),
           hintText: hint,
           filled: true,
-          fillColor: const Color.fromARGB(10, 0, 0, 0),
+          fillColor: const Color.fromARGB(15, 0, 0, 0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,

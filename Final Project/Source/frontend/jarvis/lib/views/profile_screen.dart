@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hintStyle: const TextStyle(
                       color: Colors.black45, fontWeight: FontWeight.normal),
                   filled: true,
-                  fillColor: const Color.fromARGB(10, 0, 0, 0),
+                  fillColor: const Color.fromARGB(15, 0, 0, 0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hintStyle: const TextStyle(
                       color: Colors.black45, fontWeight: FontWeight.normal),
                   filled: true,
-                  fillColor: const Color.fromARGB(10, 0, 0, 0),
+                  fillColor: const Color.fromARGB(15, 0, 0, 0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
