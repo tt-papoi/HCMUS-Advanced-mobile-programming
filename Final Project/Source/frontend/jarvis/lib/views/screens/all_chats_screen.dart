@@ -4,12 +4,18 @@ import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/chat_screen.dart';
+import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
+import 'package:jarvis/views/screens/chat_screen.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 
-class AllChatsScreen extends StatelessWidget {
-  AllChatsScreen({super.key});
+class AllChatsScreen extends StatefulWidget {
+  const AllChatsScreen({super.key});
 
+  @override
+  State<AllChatsScreen> createState() => _AllChatsScreenState();
+}
+
+class _AllChatsScreenState extends State<AllChatsScreen> {
   final List<ChatInfo> chatInfoList = [
     ChatInfo(
       mainContent: 'Drawer Creation',
@@ -25,6 +31,7 @@ class AllChatsScreen extends StatelessWidget {
         imagePath: 'lib/assets/icons/robot.png',
         id: '',
         botType: BotType.createdBot,
+        prompt: 'You are my assistant',
       ),
     ),
     ChatInfo(
@@ -157,9 +164,10 @@ class AllChatsScreen extends StatelessWidget {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'delete',
-                        child: Text('Delete'),
+                        child: const Text('Delete'),
+                        onTap: () {},
                       ),
                     ],
                   ),
@@ -178,30 +186,23 @@ class AllChatsScreen extends StatelessWidget {
     );
   }
 
+  void _deleteChat(int index) {
+    setState(() {
+      chatInfoList.removeAt(index);
+    });
+  }
+
   void _showDeleteConfirmationDialog(BuildContext context, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Confirm '),
-          content: const Text('Are you sure you want to delete this chat?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Handle the deletion logic here
-                Navigator.of(context).pop(); // Dismiss the dialog
-                // You can add the logic to remove the chat from the list here
-              },
-              child: const Text('Delete'),
-            ),
-          ],
+        return ConfirmDeleteDialog<ChatInfo>(
+          title: 'Delete chat',
+          content: 'Are you sure you want to delete this chat?',
+          onDelete: (chatInfo) {
+            _deleteChat(index);
+          },
+          parameter: chatInfoList[index],
         );
       },
     );

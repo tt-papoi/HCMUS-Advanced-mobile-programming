@@ -87,17 +87,20 @@ class _CreateKnowledgeSourceScreenState
         child: ListView(
           children: [
             // Name with asterisk
-            RichText(
-              text: const TextSpan(
+            const Text.rich(
+              TextSpan(
                 text: 'Name',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 children: [
                   TextSpan(
                     text: ' *',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -105,7 +108,7 @@ class _CreateKnowledgeSourceScreenState
             const SizedBox(height: 8),
             TextField(
               minLines: 1,
-              maxLines: null,
+              maxLines: 1,
               controller: nameController,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -120,7 +123,7 @@ class _CreateKnowledgeSourceScreenState
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -134,18 +137,20 @@ class _CreateKnowledgeSourceScreenState
             ),
             const SizedBox(height: 16),
             // Description
-            RichText(
-              text: const TextSpan(
+            const Text.rich(
+              TextSpan(
                 text: 'Description',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: descriptionController,
+              minLines: 1,
               maxLines: 3,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -154,13 +159,13 @@ class _CreateKnowledgeSourceScreenState
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText: 'Description of the Knowledge Source',
+                hintText: 'Optional',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/login_register_screen.dart';
-import 'package:jarvis/screens/support_screen.dart';
+import 'package:jarvis/views/screens/login_register_screen.dart';
+import 'package:jarvis/views/screens/support_screen.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -116,25 +116,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading: const Icon(Icons.logout, color: Colors.blueAccent),
-                title: const Text(
-                  'Log out',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                onTap: () => _logout(context),
+              leading: const Icon(Icons.logout, color: Colors.blueAccent),
+              title: const Text(
+                'Log out',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
+              onTap: () => _logout(context),
             ),
             const Divider(
               indent: 0,
@@ -142,25 +140,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               endIndent: 0,
               height: 0,
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(12),
                   bottomRight: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading: const Icon(Icons.lock, color: Colors.blueAccent),
-                title: const Text(
-                  'Change Password',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                onTap: () => _changePassword(context),
+              leading: const Icon(Icons.lock, color: Colors.blueAccent),
+              title: const Text(
+                'Change Password',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
+              onTap: () => _changePassword(context),
             ),
             const SizedBox(height: 20),
             const Text(
@@ -168,25 +164,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(12),
                   topLeft: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading: const Icon(Icons.settings, color: Colors.blueAccent),
-                title: const Text(
-                  'Settings',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                onTap: () => (context),
+              leading: const Icon(Icons.settings, color: Colors.blueAccent),
+              title: const Text(
+                'Settings',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
+              onTap: () => (context),
             ),
             const Divider(
               indent: 0,
@@ -194,26 +188,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               endIndent: 0,
               height: 0,
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(12),
                   bottomRight: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading: const Icon(Icons.help, color: Colors.blueAccent),
-                title: const Text(
-                  'Help',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                onTap: () => Navigator.push(
-                    context, FadeRoute(page: const SupportScreen())),
+              leading: const Icon(Icons.help, color: Colors.blueAccent),
+              title: const Text(
+                'Help',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
+              onTap: () => Navigator.push(
+                  context, FadeRoute(page: const SupportScreen())),
             ),
             const SizedBox(height: 20),
             const Text(
@@ -221,53 +213,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading:
-                    const Icon(Icons.privacy_tip, color: Colors.blueAccent),
-                title: const Text(
-                  'Privacy Policy',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.white,
-                        title: const Text(
-                          'Privacy Policy',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        content: const Text(
-                            'JPrivacy Policy and other information.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Close',
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
+              leading: const Icon(Icons.privacy_tip, color: Colors.blueAccent),
+              title: const Text(
+                'Privacy Policy',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: Colors.white,
+                      title: const Text(
+                        'Privacy Policy',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      content:
+                          const Text('Privacy Policy and other information.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
             const Divider(
               indent: 0,
@@ -275,34 +264,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
               endIndent: 0,
               height: 0,
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(10, 0, 0, 0),
+            ListTile(
+              tileColor: const Color.fromARGB(10, 0, 0, 0),
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(12),
                   bottomRight: Radius.circular(12),
                 ),
               ),
-              child: ListTile(
-                leading: Image.asset(
-                  "lib/assets/icons/logo_blueAccent.png",
-                  height: 20,
-                  width: 20,
-                ),
-                title: const Text(
-                  'Version',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                trailing: const Text(
-                  "1.0.0",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
+              leading: Image.asset(
+                "lib/assets/icons/logo_blueAccent.png",
+                height: 20,
+                width: 20,
+              ),
+              title: const Text(
+                'Version',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
+              ),
+              trailing: const Text(
+                "1.0.0",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
             ),
           ],

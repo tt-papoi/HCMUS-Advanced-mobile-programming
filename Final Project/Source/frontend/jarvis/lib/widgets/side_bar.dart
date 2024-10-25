@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/all_chats_screen.dart';
-import 'package:jarvis/screens/explore_screen.dart';
-import 'package:jarvis/screens/mybot_screen.dart';
-import 'package:jarvis/screens/profile_screen.dart';
+import 'package:jarvis/views/screens/all_chats_screen.dart';
+import 'package:jarvis/views/screens/explore_screen.dart';
+import 'package:jarvis/views/screens/mybot_screen.dart';
+import 'package:jarvis/views/screens/profile_screen.dart';
+import 'package:jarvis/views/screens/subscribe_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 
@@ -29,7 +30,7 @@ class SideBar extends StatelessWidget {
             _buildListTile(
               icon: Icons.chat_outlined,
               title: 'All chats',
-              customOnTap: () => _navigateTo(context, AllChatsScreen()),
+              customOnTap: () => _navigateTo(context, const AllChatsScreen()),
             ),
 
             // navigate to Profile screen
@@ -46,7 +47,7 @@ class SideBar extends StatelessWidget {
               icon: Icons.assistant_rounded,
               title: 'Subscribe',
               customOnTap: () {
-                // Add your navigation logic here
+                _navigateTo(context, const SubscribeScreen());
               },
             ),
           ],

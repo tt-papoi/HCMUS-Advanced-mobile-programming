@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/prompt.dart';
-import 'package:jarvis/widgets/prompt_library.dart';
+import 'package:jarvis/views/dialogs/prompt_library_dialog.dart';
 
 class UsedPromptDialog extends StatefulWidget {
   final Prompt prompt;

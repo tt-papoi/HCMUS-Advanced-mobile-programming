@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/chat_screen.dart';
+import 'package:jarvis/views/screens/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';

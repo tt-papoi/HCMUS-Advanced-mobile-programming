@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
+import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class BotBar extends StatefulWidget {
   const BotBar({super.key});
@@ -116,37 +117,7 @@ class BotBarState extends State<BotBar> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              TextField(
-                onTapOutside: (event) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                },
-                decoration: InputDecoration(
-                  hintText: "Search for more bots",
-                  hintStyle: const TextStyle(
-                      fontWeight: FontWeight.normal, color: Colors.black45),
-                  prefixIcon: const Icon(Icons.search),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 10.0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        const BorderSide(color: Colors.black12, width: 1.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        const BorderSide(color: Colors.black12, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        const BorderSide(color: Colors.blueAccent, width: 1.0),
-                  ),
-                ),
-                onChanged: (value) {
-                  // You can implement filtering logic here based on the value
-                },
-              ),
+              CustomSearchBar(hintText: "Search", onChanged: (String value) {}),
               Expanded(
                 child: ListView.separated(
                   itemCount: botList.length,

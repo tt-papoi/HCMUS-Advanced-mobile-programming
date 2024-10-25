@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/create_knowledge_source_screen.dart';
+import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
+import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
+import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class EditBotScreen extends StatefulWidget {
   final Bot bot;
@@ -46,8 +48,10 @@ class _EditBotScreenState extends State<EditBotScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             String searchQuery = ''; // Track search input
-
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               title: const Text('Add Knowledge Source'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -56,41 +60,13 @@ class _EditBotScreenState extends State<EditBotScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          onTapOutside: (event) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Search for more sources",
-                            hintStyle: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black45),
-                            prefixIcon: const Icon(Icons.search),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 15.0, horizontal: 10.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.black12, width: 1.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.black12, width: 1.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.blueAccent, width: 1.0),
-                            ),
-                          ),
-                          onChanged: (value) {
-                            setStateDialog(() {
-                              searchQuery = value
-                                  .toLowerCase(); // Update the search query
-                            });
-                          },
-                        ),
+                        child: CustomSearchBar(
+                            hintText: "Search",
+                            onChanged: (String value) {
+                              setStateDialog(() {
+                                searchQuery = value.toLowerCase();
+                              });
+                            }),
                       ),
                       const SizedBox(
                           width: 10), // Spacing between search and button
@@ -198,6 +174,24 @@ class _EditBotScreenState extends State<EditBotScreen> {
     );
   }
 
+  void _showDeleteConfirmationDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmDeleteDialog<KnowledgeSource>(
+          title: 'Delete knowledge source',
+          content: 'Are you sure you want to delete this knowledge source?',
+          onDelete: (knowledgeSource) {
+            setState(() {
+              dataSources.removeAt(index);
+            });
+          },
+          parameter: dataSources[index],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -238,7 +232,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
             const SizedBox(height: 8),
             TextField(
               minLines: 1,
-              maxLines: null,
+              maxLines: 1,
               controller: nameController,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -247,14 +241,13 @@ class _EditBotScreenState extends State<EditBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    '4–20 characters: letters, numbers, dashes, periods, underscores.',
+                hintText: '4–20 characters',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -289,6 +282,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: promptController,
+              minLines: 1,
               maxLines: 3,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -297,14 +291,13 @@ class _EditBotScreenState extends State<EditBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    'Describe bot behavior and response. Be clear and specific.',
+                hintText: 'Describe bot behavior and response',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -317,14 +310,27 @@ class _EditBotScreenState extends State<EditBotScreen> {
               },
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Knowledge sources',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.black),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Knowledge sources',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+                InkWell(
+                    onTap: () {
+                      _showKnowledgeSourceDialog();
+                    },
+                    child: const Icon(Icons.add_box_rounded,
+                        color: Colors.blueAccent, size: 25)),
+              ],
             ),
             const SizedBox(height: 8),
+
+            // Knowledge sources description
             const Text(
               'Provide custom knowledge that your bot will access to inform its responses.',
               style: TextStyle(color: Colors.black54, fontSize: 16),
@@ -335,6 +341,8 @@ class _EditBotScreenState extends State<EditBotScreen> {
               itemBuilder: (context, index) {
                 final knowledgeSource = dataSources[index];
                 return ListTile(
+                  onTap: () => {},
+                  contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                   leading: const Icon(
                     Icons.file_copy_rounded,
                     color: Colors.blueAccent,
@@ -342,67 +350,33 @@ class _EditBotScreenState extends State<EditBotScreen> {
                   title: Text(
                     knowledgeSource.name,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.blueAccent,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Description: ${knowledgeSource.description}",
-                        selectionColor: Colors.black87,
-                      ), // Hiển thị thêm mô tả nếu có
-                    ],
+                  subtitle: Text(
+                    knowledgeSource.description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   trailing: PopupMenuButton<String>(
                     color: Colors.white,
-                    onSelected: (String result) {
-                      if (result == 'Delete') {
-                        setState(() {
-                          dataSources.removeAt(index);
-                        });
-                      }
-                    },
+                    onSelected: (String result) {},
                     itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'Delete',
-                        child: Text(
-                          'Delete',
-                        ),
+                        child: const Text('Delete'),
+                        onTap: () {
+                          setState(() {
+                            _showDeleteConfirmationDialog(context, index);
+                          });
+                        },
                       ),
                     ],
                   ),
                 );
               },
             ),
-
-            const SizedBox(height: 16),
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                _showKnowledgeSourceDialog();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black54, width: 1.0)),
-                child: const Center(
-                  child: Text(
-                    'Add knowledge source',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Display selected knowledge sources
 
             const SizedBox(height: 16),
             InkWell(

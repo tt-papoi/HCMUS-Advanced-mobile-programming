@@ -123,17 +123,20 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             ),
             const SizedBox(height: 16),
             // Name with asterisk
-            RichText(
-              text: const TextSpan(
+            const Text.rich(
+              TextSpan(
                 text: 'Name',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 children: [
                   TextSpan(
                     text: ' *',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -141,7 +144,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             const SizedBox(height: 8),
             TextField(
               minLines: 1,
-              maxLines: null,
+              maxLines: 1,
               controller: nameController,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -150,14 +153,13 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    '4–20 characters: letters, numbers, dashes, periods, underscores.',
+                hintText: '4–20 characters',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -171,17 +173,20 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             ),
             const SizedBox(height: 16),
             // Prompt with asterisk
-            RichText(
-              text: const TextSpan(
+            const Text.rich(
+              TextSpan(
                 text: 'Prompt',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 children: [
                   TextSpan(
                     text: ' *',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -189,6 +194,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: promptController,
+              minLines: 1,
               maxLines: 3,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -197,14 +203,13 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText:
-                    'Describe bot behavior and response. Be clear and specific.',
+                hintText: 'Describe bot behavior and response',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/create_bot_screen.dart';
-import 'package:jarvis/screens/create_knowledge_source_screen.dart';
-import 'package:jarvis/screens/edit_bot_screen.dart';
-import 'package:jarvis/screens/edit_knowledge_source.dart';
+import 'package:jarvis/views/screens/create_bot_screen.dart';
+import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
+import 'package:jarvis/views/screens/edit_bot_screen.dart';
+import 'package:jarvis/views/screens/edit_knowledge_source.dart';
+import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class MybotScreen extends StatefulWidget {
   const MybotScreen({super.key});
@@ -24,6 +25,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      prompt: 'You are my assistant',
       knowledgeSources: [],
     ),
     Bot(
@@ -32,6 +34,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      prompt: 'You are my hero',
       knowledgeSources: [],
     ),
     Bot(
@@ -40,6 +43,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      prompt: 'You are my Assistant of Luto Project',
       knowledgeSources: [],
     ),
     Bot(
@@ -48,6 +52,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      prompt: 'Assistant for Turbo Project',
       knowledgeSources: [],
     ),
   ];
@@ -63,7 +68,6 @@ class MybotScreenState extends State<MybotScreen> {
         description: "This knowledge source is used for my house"),
   ];
 
-  final TextEditingController searchController = TextEditingController();
   List<Bot> filteredBotList = []; // List to store filtered bots
 
   @override
@@ -74,7 +78,6 @@ class MybotScreenState extends State<MybotScreen> {
 
   @override
   void dispose() {
-    searchController.dispose();
     super.dispose();
   }
 
@@ -211,37 +214,7 @@ class MybotScreenState extends State<MybotScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Column(
         children: [
-          TextField(
-            controller: searchController,
-            onTapOutside: (event) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            decoration: InputDecoration(
-              hintText: "Search for more bots",
-              hintStyle: const TextStyle(
-                  fontWeight: FontWeight.normal, color: Colors.black45),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.black45,
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide:
-                    const BorderSide(color: Colors.blueAccent, width: 1.0),
-              ),
-            ),
-            onChanged: _filterBots,
-          ),
+          CustomSearchBar(hintText: "Search", onChanged: _filterBots),
           Expanded(
             child: ListView.separated(
               itemCount: filteredBotList.length,
@@ -258,27 +231,8 @@ class MybotScreenState extends State<MybotScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  subtitle: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          bot.botType == BotType.offical
-                              ? 'OFFICIAL'
-                              : "MY BOT",
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  subtitle: Text(bot.prompt ?? '',
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
                   trailing: PopupMenuButton<String>(
                     color: Colors.white,
                     onSelected: (String result) {
@@ -348,35 +302,7 @@ class MybotScreenState extends State<MybotScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Column(
         children: [
-          TextField(
-            onTapOutside: (event) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            decoration: InputDecoration(
-              hintText: "Search for more knowledge sources",
-              hintStyle: const TextStyle(
-                  fontWeight: FontWeight.normal, color: Colors.black45),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.black45,
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide:
-                    const BorderSide(color: Colors.blueAccent, width: 1.0),
-              ),
-            ),
-          ),
+          CustomSearchBar(hintText: "Search", onChanged: (String value) {}),
           Expanded(
             child: ListView.separated(
               itemCount: knowledgeSourceList.length,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/screens/login_register_screen.dart';
+import 'package:jarvis/views/screens/login_register_screen.dart';
 
 void main() {
   runApp(const JarvisApp());

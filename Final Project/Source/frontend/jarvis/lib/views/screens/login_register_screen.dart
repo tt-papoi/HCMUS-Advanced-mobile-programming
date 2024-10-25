@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/screens/forgot_password_screen.dart';
+import 'package:jarvis/views/screens/forgot_password_screen.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/home_screen.dart';
+import 'package:jarvis/views/screens/home_screen.dart';
 
 class LoginRegisterScreen extends StatefulWidget {
   const LoginRegisterScreen({super.key});

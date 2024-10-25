@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/knowledge_source.dart';
-import 'package:jarvis/widgets/confluence_dialog.dart';
-
-import 'package:jarvis/widgets/google_drive_dialog.dart';
-import 'package:jarvis/widgets/local_file_dialog.dart';
+import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
+import 'package:jarvis/views/dialogs/confluence_dialog.dart';
+import 'package:jarvis/views/dialogs/google_drive_dialog.dart';
+import 'package:jarvis/views/dialogs/local_file_dialog.dart';
+import 'package:jarvis/views/dialogs/website_dialog.dart';
 import 'package:jarvis/widgets/slack_dialog.dart';
-import 'package:jarvis/widgets/website_dialog.dart';
 
 class EditKnowledgeSourceScreen extends StatefulWidget {
   final KnowledgeSource knowledgeSource;
@@ -148,6 +148,9 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           backgroundColor: Colors.white,
           title: const Text(
             'Add Data Sources',
@@ -241,18 +244,21 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // Name field
-            RichText(
-              text: const TextSpan(
+            // Name with asterisk
+            const Text.rich(
+              TextSpan(
                 text: 'Name',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
                 children: [
                   TextSpan(
                     text: ' *',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -260,7 +266,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
             const SizedBox(height: 8),
             TextField(
               minLines: 1,
-              maxLines: null,
+              maxLines: 1,
               controller: nameController,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -275,7 +281,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -288,19 +294,21 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
               },
             ),
             const SizedBox(height: 16),
-            // Description field
-            RichText(
-              text: const TextSpan(
+            // Description
+            const Text.rich(
+              TextSpan(
                 text: 'Description',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: descriptionController,
+              minLines: 1,
               maxLines: 3,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
@@ -309,12 +317,13 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
+                hintText: 'Optional',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide:
-                      const BorderSide(color: Colors.black54, width: 1.0),
+                      const BorderSide(color: Colors.black26, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -328,56 +337,70 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
             ),
             const SizedBox(height: 16),
             // Unit List
-            RichText(
-              text: const TextSpan(
-                text: 'Units',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text.rich(
+                  TextSpan(
+                    text: 'Units',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                InkWell(
+                    onTap: () {
+                      _showKnowledgeSourceDialog();
+                    },
+                    child: const Icon(Icons.add_box_rounded,
+                        color: Colors.blueAccent, size: 25)),
+              ],
             ),
             const SizedBox(height: 8),
-            ListView.builder(
+            ListView.separated(
               shrinkWrap: true,
               itemCount: units.length,
               itemBuilder: (context, index) {
                 final unit = units[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  child: ListTile(
-                    leading: Icon(
-                      unit.unitType == UnitType.localfile
-                          ? Icons.insert_drive_file
-                          : unit.unitType == UnitType.googleDrive
-                              ? Icons.drive_folder_upload
-                              : unit.unitType == UnitType.slack
-                                  ? Icons.folder
-                                  : unit.unitType == UnitType.website
-                                      ? Icons.language
-                                      : unit.unitType == UnitType.confluence
-                                          ? Icons.code
-                                          : Icons.help,
-                      color: Colors.blue,
-                    ),
-                    title: Text(
-                      unit.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      {
-                            "localfile": "Local File",
-                            "googledrive": "Google Drive",
-                            "slack": "Slack",
-                            "website": "Website",
-                            "confluence": "Confluence"
-                          }[unit.unitType.toString().split('.').last] ??
-                          unit.unitType.toString().split('.').last,
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Switch(
+                return ListTile(
+                  contentPadding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                  leading: Icon(
+                    unit.unitType == UnitType.localfile
+                        ? Icons.insert_drive_file
+                        : unit.unitType == UnitType.googleDrive
+                            ? Icons.drive_folder_upload
+                            : unit.unitType == UnitType.slack
+                                ? Icons.folder
+                                : unit.unitType == UnitType.website
+                                    ? Icons.language
+                                    : unit.unitType == UnitType.confluence
+                                        ? Icons.code
+                                        : Icons.help,
+                    color: Colors.blue,
+                  ),
+                  title: Text(
+                    unit.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    {
+                          "localfile": "Local File",
+                          "googledrive": "Google Drive",
+                          "slack": "Slack",
+                          "website": "Website",
+                          "confluence": "Confluence"
+                        }[unit.unitType.toString().split('.').last] ??
+                        unit.unitType.toString().split('.').last,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Transform.scale(
+                        scale:
+                            0.6, // Adjust the scale factor to make it smaller
+                        child: Switch(
                           value: unit.isEnabled ??
                               false, // Assuming you have isEnabled in Unit class
                           activeColor: Colors.blueAccent, // Màu khi bật
@@ -387,23 +410,42 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                               unit.isEnabled = value;
                             });
                           },
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap, // Change size
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.black54),
-                          onPressed: () => _removeUnit(unit),
-                        ),
-                      ],
-                    ),
+                      ),
+                      PopupMenuButton<String>(
+                        color: Colors.white,
+                        onSelected: (String result) {},
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem(
+                            value: 'Delete',
+                            child: const Text('Delete'),
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return ConfirmDeleteDialog(
+                                        onDelete: _removeUnit,
+                                        title: "Delete",
+                                        content:
+                                            "Are you sure you want to delete this unit?",
+                                        parameter: unit);
+                                  });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 );
               },
-            ),
-
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: _showKnowledgeSourceDialog,
-              icon: const Icon(Icons.add),
-              label: const Text('Add Unit'),
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider(
+                  height: 0,
+                  thickness: 0.5,
+                );
+              },
             ),
             const SizedBox(height: 16),
             // Save button

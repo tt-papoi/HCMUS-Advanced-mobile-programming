@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/prompt.dart';
-import 'package:jarvis/widgets/used_prompt_dialog.dart';
+import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
+import 'package:jarvis/views/dialogs/used_prompt_dialog.dart';
+import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class PromptLibrary extends StatefulWidget {
   const PromptLibrary({super.key});
@@ -174,12 +176,15 @@ class _PromptLibraryState extends State<PromptLibrary> {
 
   Widget _buildSearchBar() {
     return isShowMyPrompt
-        ? _buildSearchField()
+        ? CustomSearchBar(hintText: "Search", onChanged: (String value) {})
         : Column(
             children: [
               Row(
                 children: [
-                  Expanded(child: _buildSearchField()),
+                  Expanded(
+                    child: CustomSearchBar(
+                        hintText: "Search", onChanged: (String value) {}),
+                  ),
                   const SizedBox(width: 10),
                   _buildFavoriteFilterButton(),
                 ],
@@ -199,40 +204,6 @@ class _PromptLibraryState extends State<PromptLibrary> {
               ),
             ],
           );
-  }
-
-  Widget _buildSearchField() {
-    return TextField(
-      onTapOutside: (event) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      decoration: InputDecoration(
-        hintText: "Search",
-        hintStyle: const TextStyle(
-            fontWeight: FontWeight.normal, color: Colors.black45),
-        prefixIcon: const Icon(
-          Icons.search,
-          color: Colors.black45,
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: Colors.black12, width: 1.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: Colors.blueAccent, width: 1.0),
-        ),
-      ),
-      onChanged: (value) {
-        // Implement filtering logic here based on the value
-      },
-    );
   }
 
   Widget _buildFavoriteFilterButton() {
@@ -393,51 +364,11 @@ class _PromptLibraryState extends State<PromptLibrary> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          title: const Text(
-                            'Delete Prompt',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          content: const Text(
-                            'Are you sure you want to delete this prompt?',
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black45),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            const SizedBox(width: 10),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                              ),
-                              child: const Text(
-                                'Delete',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                _deletePrompt(index);
-                              },
-                            ),
-                          ],
+                        return ConfirmDeleteDialog(
+                          onDelete: _deletePrompt,
+                          parameter: index,
+                          title: '',
+                          content: '',
                         );
                       },
                     );

@@ -3,9 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/screens/email_reply_screen.dart';
+import 'package:jarvis/views/screens/email_reply_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
-import 'package:jarvis/widgets/prompt_library.dart';
+import 'package:jarvis/views/dialogs/prompt_library_dialog.dart';
 
 class ChatBar extends StatefulWidget {
   final String hintMessage;
