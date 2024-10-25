@@ -206,7 +206,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Delete',
+                    'Add',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
