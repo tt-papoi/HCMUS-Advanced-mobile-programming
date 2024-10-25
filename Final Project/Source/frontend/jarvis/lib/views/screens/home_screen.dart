@@ -8,7 +8,6 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
-// Import File for image handling
 
 class Suggestion {
   final String title;
@@ -22,6 +21,9 @@ class HomeScreen extends StatelessWidget {
 
   // Define a GlobalKey for BotBar
   final GlobalKey<BotBarState> botBarKey = GlobalKey<BotBarState>();
+
+  // ValueNotifier to manage BotBar visibility
+  final ValueNotifier<bool> _isBotBarVisible = ValueNotifier<bool>(true);
 
   // List of suggestions
   final List<Suggestion> suggestions = [
@@ -123,11 +125,19 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          BotBar(key: botBarKey),
+          ValueListenableBuilder<bool>(
+            valueListenable: _isBotBarVisible,
+            builder: (context, isVisible, child) {
+              return isVisible ? BotBar(key: botBarKey) : Container();
+            },
+          ),
           ChatBar(
             hintMessage: 'Start a new chat',
             onSendMessage: (ChatMessage message) {
               _startNewChat(context, message);
+            },
+            onSlashTyped: (bool isSlashTyped) {
+              _isBotBarVisible.value = !isSlashTyped;
             },
           ),
         ],
