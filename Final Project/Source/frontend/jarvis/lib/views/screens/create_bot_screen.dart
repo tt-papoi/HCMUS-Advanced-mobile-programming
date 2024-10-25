@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jarvis/models/bot.dart';
+import 'package:jarvis/utils/dialog_utils.dart';
 
 class CreateBotScreen extends StatefulWidget {
   const CreateBotScreen({super.key});
@@ -42,11 +43,12 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
 
     // Simple form validation
     if (botName.isEmpty || botName.length < 4 || botName.length > 20) {
-      _showErrorDialog("Name must be between 4 and 20 characters.");
+      DialogUtils.showErrorDialog(
+          context, "Name must be between 4 and 20 characters.");
       return;
     }
     if (botPrompt.isEmpty) {
-      _showErrorDialog("Prompt is required.");
+      DialogUtils.showErrorDialog(context, "Prompt is required.");
       return;
     }
 
@@ -54,6 +56,8 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
     Bot newBot = Bot(
       name: botName,
       description: botPrompt, // Using prompt as description for now
+      prompt: botPrompt,
+
       imagePath: imageData != null
           ? 'path/to/saved/image' // Specify where you would save the image
           : 'lib/assets/icons/robot.png', // Assuming default image if not selected
@@ -63,27 +67,6 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
 
     // Return the newly created bot to the previous screen
     Navigator.pop(context, newBot);
-  }
-
-  // Method to show error dialogs
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

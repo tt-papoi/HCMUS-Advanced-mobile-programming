@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/utils/dialog_utils.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
@@ -24,14 +25,14 @@ class _EditBotScreenState extends State<EditBotScreen> {
   late TextEditingController nameController;
   late TextEditingController promptController;
   late List<KnowledgeSource> dataSources;
-  Set<KnowledgeSource> selectedSources = {};
+  KnowledgeSource? selectedSource;
 
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.bot.name);
     promptController = TextEditingController(text: widget.bot.prompt);
-    dataSources = widget.bot.knowledgeSources!;
+    dataSources = widget.bot.knowledgeSources ?? [];
   }
 
   @override
@@ -49,68 +50,72 @@ class _EditBotScreenState extends State<EditBotScreen> {
           builder: (context, setStateDialog) {
             String searchQuery = ''; // Track search input
             return AlertDialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              title: const Text('Add Knowledge Source'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Row for Search bar and Create button
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomSearchBar(
+              title: const Text(
+                'Add Knowledge Source',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Row for Search bar and Create button
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomSearchBar(
                             hintText: "Search",
                             onChanged: (String value) {
                               setStateDialog(() {
                                 searchQuery = value.toLowerCase();
                               });
-                            }),
-                      ),
-                      const SizedBox(
-                          width: 10), // Spacing between search and button
-                      Material(
-                        color: Colors.transparent,
-                        child: Ink(
-                          decoration: const ShapeDecoration(
-                            color: Colors.blueAccent,
-                            shape: CircleBorder(),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.add,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.push(
-                                context,
-                                FadeRoute(
-                                    page: const CreateKnowledgeSourceScreen()),
-                              );
                             },
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                      height: 16), // Add spacing after search and create button
-
-                  // List of knowledge sources (filtered by search)
-                  Expanded(
-                    child: SizedBox(
-                      width: double.maxFinite,
-                      child: ListView.builder(
-                        shrinkWrap: true,
+                        const SizedBox(
+                            width: 10), // Spacing between search and button
+                        InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              FadeRoute(
+                                page: const CreateKnowledgeSourceScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.create_new_folder_outlined,
+                              color: Colors.black45,
+                              size: 25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    // List of knowledge sources (filtered by search)
+                    Expanded(
+                      child: ListView.separated(
                         itemCount: widget.knowledgeSourceList.length,
                         itemBuilder: (context, index) {
                           final knowledgeSource =
                               widget.knowledgeSourceList[index];
-                          final isSelected =
-                              selectedSources.contains(knowledgeSource);
+                          final isSelected = selectedSource == knowledgeSource;
 
                           // Filter knowledge sources based on search query
                           if (searchQuery.isNotEmpty &&
@@ -121,50 +126,99 @@ class _EditBotScreenState extends State<EditBotScreen> {
                                 .shrink(); // Hide if not matching search
                           }
 
-                          return ListTile(
-                            title: Text(knowledgeSource.name),
-                            tileColor: isSelected
-                                ? Colors.blueAccent.withOpacity(0.8)
-                                : null,
-                            selectedTileColor:
-                                Colors.blueAccent.withOpacity(0.8),
-                            onTap: () {
-                              setStateDialog(() {
-                                if (isSelected) {
-                                  selectedSources.remove(knowledgeSource);
-                                } else {
-                                  selectedSources.add(knowledgeSource);
-                                }
-                              });
-                            },
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: isSelected
+                                  ? Colors.blueAccent
+                                  : const Color.fromARGB(10, 0, 0, 0),
+                            ),
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                              leading: Icon(
+                                Icons.file_copy_rounded,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.blueAccent,
+                              ),
+                              title: Text(
+                                knowledgeSource.name,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              subtitle: Text(
+                                knowledgeSource.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black54,
+                                ),
+                              ),
+                              onTap: () {
+                                setStateDialog(() {
+                                  if (isSelected) {
+                                    selectedSource = null;
+                                  } else {
+                                    selectedSource = knowledgeSource;
+                                  }
+                                });
+                              },
+                            ),
                           );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const SizedBox(height: 10);
                         },
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               actions: <Widget>[
-                if (selectedSources.isNotEmpty)
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        for (var source in selectedSources) {
-                          if (!dataSources.contains(source)) {
-                            dataSources.add(source);
-                          }
-                        }
-                      });
-                      selectedSources.clear();
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Add Selected'),
-                  ),
                 TextButton(
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black45),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (!dataSources.contains(selectedSource)) {
+                        dataSources.add(selectedSource!);
+                      }
+                    });
+                    selectedSource = null;
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             );
@@ -335,12 +389,17 @@ class _EditBotScreenState extends State<EditBotScreen> {
               'Provide custom knowledge that your bot will access to inform its responses.',
               style: TextStyle(color: Colors.black54, fontSize: 16),
             ),
-            ListView.builder(
+            const SizedBox(height: 8),
+            ListView.separated(
               shrinkWrap: true,
               itemCount: dataSources.length,
               itemBuilder: (context, index) {
                 final knowledgeSource = dataSources[index];
                 return ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  tileColor: const Color.fromARGB(15, 0, 0, 0),
                   onTap: () => {},
                   contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                   leading: const Icon(
@@ -376,6 +435,11 @@ class _EditBotScreenState extends State<EditBotScreen> {
                   ),
                 );
               },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  height: 10,
+                );
+              },
             ),
 
             const SizedBox(height: 16),
@@ -407,6 +471,18 @@ class _EditBotScreenState extends State<EditBotScreen> {
   }
 
   void _saveBot() {
+    // Simple form validation
+    if (nameController.text.isEmpty ||
+        nameController.text.length < 4 ||
+        nameController.text.length > 20) {
+      DialogUtils.showErrorDialog(
+          context, "Name must be between 4 and 20 characters.");
+      return;
+    }
+    if (promptController.text.isEmpty) {
+      DialogUtils.showErrorDialog(context, "Prompt is required.");
+      return;
+    }
     setState(() {
       widget.bot.knowledgeSources = dataSources;
     });

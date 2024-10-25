@@ -17,6 +17,9 @@ class SlackDialogState extends State<SlackDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       title: const Row(

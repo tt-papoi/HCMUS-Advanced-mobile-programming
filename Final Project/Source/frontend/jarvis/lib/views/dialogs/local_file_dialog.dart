@@ -17,6 +17,9 @@ class LocalFileDialogState extends State<LocalFileDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       title: const Row(

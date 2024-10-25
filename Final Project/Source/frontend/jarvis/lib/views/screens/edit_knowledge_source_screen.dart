@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/utils/dialog_utils.dart';
 import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
 import 'package:jarvis/views/dialogs/confluence_dialog.dart';
 import 'package:jarvis/views/dialogs/google_drive_dialog.dart';
 import 'package:jarvis/views/dialogs/local_file_dialog.dart';
 import 'package:jarvis/views/dialogs/website_dialog.dart';
-import 'package:jarvis/widgets/slack_dialog.dart';
+import 'package:jarvis/views/dialogs/slack_dialog.dart';
 
 class EditKnowledgeSourceScreen extends StatefulWidget {
   final KnowledgeSource knowledgeSource;
@@ -39,6 +40,14 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
   }
 
   void _saveKnowledgeSource() {
+    // Simple form validation
+    if (nameController.text.isEmpty ||
+        nameController.text.length < 4 ||
+        nameController.text.length > 20) {
+      DialogUtils.showErrorDialog(
+          context, "Name must be between 4 and 20 characters.");
+      return;
+    }
     setState(() {
       widget.knowledgeSource.name = nameController.text;
       widget.knowledgeSource.description = descriptionController.text;
@@ -365,7 +374,11 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
               itemBuilder: (context, index) {
                 final unit = units[index];
                 return ListTile(
-                  contentPadding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  tileColor: const Color.fromARGB(15, 0, 0, 0),
+                  contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   leading: Icon(
                     unit.unitType == UnitType.localfile
                         ? Icons.insert_drive_file
@@ -441,9 +454,8 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
-                return const Divider(
-                  height: 0,
-                  thickness: 0.5,
+                return const SizedBox(
+                  height: 10,
                 );
               },
             ),

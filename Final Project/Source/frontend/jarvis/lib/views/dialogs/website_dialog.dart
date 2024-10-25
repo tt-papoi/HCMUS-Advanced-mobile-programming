@@ -11,6 +11,9 @@ class WebsiteDialog extends StatelessWidget {
     TextEditingController urlController = TextEditingController();
 
     return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       title: const Row(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/utils/dialog_utils.dart';
 
 class CreateKnowledgeSourceScreen extends StatefulWidget {
   const CreateKnowledgeSourceScreen({super.key});
@@ -28,7 +29,8 @@ class _CreateKnowledgeSourceScreenState
 
     // Simple form validation
     if (sourceName.isEmpty || sourceName.length < 4 || sourceName.length > 20) {
-      _showErrorDialog("Name must be between 4 and 20 characters.");
+      DialogUtils.showErrorDialog(
+          context, "Name must be between 4 and 20 characters.");
       return;
     }
 
@@ -43,27 +45,6 @@ class _CreateKnowledgeSourceScreenState
 
     // Return the newly created knowledge source to the previous screen
     Navigator.pop(context, newSource);
-  }
-
-  // Method to show error dialogs
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

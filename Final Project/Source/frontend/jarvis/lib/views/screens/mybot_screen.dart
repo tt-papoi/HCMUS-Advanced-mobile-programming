@@ -5,7 +5,7 @@ import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/create_bot_screen.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
 import 'package:jarvis/views/screens/edit_bot_screen.dart';
-import 'package:jarvis/views/screens/edit_knowledge_source.dart';
+import 'package:jarvis/views/screens/edit_knowledge_source_screen.dart';
 import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class MybotScreen extends StatefulWidget {
@@ -66,6 +66,18 @@ class MybotScreenState extends State<MybotScreen> {
         id: "02",
         name: "My house",
         description: "This knowledge source is used for my house"),
+    KnowledgeSource(
+        id: "03",
+        name: "My dog",
+        description: "This knowledge source is used for my dog"),
+    KnowledgeSource(
+        id: "04",
+        name: "My cat",
+        description: "This knowledge source is used for my cat"),
+    KnowledgeSource(
+        id: "05",
+        name: "My car",
+        description: "This knowledge source is used for my car"),
   ];
 
   List<Bot> filteredBotList = []; // List to store filtered bots
@@ -118,6 +130,7 @@ class MybotScreenState extends State<MybotScreen> {
                 ? _buildMyBotScreen(context)
                 : _buildKnowledgeSourcesScreen(context),
           ),
+          const SizedBox(height: 60),
         ],
       ),
       floatingActionButton: FloatingActionButton(

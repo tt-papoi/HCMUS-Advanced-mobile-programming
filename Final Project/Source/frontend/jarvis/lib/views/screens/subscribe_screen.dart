@@ -1,93 +1,193 @@
 import 'package:flutter/material.dart';
 
-class SubscribeScreen extends StatelessWidget {
+class SubscribeScreen extends StatefulWidget {
   const SubscribeScreen({super.key});
+
+  @override
+  State<SubscribeScreen> createState() => _SubscribeScreenState();
+}
+
+class _SubscribeScreenState extends State<SubscribeScreen> {
+  String _selectedOption = 'Yearly';
+
+  void _selectOption(String option) {
+    setState(() {
+      _selectedOption = option;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Subscribe'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black45),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title
             const Text(
-              'Choose your subscription plan',
+              'Subscribe to Jarvis',
               style: TextStyle(
-                  fontSize: 24,
+                color: Colors.black87,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Description
+            const Text(
+              'Subscribe to send more messages without daily limits, access exclusive bots like GPT-4-Turbo and Claude-3-Opus, and more.',
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 15),
+            // Discount information
+            const Text(
+              'Enjoy 33% off with a yearly Jarvis subscription.',
+              style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Yearly and Monthly Options
+            _buildPricingOption(
+              context,
+              title: 'Yearly',
+              price: '\$79.99/yr',
+              isSelected: _selectedOption == 'Yearly',
+              onTap: () => _selectOption('Yearly'),
+            ),
+            const SizedBox(height: 15),
+            _buildPricingOption(
+              context,
+              title: 'Monthly',
+              price: '\$9.99/mo',
+              isSelected: _selectedOption == 'Monthly',
+              onTap: () => _selectOption('Monthly'),
+            ),
+            const SizedBox(height: 10),
+            // Enhanced ExpansionTile for "What's included?"
+            ExpansionTile(
+              title: const Text(
+                'What\'s included?',
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple),
-              textAlign: TextAlign.center,
+                  fontSize: 18,
+                ),
+              ),
+              children: [
+                _buildIncludedItem(
+                    'Send and receive far more messages each month'),
+                _buildIncludedItem(
+                    'Access exclusive bots, including GPT-4-Turbo'),
+                _buildIncludedItem(
+                    'Unlock each bot\'s maximum input size and chat history'),
+                _buildIncludedItem('.....................'),
+              ],
+            ),
+            const Spacer(),
+            // Subscribe Button
+            InkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: () {
+                setState(() {});
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: const Center(
+                  child: Text(
+                    "Subscribe to Jarvis",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-            SubscriptionOption(
-              title: '1 Month',
-              price: '\$10',
-              onTap: () {
-                // Handle 1 month subscription
-              },
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPricingOption(BuildContext context,
+      {required String title,
+      required String price,
+      required bool isSelected,
+      required VoidCallback onTap}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.shade50 : Colors.white,
+          border: Border.all(
+            color: isSelected ? Colors.blueAccent : Colors.black12,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
             ),
-            const SizedBox(height: 20),
-            SubscriptionOption(
-              title: '1 Year',
-              price: '\$89',
-              onTap: () {
-                // Handle 1 year subscription
-              },
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? Icons.check_circle : Icons.circle_outlined,
+              color: isSelected ? Colors.blueAccent : Colors.black26,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? Colors.blueAccent : Colors.black87,
+                ),
+              ),
+            ),
+            Text(
+              price,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class SubscriptionOption extends StatelessWidget {
-  final String title;
-  final String price;
-  final VoidCallback onTap;
-
-  SubscriptionOption(
-      {required this.title, required this.price, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.deepPurple),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              price,
-              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-            ),
-          ],
+  Widget _buildIncludedItem(String text) {
+    return ListTile(
+      leading: const Icon(Icons.check, color: Colors.blueAccent),
+      title: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 16,
+          color: Colors.black87,
         ),
       ),
     );
