@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/models/knowledge_source.dart';
 
 class CreateKnowledgeSourceScreen extends StatefulWidget {
   const CreateKnowledgeSourceScreen({super.key});
@@ -18,6 +19,51 @@ class _CreateKnowledgeSourceScreenState
     nameController.dispose();
     descriptionController.dispose();
     super.dispose();
+  }
+
+  // Method to create the knowledge source
+  void _createKnowledgeSource() {
+    String sourceName = nameController.text.trim();
+    String sourceDescription = descriptionController.text.trim();
+
+    // Simple form validation
+    if (sourceName.isEmpty || sourceName.length < 4 || sourceName.length > 20) {
+      _showErrorDialog("Name must be between 4 and 20 characters.");
+      return;
+    }
+
+    // If everything is valid, create the knowledge source
+    KnowledgeSource newSource = KnowledgeSource(
+      name: sourceName,
+      description: sourceDescription.isNotEmpty
+          ? sourceDescription
+          : "No description provided",
+      id: '', // Assign a unique ID here if needed
+    );
+
+    // Return the newly created knowledge source to the previous screen
+    Navigator.pop(context, newSource);
+  }
+
+  // Method to show error dialogs
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -87,7 +133,7 @@ class _CreateKnowledgeSourceScreenState
               },
             ),
             const SizedBox(height: 16),
-            // Prompt with asterisk
+            // Description
             RichText(
               text: const TextSpan(
                 text: 'Description',
@@ -108,7 +154,7 @@ class _CreateKnowledgeSourceScreenState
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
-                hintText: 'Descripsion of the Knowledge Base',
+                hintText: 'Description of the Knowledge Source',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
@@ -129,9 +175,8 @@ class _CreateKnowledgeSourceScreenState
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                // Logic to create bot
-              },
+              onTap:
+                  _createKnowledgeSource, // Added the function to create the knowledge source
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,

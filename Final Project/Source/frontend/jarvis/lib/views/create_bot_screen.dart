@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jarvis/models/bot.dart';
 
 class CreateBotScreen extends StatefulWidget {
   const CreateBotScreen({super.key});
@@ -32,6 +33,57 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
         imageData = data;
       });
     }
+  }
+
+  // Method to create the bot
+  void _createBot() {
+    String botName = nameController.text.trim();
+    String botPrompt = promptController.text.trim();
+
+    // Simple form validation
+    if (botName.isEmpty || botName.length < 4 || botName.length > 20) {
+      _showErrorDialog("Name must be between 4 and 20 characters.");
+      return;
+    }
+    if (botPrompt.isEmpty) {
+      _showErrorDialog("Prompt is required.");
+      return;
+    }
+
+    // If everything is valid, create the bot
+    Bot newBot = Bot(
+      name: botName,
+      description: botPrompt, // Using prompt as description for now
+      imagePath: imageData != null
+          ? 'path/to/saved/image' // Specify where you would save the image
+          : 'lib/assets/icons/robot.png', // Assuming default image if not selected
+      id: '', // Assign a unique ID here if needed
+      botType: BotType.createdBot,
+    );
+
+    // Return the newly created bot to the previous screen
+    Navigator.pop(context, newBot);
+  }
+
+  // Method to show error dialogs
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -167,9 +219,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                // Logic to create bot
-              },
+              onTap: _createBot, // Added the function to create the bot
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
