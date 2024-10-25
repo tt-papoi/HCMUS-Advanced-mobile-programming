@@ -380,7 +380,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.black54),
                           onPressed: () => _removeUnit(unit),
                         ),
                       ],
