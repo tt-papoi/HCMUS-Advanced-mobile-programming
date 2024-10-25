@@ -106,12 +106,36 @@ class MybotScreenState extends State<MybotScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (isMyBotScreen) {
-            Navigator.push(context, FadeRoute(page: const CreateBotScreen()));
+            final newBot = await Navigator.push(
+              context,
+              FadeRoute(
+                  page:
+                      const CreateBotScreen()), // điều hướng đến CreateBotScreen
+            );
+
+            if (newBot != null) {
+              // Sau khi nhận lại dữ liệu từ CreateBotScreen, thêm bot vào botList
+              setState(() {
+                botList.add(newBot);
+              });
+            }
           } else {
-            Navigator.push(
-                context, FadeRoute(page: const CreateKnowledgeSourceScreen()));
+            final newKnowledgeSource = await Navigator.push(
+              context,
+              FadeRoute(
+                page:
+                    const CreateKnowledgeSourceScreen(), // Navigate to CreateKnowledgeSourceScreen
+              ),
+            );
+
+            if (newKnowledgeSource != null) {
+              // After receiving the data from CreateKnowledgeSourceScreen, add the knowledge source to the knowledgeSourceList
+              setState(() {
+                knowledgeSourceList.add(newKnowledgeSource);
+              });
+            }
           }
         },
         backgroundColor: Colors.blueAccent,
