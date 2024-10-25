@@ -54,28 +54,36 @@ class MybotScreenState extends State<MybotScreen> {
         name: "My Job",
         description: "This knowledge source is used for my job"),
     KnowledgeSource(
-        id: "01",
+        id: "02",
         name: "My house",
         description: "This knowledge source is used for my house"),
   ];
 
   final TextEditingController searchController = TextEditingController();
+  List<Bot> filteredBotList = []; // List to store filtered bots
 
-  void editBot(Bot bot) async {
-    final result = await Navigator.of(context).push(FadeRoute(
-      page: EditBotScreen(
-        bot: bot,
-        knowledgeSourceList: knowledgeSourceList, // Truyền knowledge sources
-      ),
-    ));
-    if (result != null) {
-      setState(() {}); // Nếu có kết quả trả về, cập nhật lại màn hình.
-    }
+  @override
+  void initState() {
+    super.initState();
+    filteredBotList = botList; // Initialize the filtered list to show all bots
   }
 
-  void deleteBot(int index) {
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterBots(String query) {
     setState(() {
-      botList.removeAt(index);
+      if (query.isEmpty) {
+        filteredBotList = botList;
+      } else {
+        filteredBotList = botList
+            .where(
+                (bot) => bot.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
     });
   }
 
@@ -110,28 +118,22 @@ class MybotScreenState extends State<MybotScreen> {
           if (isMyBotScreen) {
             final newBot = await Navigator.push(
               context,
-              FadeRoute(
-                  page:
-                      const CreateBotScreen()), // điều hướng đến CreateBotScreen
+              FadeRoute(page: const CreateBotScreen()),
             );
 
             if (newBot != null) {
-              // Sau khi nhận lại dữ liệu từ CreateBotScreen, thêm bot vào botList
               setState(() {
                 botList.add(newBot);
+                filteredBotList = botList;
               });
             }
           } else {
             final newKnowledgeSource = await Navigator.push(
               context,
-              FadeRoute(
-                page:
-                    const CreateKnowledgeSourceScreen(), // Navigate to CreateKnowledgeSourceScreen
-              ),
+              FadeRoute(page: const CreateKnowledgeSourceScreen()),
             );
 
             if (newKnowledgeSource != null) {
-              // After receiving the data from CreateKnowledgeSourceScreen, add the knowledge source to the knowledgeSourceList
               setState(() {
                 knowledgeSourceList.add(newKnowledgeSource);
               });
@@ -168,34 +170,36 @@ class MybotScreenState extends State<MybotScreen> {
 
   Widget _buildToggleButton(String text, bool isActive) {
     return Expanded(
-        child: Container(
-      margin: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.blueAccent : Colors.transparent,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(50),
-        onTap: () {
-          setState(() {
-            isMyBotScreen = (text == 'My Bots');
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(
+      child: Container(
+        margin: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.blueAccent : Colors.transparent,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {
+            setState(() {
+              isMyBotScreen = (text == 'My Bots');
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: Text(
+                text,
+                style: TextStyle(
                   color: isActive
                       ? const Color.fromARGB(255, 255, 255, 255)
                       : Colors.black54,
-                  fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildMyBotScreen(BuildContext context) {
@@ -204,6 +208,7 @@ class MybotScreenState extends State<MybotScreen> {
       child: Column(
         children: [
           TextField(
+            controller: searchController,
             onTapOutside: (event) {
               FocusManager.instance.primaryFocus?.unfocus();
             },
@@ -231,15 +236,13 @@ class MybotScreenState extends State<MybotScreen> {
                     const BorderSide(color: Colors.blueAccent, width: 1.0),
               ),
             ),
-            onChanged: (value) {
-              // You can implement filtering logic here based on the value
-            },
+            onChanged: _filterBots,
           ),
           Expanded(
             child: ListView.separated(
-              itemCount: botList.length,
+              itemCount: filteredBotList.length,
               itemBuilder: (context, index) {
-                final bot = botList[index];
+                final bot = filteredBotList[index];
                 return ListTile(
                   contentPadding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                   leading:
@@ -258,8 +261,7 @@ class MybotScreenState extends State<MybotScreen> {
                             horizontal: 10, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
-                          borderRadius:
-                              BorderRadius.circular(5), // Rounded corners
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
                           bot.botType == BotType.offical
@@ -307,11 +309,31 @@ class MybotScreenState extends State<MybotScreen> {
     );
   }
 
+  void editBot(Bot bot) async {
+    final result = await Navigator.of(context).push(FadeRoute(
+      page: EditBotScreen(
+        bot: bot,
+        knowledgeSourceList: knowledgeSourceList,
+      ),
+    ));
+    if (result != null) {
+      setState(() {});
+    }
+  }
+
+  void deleteBot(int index) {
+    setState(() {
+      botList.removeAt(index);
+      filteredBotList = botList;
+    });
+  }
+
   void editKnowledgeSource(KnowledgeSource knowledgesource) async {
     final result = await Navigator.of(context).push(FadeRoute(
-        page: EditKnowledgeSourceScreen(
-      knowledgeSource: knowledgesource,
-    )));
+      page: EditKnowledgeSourceScreen(
+        knowledgeSource: knowledgesource,
+      ),
+    ));
     if (result != null) {
       setState(() {});
     }
@@ -350,9 +372,6 @@ class MybotScreenState extends State<MybotScreen> {
                     const BorderSide(color: Colors.blueAccent, width: 1.0),
               ),
             ),
-            onChanged: (value) {
-              // You can implement filtering logic here based on the value
-            },
           ),
           Expanded(
             child: ListView.separated(

@@ -407,9 +407,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                // Logic to create bot
-              },
+              onTap: _saveBot,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
@@ -419,7 +417,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Save',
+                    'Save Bot',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -432,5 +430,12 @@ class _EditBotScreenState extends State<EditBotScreen> {
         ),
       ),
     );
+  }
+
+  void _saveBot() {
+    setState(() {
+      widget.bot.knowledgeSources = dataSources;
+    });
+    Navigator.of(context).pop(dataSources);
   }
 }
