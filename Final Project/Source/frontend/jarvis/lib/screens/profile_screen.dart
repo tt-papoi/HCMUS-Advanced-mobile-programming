@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/login_register_screen.dart';
-import 'package:jarvis/views/support_screen.dart';
+import 'package:jarvis/screens/login_register_screen.dart';
+import 'package:jarvis/screens/support_screen.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 
 class ProfileScreen extends StatefulWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/screens/forgot_password_screen.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/home_screen.dart';
+import 'package:jarvis/screens/home_screen.dart';
 
 class LoginRegisterScreen extends StatefulWidget {
   const LoginRegisterScreen({super.key});
@@ -73,7 +74,6 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        toolbarHeight: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -81,7 +81,6 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -229,7 +228,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () {
-        // Handle forgot password
+        Navigator.push(context, FadeRoute(page: const ForgotPasswordScreen()));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),

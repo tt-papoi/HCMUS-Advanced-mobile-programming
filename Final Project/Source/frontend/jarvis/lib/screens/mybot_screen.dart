@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/create_bot_screen.dart';
-import 'package:jarvis/views/create_knowledge_source_screen.dart';
-import 'package:jarvis/views/edit_bot_screen.dart';
-import 'package:jarvis/views/edit_knowledge_source.dart';
+import 'package:jarvis/screens/create_bot_screen.dart';
+import 'package:jarvis/screens/create_knowledge_source_screen.dart';
+import 'package:jarvis/screens/edit_bot_screen.dart';
+import 'package:jarvis/screens/edit_knowledge_source.dart';
 
 class MybotScreen extends StatefulWidget {
   const MybotScreen({super.key});

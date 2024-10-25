@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/all_chats_screen.dart';
-import 'package:jarvis/views/explore_screen.dart';
-import 'package:jarvis/views/mybot_screen.dart';
-import 'package:jarvis/views/profile_screen.dart';
+import 'package:jarvis/screens/all_chats_screen.dart';
+import 'package:jarvis/screens/explore_screen.dart';
+import 'package:jarvis/screens/mybot_screen.dart';
+import 'package:jarvis/screens/profile_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
 

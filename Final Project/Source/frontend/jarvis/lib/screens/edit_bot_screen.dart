@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/create_knowledge_source_screen.dart';
+import 'package:jarvis/screens/create_knowledge_source_screen.dart';
 
 class EditBotScreen extends StatefulWidget {
   final Bot bot;
