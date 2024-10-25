@@ -367,8 +367,9 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         return ConfirmDeleteDialog(
                           onDelete: _deletePrompt,
                           parameter: index,
-                          title: '',
-                          content: '',
+                          title: 'Delete prompt',
+                          content:
+                              'Are you sure you want to delete this prompt?',
                         );
                       },
                     );
