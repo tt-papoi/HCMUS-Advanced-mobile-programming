@@ -16,7 +16,7 @@
 - Requirements: [Requirements Document](https://docs.google.com/document/d/1ualtUcG6kswL7nUqNQbl1z9Dnos_DvmC/view)
 - Milestones:
     1. Mock-UI: 
-        - [Mock-UI Demo](https://youtu.be/ujEhKZBWzF4)
+        - [Mock-UI Demo](https://youtu.be/asB_T--IEmA)
         - [Git Branch Mock-UI](https://github.com/tt-papoi/HCMUS-Advanced-mobile-programming/tree/mock-ui/Final%20Project/Source/frontend/jarvis)
     2. Basic features
     3. Intermediate features
