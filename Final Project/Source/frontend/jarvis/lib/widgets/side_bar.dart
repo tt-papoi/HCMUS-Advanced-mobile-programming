@@ -1,5 +1,3 @@
-// ignore: unnecessary_import
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/all_chats_screen.dart';

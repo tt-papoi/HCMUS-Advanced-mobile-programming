@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/knowledge_source.dart';
-import 'package:jarvis/utils/add_kb_confluence.dart';
-import 'package:jarvis/utils/add_kb_gg_drive.dart';
-import 'package:jarvis/utils/add_kb_local_file.dart';
-import 'package:jarvis/utils/add_kb_slack.dart';
-import 'package:jarvis/utils/add_kb_web.dart';
+import 'package:jarvis/widgets/confluence_dialog.dart';
+
+import 'package:jarvis/widgets/google_drive_dialog.dart';
+import 'package:jarvis/widgets/local_file_dialog.dart';
+import 'package:jarvis/widgets/slack_dialog.dart';
+import 'package:jarvis/widgets/website_dialog.dart';
 
 class EditKnowledgeSourceScreen extends StatefulWidget {
   final KnowledgeSource knowledgeSource;

@@ -23,6 +23,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
     emailController.clear();
     passwordController.clear();
     usernameController.clear();
+    emailError = null;
+    passwordError = null;
   }
 
   bool _validateEmail(String email) {

@@ -4,7 +4,7 @@ import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/models/chat_message.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/chat_screen.dart';
+import 'package:jarvis/screens/chat_screen.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 
 class AllChatsScreen extends StatelessWidget {
