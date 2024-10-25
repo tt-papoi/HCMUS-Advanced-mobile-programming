@@ -348,7 +348,15 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                     leading: Icon(
                       unit.unitType == UnitType.localfile
                           ? Icons.insert_drive_file
-                          : Icons.language,
+                          : unit.unitType == UnitType.googleDrive
+                              ? Icons.drive_folder_upload
+                              : unit.unitType == UnitType.slack
+                                  ? Icons.folder
+                                  : unit.unitType == UnitType.website
+                                      ? Icons.language
+                                      : unit.unitType == UnitType.confluence
+                                          ? Icons.code
+                                          : Icons.help,
                       color: Colors.blue,
                     ),
                     title: Text(
