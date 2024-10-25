@@ -108,6 +108,7 @@ class _CreateKnowledgeSourceScreenState
                     color: Colors.black54,
                     fontWeight: FontWeight.bold,
                     fontSize: 14),
+                hintText: 'Descripsion of the Knowledge Base',
                 filled: true,
                 fillColor: const Color.fromARGB(0, 0, 0, 0),
                 enabledBorder: OutlineInputBorder(
