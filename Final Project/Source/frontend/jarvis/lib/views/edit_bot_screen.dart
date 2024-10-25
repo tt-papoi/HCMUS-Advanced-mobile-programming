@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
-import 'package:jarvis/views/create_bot_screen.dart';
+import 'package:jarvis/views/create_knowledge_source_screen.dart';
 
 class EditBotScreen extends StatefulWidget {
   final Bot bot;
@@ -111,7 +111,8 @@ class _EditBotScreenState extends State<EditBotScreen> {
                               Navigator.of(context).pop();
                               Navigator.push(
                                 context,
-                                FadeRoute(page: const CreateBotScreen()),
+                                FadeRoute(
+                                    page: const CreateKnowledgeSourceScreen()),
                               );
                             },
                           ),
@@ -172,7 +173,11 @@ class _EditBotScreenState extends State<EditBotScreen> {
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        dataSources.addAll(selectedSources);
+                        for (var source in selectedSources) {
+                          if (!dataSources.contains(source)) {
+                            dataSources.add(source);
+                          }
+                        }
                       });
                       selectedSources.clear();
                       Navigator.of(context).pop();
