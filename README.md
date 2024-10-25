@@ -10,7 +10,7 @@
 - Description: An AI-powered chatbot to assist users with various tasks.
 - Requirements: [Requirements Document](https://docs.google.com/document/d/1ualtUcG6kswL7nUqNQbl1z9Dnos_DvmC/edit)
 - Milestones:
-    1. Mock-UI: 
+    1. Mock-UI: [Mock-UI Demo](https://youtu.be/ujEhKZBWzF4)
     2. Basic features
     3. Intermediate features
     4. Advanced features
