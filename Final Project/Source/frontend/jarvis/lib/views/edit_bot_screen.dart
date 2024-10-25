@@ -29,7 +29,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
     super.initState();
     nameController = TextEditingController(text: widget.bot.name);
     promptController = TextEditingController(text: widget.bot.prompt);
-    dataSources = [];
+    dataSources = widget.bot.knowledgeSources!;
   }
 
   @override
