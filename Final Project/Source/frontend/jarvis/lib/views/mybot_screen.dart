@@ -24,6 +24,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      knowledgeSources: [],
     ),
     Bot(
       name: "Supper Hero",
@@ -31,6 +32,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      knowledgeSources: [],
     ),
     Bot(
       name: "AI Luto",
@@ -38,6 +40,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      knowledgeSources: [],
     ),
     Bot(
       name: "Turbo",
@@ -45,6 +48,7 @@ class MybotScreenState extends State<MybotScreen> {
       imagePath: 'lib/assets/icons/robot.png',
       id: '',
       botType: BotType.createdBot,
+      knowledgeSources: [],
     ),
   ];
 
