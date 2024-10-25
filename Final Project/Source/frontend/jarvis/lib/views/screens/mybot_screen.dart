@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jarvis/models/bot.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/fade_route.dart';
+import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
 import 'package:jarvis/views/screens/create_bot_screen.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
 import 'package:jarvis/views/screens/edit_bot_screen.dart';
@@ -249,10 +250,21 @@ class MybotScreenState extends State<MybotScreen> {
                   trailing: PopupMenuButton<String>(
                     color: Colors.white,
                     onSelected: (String result) {
-                      if (result == 'Edit') {
-                        editBot(botList[index]);
-                      } else if (result == 'Delete') {
-                        deleteBot(index);
+                      if (result == 'Delete') {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return ConfirmDeleteDialog<Bot>(
+                              title: 'Delete bot',
+                              content:
+                                  'Are you sure you want to delete this bot?',
+                              onDelete: (knowledgeSource) {
+                                deleteBot(index);
+                              },
+                              parameter: botList[index],
+                            );
+                          },
+                        );
                       }
                     },
                     itemBuilder: (BuildContext context) => [
@@ -343,9 +355,27 @@ class MybotScreenState extends State<MybotScreen> {
                     color: Colors.white,
                     onSelected: (String result) {},
                     itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'Delete',
-                        child: Text('Delete'),
+                        child: const Text('Delete'),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ConfirmDeleteDialog<KnowledgeSource>(
+                                title: 'Delete knowledge source',
+                                content:
+                                    'Are you sure you want to delete this knowledge source?',
+                                onDelete: (knowledgeSource) {
+                                  setState(() {
+                                    knowledgeSourceList.removeAt(index);
+                                  });
+                                },
+                                parameter: knowledgeSource,
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),
