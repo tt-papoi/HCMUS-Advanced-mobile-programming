@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:jarvis/views/screens/forgot_password_screen.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/home_screen.dart';
+import 'package:jarvis/providers/auth_provider.dart';
 
 class LoginRegisterScreen extends StatefulWidget {
   const LoginRegisterScreen({super.key});
@@ -19,6 +21,28 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
   String? emailError;
   String? passwordError;
+  String? usernameError;
+
+  @override
+  initState() {
+    super.initState();
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Tải token từ secure storage
+    authProvider.loadTokens().then((_) {
+      if (authProvider.isLoggedIn && mounted) {
+        // Nếu đã đăng nhập, chuyển hướng đến HomeScreen
+        Navigator.pushReplacement(
+          context,
+          FadeRoute(page: HomeScreen()),
+        );
+      } else {
+        // Nếu chưa đăng nhập, ở lại trên màn hình SplashScreen
+        // Bạn có thể chuyển hướng đến màn hình đăng nhập ở đây nếu cần
+      }
+    });
+  }
 
   void _clearTextFields() {
     emailController.clear();
@@ -26,6 +50,20 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
     usernameController.clear();
     emailError = null;
     passwordError = null;
+    usernameError = null;
+  }
+
+  bool _validateUsername(String username) {
+    if (username.isEmpty || username.length < 3) {
+      setState(() {
+        usernameError = 'Username must be at least 3 characters';
+      });
+      return false;
+    }
+    setState(() {
+      usernameError = null;
+    });
+    return true;
   }
 
   bool _validateEmail(String email) {
@@ -57,13 +95,51 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
     return true;
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (isLogin) {
-      Navigator.push(context, FadeRoute(page: HomeScreen()));
-    } else {
       if (_validateEmail(emailController.text) &&
           _validatePassword(passwordController.text)) {
-        // Handle Register
+        try {
+          await authProvider.signIn(
+              emailController.text, passwordController.text);
+          if (mounted) {
+            Navigator.pushReplacement(context, FadeRoute(page: HomeScreen()));
+          }
+        } catch (e) {
+          String errorMessage = e is Exception
+              ? e.toString().replaceFirst('Exception: ', '')
+              : 'An unexpected error occurred';
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to sign in: $errorMessage')),
+            );
+          }
+        }
+      }
+    } else {
+      if (_validateUsername(usernameController.text) &&
+          _validateEmail(emailController.text) &&
+          _validatePassword(passwordController.text)) {
+        try {
+          await authProvider.signUp(
+            username: usernameController.text,
+            email: emailController.text,
+            password: passwordController.text,
+          );
+          if (mounted) {
+            Navigator.pushReplacement(context, FadeRoute(page: HomeScreen()));
+          }
+        } catch (e) {
+          String errorMessage = e is Exception
+              ? e.toString().replaceFirst('Exception: ', '')
+              : 'An unexpected error occurred';
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to sign up: $errorMessage')),
+            );
+          }
+        }
       }
     }
   }
@@ -177,7 +253,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
               if (!isLogin)
                 _buildTextField('Username', 'Enter your username', false,
-                    usernameController),
+                    usernameController,
+                    errorText: usernameError),
               _buildTextField(
                   'Email', 'Enter your email address', false, emailController,
                   errorText: emailError),

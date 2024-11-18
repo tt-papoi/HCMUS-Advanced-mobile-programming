@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/views/screens/login_register_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const JarvisApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const JarvisApp(),
+    ),
+  );
 }
 
 class JarvisApp extends StatelessWidget {
