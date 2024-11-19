@@ -26,22 +26,6 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
   @override
   initState() {
     super.initState();
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    // Tải token từ secure storage
-    authProvider.loadTokens().then((_) {
-      if (authProvider.isLoggedIn && mounted) {
-        // Nếu đã đăng nhập, chuyển hướng đến HomeScreen
-        Navigator.pushReplacement(
-          context,
-          FadeRoute(page: HomeScreen()),
-        );
-      } else {
-        // Nếu chưa đăng nhập, ở lại trên màn hình SplashScreen
-        // Bạn có thể chuyển hướng đến màn hình đăng nhập ở đây nếu cần
-      }
-    });
   }
 
   void _clearTextFields() {

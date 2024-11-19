@@ -22,16 +22,13 @@ class AuthProvider with ChangeNotifier {
     return _accessToken != null;
   }
 
-  // Đăng nhập và lưu token
   Future<void> signIn(String email, String password) async {
     try {
       final response = await _authService.signIn(email, password);
 
-      // Access the tokens from the response
       _accessToken = response['token']['accessToken'];
       _refreshToken = response['token']['refreshToken'];
 
-      // Lưu vào secure storage
       await _storageService.saveAccessToken(_accessToken!);
       await _storageService.saveRefreshToken(_refreshToken!);
 
@@ -41,14 +38,12 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Lấy token từ storage khi khởi động ứng dụng
   Future<void> loadTokens() async {
     _accessToken = await _storageService.getAccessToken();
     _refreshToken = await _storageService.getRefreshToken();
     notifyListeners();
   }
 
-  // Refresh token if expired
   Future<void> refreshAccessToken() async {
     if (_refreshToken == null) return;
 
@@ -57,7 +52,6 @@ class AuthProvider with ChangeNotifier {
 
       _accessToken = response['token']['accessToken'];
 
-      // Save the new tokens
       await _storageService.saveAccessToken(_accessToken!);
 
       notifyListeners();
@@ -78,7 +72,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> logout() async {
     _accessToken = null;
     _refreshToken = null;
 

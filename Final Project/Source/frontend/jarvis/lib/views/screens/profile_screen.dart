@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/login_register_screen.dart';
 import 'package:jarvis/views/screens/support_screen.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,13 +14,22 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late AuthProvider authProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+  }
+
   int currentToken = 30;
   final int maxToken = 50;
 
   void _logout(BuildContext context) {
+    authProvider.logout();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const LoginRegisterScreen()),
+      FadeRoute(page: const LoginRegisterScreen()),
       (route) => false,
     );
   }
