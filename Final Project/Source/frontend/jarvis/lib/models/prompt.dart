@@ -21,6 +21,20 @@ class Prompt {
     placeholders = extractStringsInBrackets(prompt);
   }
 
+  factory Prompt.fromJson(Map<String, dynamic> json) {
+    return Prompt(
+      id: json['_id'],
+      prompt: json['content'],
+      category: Category.values.firstWhere((e) =>
+          e.toString().split('.').last.toLowerCase() ==
+          json['category'].toLowerCase()),
+      promptType: json['isPublic'] ? PromptType.public : PromptType.private,
+      isMine: json['isPublic'],
+      name: json['title'],
+      isFavorite: json['isFavorite'],
+    );
+  }
+
   List<Map<String, String>> extractStringsInBrackets(String input) {
     // Find strings in []
     final RegExp regex = RegExp(r'\[(.*?)\]');
