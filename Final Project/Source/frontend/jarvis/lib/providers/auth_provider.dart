@@ -103,6 +103,16 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> getCurrentUser() async {
+    await ensureValidToken();
+    if (_accessToken == null) throw Exception('No access token available');
+
+    final response = await _authService.getCurrentUser(_accessToken!);
+
+    await _storageService.saveUserId(response['id']);
+    return response;
+  }
+
   // Synchronous helper method to check if the token is expired (JWT decoding)
   bool _isTokenExpiredSync(String token) {
     try {
@@ -124,5 +134,13 @@ class AuthProvider with ChangeNotifier {
     final normalized = base64Str.replaceAll('-', '+').replaceAll('_', '/');
     final decoded = base64.decode(normalized);
     return jsonDecode(utf8.decode(decoded));
+  }
+
+  Future<String?> getUserId() async {
+    await ensureValidToken();
+    if (_accessToken == null) return null;
+
+    final payload = _decodeJWT(_accessToken!.split('.')[1]);
+    return payload['sub'];
   }
 }

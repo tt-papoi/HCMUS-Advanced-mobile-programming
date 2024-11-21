@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/prompt.dart';
+import 'package:jarvis/providers/prompt_provider.dart';
+import 'package:provider/provider.dart';
 
 class CreatePromptDialog extends StatefulWidget {
   const CreatePromptDialog({super.key});
@@ -12,10 +14,20 @@ class _CreatePromptDialogState extends State<CreatePromptDialog> {
   Category selectedDropdownCategory = Category.Other;
   TextEditingController nameController = TextEditingController();
   TextEditingController promptController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
   bool isPrivatePrompt = true;
 
   String? nameError;
   String? promptError;
+  String? descriptionError;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    promptController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +162,69 @@ class _CreatePromptDialogState extends State<CreatePromptDialog> {
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
+            const SizedBox(height: 15),
+            const Text.rich(
+              TextSpan(
+                text: 'Description',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: descriptionController,
+              maxLines: 3,
+              minLines: 1,
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                  color: Colors.black45,
+                  fontWeight: FontWeight.normal,
+                ),
+                labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                hintText: 'Description of the prompt',
+                filled: true,
+                fillColor: const Color.fromARGB(15, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(0, 0, 0, 0),
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(
+                    color: Colors.blueAccent,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+            ),
+            if (descriptionError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  descriptionError!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             if (!isPrivatePrompt) ...[
               const SizedBox(height: 15),
               const Text.rich(
@@ -234,6 +309,7 @@ class _CreatePromptDialogState extends State<CreatePromptDialog> {
             TextField(
               controller: promptController,
               maxLines: 5,
+              minLines: 1,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
                   color: Colors.black45,
@@ -306,16 +382,38 @@ class _CreatePromptDialogState extends State<CreatePromptDialog> {
                     setState(() {
                       nameError = null; // Reset error
                       promptError = null; // Reset error
+                      descriptionError = null; // Reset error
 
                       if (nameController.text.isEmpty) {
                         nameError = 'The field is required.';
+                      }
+                      if (descriptionController.text.isEmpty) {
+                        descriptionError = 'The field is required.';
                       }
                       if (promptController.text.isEmpty) {
                         promptError = 'The field is required.';
                       }
 
                       // check empty field
-                      if (nameError == null && promptError == null) {
+                      if (nameError == null &&
+                          descriptionError == null &&
+                          promptError == null) {
+                        // Create Prompt
+                        final Prompt prompt = Prompt(
+                          id: '',
+                          content: promptController.text,
+                          category: selectedDropdownCategory,
+                          description: descriptionController.text,
+                          promptType: isPrivatePrompt
+                              ? PromptType.private
+                              : PromptType.public,
+                          isMine: true,
+                          name: nameController.text,
+                          isFavorite: false,
+                          username: '',
+                        );
+                        Provider.of<PromptProvider>(context, listen: false)
+                            .createPrompt(prompt);
                         Navigator.of(context).pop();
                       }
                     });

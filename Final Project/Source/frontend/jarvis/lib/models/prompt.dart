@@ -1,7 +1,11 @@
 // ignore_for_file: constant_identifier_names
+import 'package:jarvis/services/storage_service.dart';
+
 class Prompt {
   String id;
-  String prompt;
+  String username;
+  String content;
+  String description;
   String name;
   Category category;
   PromptType promptType;
@@ -11,28 +15,46 @@ class Prompt {
 
   Prompt({
     required this.id,
-    required this.prompt,
+    required this.content,
     required this.category,
+    required this.description,
     required this.promptType,
     required this.isMine,
     required this.name,
     required this.isFavorite,
+    required this.username,
   }) {
-    placeholders = extractStringsInBrackets(prompt);
+    placeholders = extractStringsInBrackets(content);
   }
 
-  factory Prompt.fromJson(Map<String, dynamic> json) {
+  static Future<Prompt> fromJson(Map<String, dynamic> json) async {
+    StorageService storageService = StorageService();
+    String userId = await storageService.getUserId() ?? '';
     return Prompt(
       id: json['_id'],
-      prompt: json['content'],
+      username: json['userName'],
+      content: json['content'],
+      description: json['description'],
       category: Category.values.firstWhere((e) =>
           e.toString().split('.').last.toLowerCase() ==
           json['category'].toLowerCase()),
       promptType: json['isPublic'] ? PromptType.public : PromptType.private,
-      isMine: json['isPublic'],
+      isMine: json['userId'] == userId,
       name: json['title'],
       isFavorite: json['isFavorite'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userName': username,
+      'content': content,
+      'description': description,
+      'category': category.toString().split('.').last.toLowerCase(),
+      'isPublic': promptType == PromptType.public,
+      "language": "English",
+      'title': name,
+    };
   }
 
   List<Map<String, String>> extractStringsInBrackets(String input) {
@@ -50,7 +72,7 @@ class Prompt {
   }
 
   String getFinalPrompt() {
-    String finalPrompt = prompt;
+    String finalPrompt = content;
 
     for (var placeholder in placeholders!) {
       String key = placeholder.keys.first;
@@ -59,6 +81,31 @@ class Prompt {
     }
 
     return finalPrompt;
+  }
+
+  Prompt copyWith({
+    String? id,
+    String? content,
+    String? username,
+    String? name,
+    String? description,
+    Category? category,
+    PromptType? promptType,
+    bool? isMine,
+    bool? isFavorite,
+    List<Map<String, String>>? placeholders,
+  }) {
+    return Prompt(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      content: content ?? this.content,
+      description: description ?? this.description,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      promptType: promptType ?? this.promptType,
+      isMine: isMine ?? this.isMine,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
   }
 }
 
@@ -75,4 +122,6 @@ enum Category {
   Business,
   Education,
   Fun,
+  Productivity,
+  Chatbot,
 }

@@ -39,6 +39,7 @@ class _JarvisAppState extends State<JarvisApp> {
   Future<void> init() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.loadTokens();
+    await authProvider.getCurrentUser();
     setState(() {
       _isLoggedIn = authProvider.isLoggedIn;
     });

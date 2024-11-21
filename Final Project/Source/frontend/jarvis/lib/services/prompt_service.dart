@@ -6,7 +6,7 @@ class PromptService {
   final String baseUrl = ProjectConstants.baseUrl;
   late String token;
 
-  void setToken(String newToken) {
+  Future<void> setToken(String newToken) async {
     token = newToken;
   }
 
@@ -81,7 +81,7 @@ class PromptService {
     request.headers.addAll(getHeaders());
 
     var response = await request.send();
-    return await handleResponse(response);
+    return response;
   }
 
   // Remove Prompt from Favorite
@@ -91,6 +91,6 @@ class PromptService {
     request.headers.addAll(getHeaders());
 
     var response = await request.send();
-    return await handleResponse(response);
+    return response;
   }
 }

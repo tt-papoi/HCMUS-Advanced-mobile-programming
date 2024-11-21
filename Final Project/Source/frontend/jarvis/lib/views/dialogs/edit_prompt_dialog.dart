@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/prompt.dart';
+import 'package:jarvis/providers/prompt_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditPromptDialog extends StatefulWidget {
   final Prompt prompt;
@@ -16,21 +18,27 @@ class _EditPromptDialogState extends State<EditPromptDialog> {
   late Category selectedDropdownCategory;
   late TextEditingController nameController;
   late TextEditingController promptController;
+  late TextEditingController descriptionController;
+
   String? nameError;
   String? promptError;
+  String? descriptionError;
 
   @override
   void initState() {
     super.initState();
     selectedDropdownCategory = widget.prompt.category;
     nameController = TextEditingController(text: widget.prompt.name);
-    promptController = TextEditingController(text: widget.prompt.prompt);
+    descriptionController =
+        TextEditingController(text: widget.prompt.description);
+    promptController = TextEditingController(text: widget.prompt.description);
   }
 
   @override
   void dispose() {
     nameController.dispose();
     promptController.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 
@@ -118,6 +126,69 @@ class _EditPromptDialogState extends State<EditPromptDialog> {
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
+            const SizedBox(height: 15),
+            const Text.rich(
+              TextSpan(
+                text: 'Description',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: descriptionController,
+              maxLines: 3,
+              minLines: 1,
+              decoration: InputDecoration(
+                hintStyle: const TextStyle(
+                  color: Colors.black45,
+                  fontWeight: FontWeight.normal,
+                ),
+                labelStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                hintText: 'Description of the prompt',
+                filled: true,
+                fillColor: const Color.fromARGB(15, 0, 0, 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(0, 0, 0, 0),
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(
+                    color: Colors.blueAccent,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+            ),
+            if (descriptionError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  descriptionError!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             if (widget.prompt.promptType == PromptType.public) ...[
               const SizedBox(height: 15),
               const Text.rich(
@@ -202,6 +273,7 @@ class _EditPromptDialogState extends State<EditPromptDialog> {
             TextField(
               controller: promptController,
               maxLines: 5,
+              minLines: 1,
               decoration: InputDecoration(
                 hintStyle: const TextStyle(
                   color: Colors.black45,
@@ -274,15 +346,35 @@ class _EditPromptDialogState extends State<EditPromptDialog> {
                     setState(() {
                       nameError = null; // Reset error
                       promptError = null; // Reset error
+                      descriptionError = null; // Reset error
 
                       if (nameController.text.isEmpty) {
                         nameError = 'The field is required.';
+                      }
+                      if (descriptionController.text.isEmpty) {
+                        descriptionError = 'The field is required.';
                       }
                       if (promptController.text.isEmpty) {
                         promptError = 'The field is required.';
                       }
 
-                      if (nameError == null && promptError == null) {
+                      // check empty field
+                      if (nameError == null &&
+                          descriptionError == null &&
+                          promptError == null) {
+                        final prompt = Prompt(
+                          id: widget.prompt.id,
+                          name: nameController.text,
+                          description: descriptionController.text,
+                          content: promptController.text,
+                          category: selectedDropdownCategory,
+                          promptType: widget.prompt.promptType,
+                          isMine: widget.prompt.isMine,
+                          isFavorite: widget.prompt.isFavorite,
+                          username: widget.prompt.username,
+                        );
+                        Provider.of<PromptProvider>(context, listen: false)
+                            .updatePrompt(prompt);
                         Navigator.of(context).pop();
                       }
                     });

@@ -27,11 +27,29 @@ class _PromptLibraryState extends State<PromptLibrary> {
   void initState() {
     super.initState();
     promptProvider = Provider.of<PromptProvider>(context, listen: false);
-    _fetchPrompts();
+    promptProvider.isLoading = true;
+    _fetchPrompts(limit: 50, isPublic: !isShowMyPrompt);
   }
 
-  Future<void> _fetchPrompts() async {
-    await promptProvider.fetchPrompts();
+  Future<void> _fetchPrompts({
+    String query = '',
+    int offset = 0,
+    int limit = 20,
+    bool isFavorite = false,
+    bool isPublic = true,
+  }) async {
+    await promptProvider.fetchPrompts(
+      query: query,
+      isFavorite: isFavorite,
+      isPublic: isPublic,
+      offset: offset,
+      limit: limit,
+    );
+    if (mounted) {
+      setState(() {
+        promptProvider.isLoading = false;
+      });
+    }
   }
 
   @override
@@ -128,6 +146,8 @@ class _PromptLibraryState extends State<PromptLibrary> {
             setState(() {
               isShowMyPrompt = text == 'My prompts';
               selectedCategory = Category.All;
+              promptProvider.isLoading = true;
+              _fetchPrompts(isPublic: !isShowMyPrompt);
             });
           },
           child: Container(
@@ -150,14 +170,33 @@ class _PromptLibraryState extends State<PromptLibrary> {
 
   Widget _buildSearchBar() {
     return isShowMyPrompt
-        ? CustomSearchBar(hintText: "Search", onChanged: (String value) {})
+        ? CustomSearchBar(
+            hintText: "Search",
+            onChanged: (String value) {
+              setState(() {
+                promptProvider.isLoading = true;
+                _fetchPrompts(
+                  query: value,
+                  isPublic: false,
+                );
+              });
+            })
         : Column(
             children: [
               Row(
                 children: [
                   Expanded(
                     child: CustomSearchBar(
-                        hintText: "Search", onChanged: (String value) {}),
+                        hintText: "Search",
+                        onChanged: (String value) {
+                          setState(() {
+                            promptProvider.isLoading = true;
+                            _fetchPrompts(
+                              query: value,
+                              isPublic: true,
+                            );
+                          });
+                        }),
                   ),
                   const SizedBox(width: 10),
                   _buildFavoriteFilterButton(),
@@ -226,6 +265,10 @@ class _PromptLibraryState extends State<PromptLibrary> {
   }
 
   Widget _buildPromptList(PromptProvider promptProvider) {
+    if (promptProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Expanded(
       child: ListView.separated(
         itemCount: promptProvider.prompts.length,
@@ -297,7 +340,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
-        prompt.prompt,
+        prompt.description,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -316,13 +359,10 @@ class _PromptLibraryState extends State<PromptLibrary> {
               : IconButton(
                   onPressed: () {
                     setState(() {
-                      prompt.isFavorite = !prompt.isFavorite;
                       if (prompt.isFavorite) {
-                        Provider.of<PromptProvider>(context, listen: false)
-                            .addPromptToFavorite(prompt.id);
+                        promptProvider.removePromptFromFavorite(prompt.id);
                       } else {
-                        Provider.of<PromptProvider>(context, listen: false)
-                            .removePromptFromFavorite(prompt.id);
+                        promptProvider.addPromptToFavorite(prompt.id);
                       }
                     });
                   },
@@ -347,7 +387,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
                         return ConfirmDeleteDialog(
                           onDelete: (index) {
                             Provider.of<PromptProvider>(context, listen: false)
-                                .deletePrompt(prompt.id);
+                                .deletePrompt(prompt);
                           },
                           parameter: index,
                           title: 'Delete prompt',
@@ -449,9 +489,7 @@ class _PromptLibraryState extends State<PromptLibrary> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return EditPromptDialog(
-            prompt: Provider.of<PromptProvider>(context, listen: false)
-                .prompts[index],
-            index: index);
+            prompt: promptProvider.prompts[index], index: index);
       },
     );
   }
@@ -460,7 +498,6 @@ class _PromptLibraryState extends State<PromptLibrary> {
       BuildContext context, Prompt prompt) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return PublicPromptInfoDialog(
           prompt: prompt,
