@@ -89,6 +89,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
               emailController.text, passwordController.text);
           if (mounted) {
             Navigator.pushReplacement(context, FadeRoute(page: HomeScreen()));
+            authProvider.getCurrentUser();
           }
         } catch (e) {
           String errorMessage = e is Exception
