@@ -4,17 +4,34 @@ import 'dart:io';
 class ChatMessage {
   String textMessage;
   final MessageType messageType;
-  File? image;
-  String? code;
-  DateTime sendTime;
+  File? file; // Optional file attachment
 
   ChatMessage({
     required this.textMessage,
     required this.messageType,
-    this.image,
-    this.code,
-    required this.sendTime,
+    this.file,
   });
+
+  /// Convert JSON to ChatMessage
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      textMessage: json['content'] as String,
+      messageType:
+          json['role'] == 'user' ? MessageType.user : MessageType.model,
+      file: json['files'] != null && json['files'].isNotEmpty
+          ? File(json['files'][0]) // Use the first file if present
+          : null,
+    );
+  }
+
+  /// Convert ChatMessage to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'content': textMessage,
+      'role': messageType == MessageType.user ? 'user' : 'model',
+      if (file != null) 'files': [file!.path], // Attach file path if present
+    };
+  }
 }
 
-enum MessageType { user, bot }
+enum MessageType { user, model }
