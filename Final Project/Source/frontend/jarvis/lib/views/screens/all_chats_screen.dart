@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:jarvis/models/chat_info.dart';
+import 'package:jarvis/models/conversation.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
@@ -24,42 +24,33 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
 
   @override
   void initState() {
-    super.initState();
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
-
     _fetchInitialChats();
-
-    // Lắng nghe khi người dùng cuộn gần đến cuối danh sách để tải thêm
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100) {
-        _loadMoreChats();
-      }
-    });
+    super.initState();
   }
 
   Future<void> _fetchInitialChats() async {
     try {
-      await _authProvider.ensureValidToken();
+      await _authProvider.refreshAccessToken();
 
-      await _chatProvider.fetchChats(_authProvider.accessToken!);
+      _chatProvider.conversationList.clear();
+      _chatProvider.isLoading = true;
+      _chatProvider.fetchChats(_authProvider.accessToken!, limit: 20);
     } catch (e) {
-      print('Error fetching chats: $e');
-    }
-  }
-
-  Future<void> _loadMoreChats() async {
-    if (_chatProvider.hasMore && !_chatProvider.isLoading) {
-      await _chatProvider.fetchChats(
-        _authProvider.accessToken!,
-        loadMore: true,
-      );
+      throw Exception('Error in fetchInitialChats: $e');
     }
   }
 
   String formatDate(DateTime date) {
-    return DateFormat('MMM dd').format(date); // Format date as "Oct 14"
+    return DateFormat('MMM dd').format(date);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _chatProvider.clearChats();
+    super.dispose();
   }
 
   @override
@@ -81,11 +72,11 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
       ),
       body: Consumer<ChatProvider>(
         builder: (context, chatProvider, child) {
-          if (chatProvider.isLoading && chatProvider.chatList.isEmpty) {
+          if (chatProvider.isLoading && chatProvider.conversationList.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (chatProvider.chatList.isEmpty) {
+          if (chatProvider.conversationList.isEmpty) {
             return const Center(
               child: Text(
                 'No chats available.',
@@ -96,10 +87,10 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
 
           return ListView.separated(
             controller: _scrollController,
-            itemCount: chatProvider.chatList.length +
+            itemCount: chatProvider.conversationList.length +
                 (chatProvider.hasMore ? 1 : 0), // Thêm item loader nếu có
             itemBuilder: (context, index) {
-              if (index >= chatProvider.chatList.length) {
+              if (index >= chatProvider.conversationList.length) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -108,7 +99,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                 );
               }
 
-              final chatInfo = chatProvider.chatList[index];
+              final conversation = chatProvider.conversationList[index];
 
               return ListTile(
                 contentPadding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
@@ -117,7 +108,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                     context,
                     FadeRoute(
                       page: ChatScreen(
-                        chatInfo: chatInfo,
+                        conversation: conversation,
                         isNewChat: false,
                       ),
                     ),
@@ -126,7 +117,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                 leading: CircleAvatar(
                   backgroundColor: Colors.blueAccent,
                   child: Text(
-                    chatInfo.mainContent[0], // First letter of the mainContent
+                    conversation.title[0],
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -134,12 +125,16 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chatInfo.mainContent,
+                      conversation.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     Text(
-                      chatInfo.latestMessage.textMessage,
+                      conversation.messages!.isNotEmpty
+                          ? conversation.messages!.last.content
+                          : 'No messages',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style:
@@ -151,13 +146,18 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Text(
+                      formatDate(conversation.createdAt),
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                     Expanded(
                       child: PopupMenuButton<String>(
                         color: Colors.white,
                         icon: const Icon(Icons.more_horiz),
                         onSelected: (value) {
                           if (value == 'delete') {
-                            _showDeleteConfirmationDialog(context, chatInfo);
+                            _showDeleteConfirmationDialog(
+                                context, conversation);
                           }
                         },
                         itemBuilder: (context) => [
@@ -176,7 +176,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
               indent: 0,
               thickness: 0,
               endIndent: 0,
-              height: 0,
+              height: 10,
             ),
           );
         },
@@ -184,23 +184,18 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, ChatInfo chatInfo) {
+  void _showDeleteConfirmationDialog(
+      BuildContext context, Conversation chatInfo) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return ConfirmDeleteDialog<ChatInfo>(
+        return ConfirmDeleteDialog<Conversation>(
           title: 'Delete chat',
           content: 'Are you sure you want to delete this chat?',
-          onDelete: (_) {
-            _deleteChat(chatInfo);
-          },
+          onDelete: (_) {},
           parameter: chatInfo,
         );
       },
     );
-  }
-
-  void _deleteChat(ChatInfo chatInfo) {
-    _chatProvider.clearChats(); // Clear toàn bộ dữ liệu nếu cần
   }
 }

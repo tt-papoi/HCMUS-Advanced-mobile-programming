@@ -14,16 +14,15 @@ class RemainToken extends StatefulWidget {
 class _RemainTokenState extends State<RemainToken> {
   @override
   void initState() {
-    super.initState();
-
     _checkAndUpdateTokens();
+    super.initState();
   }
 
   Future<void> _checkAndUpdateTokens() async {
     final tokenProvider = Provider.of<TokenProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     try {
-      await authProvider.ensureValidToken();
+      await authProvider.refreshAccessToken();
     } catch (e) {
       //print('Error fetching chats: $e');
     }
@@ -40,7 +39,7 @@ class _RemainTokenState extends State<RemainToken> {
         final tokenUsage = tokenProvider.tokenUsage;
 
         if (tokenUsage == null) {
-          return const CircularProgressIndicator(); // Hiển thị loading khi chưa có dữ liệu
+          return Container(); // Hiển thị container trống khi chưa có dữ liệu
         }
         int tokenCount = tokenUsage['availableTokens'] ?? 0;
 

@@ -44,6 +44,7 @@ class _JarvisAppState extends State<JarvisApp> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.loadTokens();
     if (authProvider.isLoggedIn) {
+      await authProvider.refreshAccessToken();
       await authProvider.getCurrentUser();
     }
     setState(() {

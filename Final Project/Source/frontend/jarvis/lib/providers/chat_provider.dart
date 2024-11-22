@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import '../services/chat_service.dart';
-import '../models/chat_info.dart';
-import '../models/chat_message.dart';
+import '../models/conversation.dart';
+import '../models/message.dart';
 
 class ChatProvider with ChangeNotifier {
   final ChatService _chatService = ChatService();
 
-  List<ChatInfo> _chatList = [];
-  Map<String, List<ChatMessage>> _chatHistories = {};
+  List<Conversation> _conversationList = [];
+  List<Message> _messages = [];
   bool _isLoading = false;
   String? _nextCursor;
 
-  List<ChatInfo> get chatList => _chatList;
-  Map<String, List<ChatMessage>> get chatHistories => _chatHistories;
+  List<Conversation> get conversationList => _conversationList;
+  List<Message> get messages => _messages;
   bool get isLoading => _isLoading;
+  set isLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   bool get hasMore => _nextCursor != null;
 
   /// 1. Fetch all chat conversations
-  Future<void> fetchChats(String accessToken, {bool loadMore = false}) async {
+  Future<void> fetchChats(String accessToken,
+      {bool loadMore = false, int limit = 20}) async {
     if (loadMore && _nextCursor == null) return;
 
     try {
@@ -27,12 +33,14 @@ class ChatProvider with ChangeNotifier {
       final result = await _chatService.fetchAllChats(
         accessToken: accessToken,
         cursor: loadMore ? _nextCursor : null,
+        limit: limit,
       );
-      print('API result: ${result['items']}');
+
+      final items = result['data'] as List<Conversation>? ?? [];
       if (loadMore) {
-        _chatList.addAll(result['item'] as List<ChatInfo>);
+        _conversationList.addAll(items);
       } else {
-        _chatList = result['item'] as List<ChatInfo>;
+        _conversationList = items;
       }
 
       _nextCursor = result['nextCursor'];
@@ -59,8 +67,8 @@ class ChatProvider with ChangeNotifier {
         assistantModel: assistantModel,
       );
 
-      final newChat = ChatInfo.fromJson(response);
-      _chatList.insert(0, newChat);
+      final newChat = Conversation.fromJson(response);
+      _conversationList.insert(0, newChat);
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -87,17 +95,12 @@ class ChatProvider with ChangeNotifier {
         conversationId: conversationId,
         assistantId: assistantId,
         assistantModel: assistantModel,
-        jarvisGuid: jarvisGuid,
       );
 
-      final messages = (result['messages'] as List)
-          .map((msg) => ChatMessage.fromJson(msg))
-          .toList();
-
-      if (loadMore && _chatHistories.containsKey(conversationId)) {
-        _chatHistories[conversationId]?.addAll(messages);
-      } else {
-        _chatHistories[conversationId] = messages;
+      for (var item in result['messages']) {
+        List<Message> res = Message.fromJson(item);
+        _messages.add(res[0]);
+        _messages.add(res[1]);
       }
 
       _nextCursor = result['nextCursor'];
@@ -130,10 +133,10 @@ class ChatProvider with ChangeNotifier {
         jarvisGuid: jarvisGuid,
       );
 
-      final newMessage = ChatMessage.fromJson(response);
+      //final newMessage = Message.fromJson(response);
 
       // Add to local history
-      _chatHistories[conversationId]?.add(newMessage);
+      //_chatHistories[conversationId]?.add(newMessage);
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -142,14 +145,12 @@ class ChatProvider with ChangeNotifier {
 
   /// Clear chat histories
   void clearChatHistories() {
-    _chatHistories = {};
+    _messages = [];
     _nextCursor = null;
-    notifyListeners();
   }
 
   void clearChats() {
-    _chatList = [];
+    _conversationList = [];
     _nextCursor = null;
-    notifyListeners();
   }
 }

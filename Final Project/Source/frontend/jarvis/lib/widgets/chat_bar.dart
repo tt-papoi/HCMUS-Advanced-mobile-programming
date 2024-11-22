@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/models/message.dart';
 import 'package:jarvis/models/prompt.dart';
 import 'package:jarvis/providers/prompt_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 
 class ChatBar extends StatefulWidget {
   final String hintMessage;
-  final Function(ChatMessage) onSendMessage;
+  final Function(Message) onSendMessage;
   final Function(bool)? onSlashTyped;
 
   const ChatBar({
@@ -343,16 +343,16 @@ class _ChatBarState extends State<ChatBar> {
                     IconButton(
                       icon: const Icon(Icons.send_rounded),
                       onPressed: () {
-                        ChatMessage message = ChatMessage(
-                          messageType: MessageType.user,
-                          textMessage: '',
+                        Message message = Message(
+                          role: Role.user,
+                          content: '',
                         );
                         if (_messageController.text.isEmpty &&
                             (_selectedFile == null)) {
                           return;
                         }
 
-                        message.textMessage = _messageController.text;
+                        message.content = _messageController.text;
                         message.file = _selectedFile;
 
                         widget.onSendMessage(message);

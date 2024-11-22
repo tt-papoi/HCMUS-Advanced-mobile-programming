@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/chat_info.dart';
-import 'package:jarvis/models/chat_message.dart';
-import 'package:jarvis/providers/auth_provider.dart';
-import 'package:jarvis/providers/chat_provider.dart';
+import 'package:jarvis/models/conversation.dart';
+import 'package:jarvis/models/message.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
@@ -10,7 +8,6 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
-import 'package:provider/provider.dart';
 
 class Suggestion {
   final String title;
@@ -111,10 +108,10 @@ class HomeScreen extends StatelessWidget {
                           title: suggestion.title,
                           subtitle: suggestion.subtitle,
                           onTap: () {
-                            ChatMessage chatMessage = ChatMessage(
-                              textMessage:
+                            Message chatMessage = Message(
+                              content:
                                   "${suggestion.title} ${suggestion.subtitle}",
-                              messageType: MessageType.user,
+                              role: Role.user,
                               file: null,
                             );
                             _startNewChat(context, chatMessage);
@@ -137,7 +134,7 @@ class HomeScreen extends StatelessWidget {
           ),
           ChatBar(
             hintMessage: 'Start a new chat',
-            onSendMessage: (ChatMessage message) {
+            onSendMessage: (Message message) {
               _startNewChat(context, message);
             },
             onSlashTyped: (bool isSlashTyped) {
@@ -149,7 +146,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startNewChat(BuildContext context, ChatMessage message) async {
+  void _startNewChat(BuildContext context, Message message) async {
     final selectedBot = botBarKey.currentState?.getSelectedBot;
 
     if (selectedBot == null) {
@@ -159,17 +156,15 @@ class HomeScreen extends StatelessWidget {
       return; // Exit early if no bot is selected
     }
 
-    ChatInfo newChatInfo = ChatInfo(
-      bot: selectedBot,
-      mainContent: "New Chat",
-      latestMessage: message,
+    Conversation newChatInfo = Conversation(
+      title: "New Chat",
       conversationId: '',
-      lastUpdated: DateTime.now(),
+      createdAt: DateTime.now(),
     );
 
     Navigator.push(
       context,
-      FadeRoute(page: ChatScreen(isNewChat: true, chatInfo: newChatInfo)),
+      FadeRoute(page: ChatScreen(isNewChat: true, conversation: newChatInfo)),
     );
   }
 }

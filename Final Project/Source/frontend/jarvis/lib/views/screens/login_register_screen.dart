@@ -88,8 +88,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
           await authProvider.signIn(
               emailController.text, passwordController.text);
           if (mounted) {
-            Navigator.pushReplacement(context, FadeRoute(page: HomeScreen()));
             authProvider.getCurrentUser();
+            Navigator.pushReplacement(context, FadeRoute(page: HomeScreen()));
           }
         } catch (e) {
           String errorMessage = e is Exception
@@ -135,6 +135,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(

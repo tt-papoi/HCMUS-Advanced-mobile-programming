@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/chat_info.dart';
+import 'package:jarvis/models/message.dart';
+import '../models/conversation.dart';
 import 'package:jarvis/utils/constants.dart';
 
 class ChatService {
@@ -29,16 +30,31 @@ class ChatService {
       };
 
       final response = await http.get(uri, headers: headers);
-      print('response: ${response.body}');
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        print('data: $data');
         // Kiểm tra nếu 'data' là null hoặc không phải danh sách
-        final List<ChatInfo> chatList = (data['items'] as List?)
-                ?.map((json) => ChatInfo.fromJson(json))
-                .toList() ??
-            []; // Trả về danh sách rỗng nếu null
+        final List<Conversation> chatList = [];
+        for (var item in data['items']) {
+          Conversation conversation = Conversation.fromJson(item);
+          List<Message> messages = [];
 
+          await fetchChatHistory(
+            limit: 1,
+            accessToken: accessToken,
+            conversationId: conversation.conversationId,
+            assistantId: assistantId,
+            assistantModel: assistantModel,
+          ).then((value) {
+            for (var item in value['messages']) {
+              List<Message> res = Message.fromJson(item);
+              messages.add(res[0]);
+              messages.add(res[1]);
+            }
+          });
+          conversation.messages = messages;
+          chatList.add(conversation);
+        }
         return {
           'data': chatList,
           'nextCursor': data['nextCursor'],
@@ -97,21 +113,21 @@ class ChatService {
   Future<Map<String, dynamic>> fetchChatHistory({
     required String accessToken,
     required String conversationId,
+    int limit = 100,
     String assistantId = 'gpt-4o-mini',
     String assistantModel = 'dify',
-    String? jarvisGuid,
   }) async {
     try {
       final uri = Uri.parse(
         '$baseUrl/api/v1/ai-chat/conversations/$conversationId/messages',
       ).replace(queryParameters: {
+        'limit': '$limit',
         'assistantId': assistantId,
         'assistantModel': assistantModel,
       });
 
       final headers = {
         'Authorization': 'Bearer $accessToken',
-        if (jarvisGuid != null) 'x-jarvis-guid': jarvisGuid,
       };
 
       final response = await http.get(uri, headers: headers);

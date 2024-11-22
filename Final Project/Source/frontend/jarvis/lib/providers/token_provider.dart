@@ -13,10 +13,10 @@ class TokenProvider with ChangeNotifier {
     try {
       final response = await _tokenService.fetchTokenUsage(accessToken);
       _tokenUsage = response;
-      print("Token usage: $_tokenUsage");
+
       notifyListeners();
     } catch (e) {
-      print("Error fetching token usage: $e");
+      throw Exception('Error in fetchTokenUsage: $e');
     }
   }
 }

@@ -1,19 +1,22 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/chat_info.dart';
-import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/models/conversation.dart';
+import 'package:jarvis/models/message.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewChat;
-  final ChatInfo chatInfo;
+  final Conversation conversation;
 
   const ChatScreen({
     super.key,
     required this.isNewChat,
-    required this.chatInfo,
+    required this.conversation,
   });
 
   @override
@@ -21,31 +24,34 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<ChatMessage> listMessages = [];
+  late ChatProvider _chatProvider;
+  late AuthProvider _authProvider;
 
-  void _sendMessage(ChatMessage message) {
-    setState(() {
-      listMessages.add(message);
-    });
+  void _sendMessage(Message message) {
     _receiveMessage();
   }
 
-  void _receiveMessage() {
-    ChatMessage message = ChatMessage(
-      textMessage: "Coming soon!",
-      messageType: MessageType.model,
-      file: null,
-    );
-    setState(() {
-      listMessages.add(message);
-    });
-  }
+  void _receiveMessage() {}
 
   @override
   void initState() {
+    init();
     super.initState();
-    listMessages.add(widget.chatInfo.latestMessage);
-    _receiveMessage();
+  }
+
+  void init() async {
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    _chatProvider.isLoading = true;
+    await _chatProvider.fetchChatHistory(
+        accessToken: _authProvider.accessToken!,
+        conversationId: widget.conversation.conversationId);
+  }
+
+  @override
+  void dispose() {
+    _chatProvider.clearChatHistories();
+    super.dispose();
   }
 
   @override
@@ -60,12 +66,8 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.isNewChat ? "New chat" : widget.chatInfo.mainContent,
+              widget.isNewChat ? "New chat" : widget.conversation.title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              widget.chatInfo.bot.name,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -73,27 +75,33 @@ class _ChatScreenState extends State<ChatScreen> {
           RemainToken(),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: listMessages.length,
-              itemBuilder: (context, index) {
-                return _displayMessageContainer(listMessages[index]);
-              },
+      body: Consumer<ChatProvider>(builder: (context, chatProvider, child) {
+        if (chatProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: _chatProvider.messages.length,
+                itemBuilder: (context, index) {
+                  return _displayMessageContainer(
+                      _chatProvider.messages[index]);
+                },
+              ),
             ),
-          ),
-          ChatBar(
-            hintMessage: 'Message',
-            onSendMessage: _sendMessage,
-          ),
-        ],
-      ),
+            ChatBar(
+              hintMessage: 'Message',
+              onSendMessage: _sendMessage,
+            ),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _displayMessageContainer(ChatMessage message) {
-    bool isUserMessage = message.messageType == MessageType.user;
+  Widget _displayMessageContainer(Message message) {
+    bool isUserMessage = message.role == Role.user;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -116,13 +124,12 @@ class _ChatScreenState extends State<ChatScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Image.asset(
-            widget.chatInfo.bot.imagePath,
+            "lib/assets/icons/logo_blueAccent.png",
             width: 30,
             height: 30,
           ),
           const SizedBox(width: 8),
-          Text(widget.chatInfo.bot.name,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          const Text("Jarvis", style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -150,9 +157,9 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _displayMessageContent(ChatMessage message) {
+  Widget _displayMessageContent(Message message) {
     return Column(
-      crossAxisAlignment: message.messageType == MessageType.user
+      crossAxisAlignment: message.role == Role.user
           ? CrossAxisAlignment.end
           : CrossAxisAlignment.start,
       children: [
@@ -160,18 +167,16 @@ class _ChatScreenState extends State<ChatScreen> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           decoration: BoxDecoration(
-            color: message.messageType == MessageType.user
-                ? Colors.blue[50]
-                : Colors.grey[300],
+            color:
+                message.role == Role.user ? Colors.blue[50] : Colors.grey[300],
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (message.textMessage != "")
-                _displayTextMessage(message.textMessage),
+              if (message.content != "") _displayTextMessage(message.content),
               if (message.file != null)
-                _displayImage(message.messageType, message.file!),
+                _displayImage(message.role, message.file!),
             ],
           ),
         ),
@@ -189,8 +194,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _displayImage(MessageType type, File image) {
-    return type == MessageType.user
+  Widget _displayImage(Role type, File image) {
+    return type == Role.user
         ? Container(
             width: 100,
             height: 100,

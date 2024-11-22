@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:jarvis/providers/token_provider.dart';
 import 'package:jarvis/widgets/icons.dart';
 
-class TokenUsageCard extends StatelessWidget {
+class TokenUsageCard extends StatefulWidget {
   const TokenUsageCard({super.key});
+
+  @override
+  State<TokenUsageCard> createState() => _TokenUsageCardState();
+}
+
+class _TokenUsageCardState extends State<TokenUsageCard> {
+  late AuthProvider authProvider;
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  void init() async {
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final tokenProvider = Provider.of<TokenProvider>(context, listen: false);
+    tokenProvider.fetchTokenUsage(authProvider.accessToken!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,30 +50,30 @@ class TokenUsageCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
                   // Profile Icon
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 24,
                     backgroundColor: Colors.blueAccent,
                     child: Icon(Icons.person, color: Colors.white),
                   ),
-                  SizedBox(width: 12.0),
+                  const SizedBox(width: 12.0),
                   // User Info
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'trantien4868',
-                        style: TextStyle(
+                        authProvider.username ?? 'User',
+                        style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       Text(
-                        'trantien4868@gmail.com',
-                        style: TextStyle(
+                        authProvider.email ?? 'Email',
+                        style: const TextStyle(
                           fontSize: 14.0,
                           color: Colors.grey,
                         ),
