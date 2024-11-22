@@ -20,6 +20,36 @@ class Bot {
     this.prompt,
     this.knowledgeSources,
   });
+
+  /// Convert JSON to Bot
+  factory Bot.fromJson(Map<String, dynamic> json) {
+    return Bot(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      imagePath: json['imagePath'] as String,
+      botType:
+          json['botType'] == 'official' ? BotType.offical : BotType.createdBot,
+      prompt: json['prompt'] as String?,
+      knowledgeSources: (json['knowledgeSources'] as List<dynamic>?)
+          ?.map((source) => KnowledgeSource.fromJson(source))
+          .toList(),
+    );
+  }
+
+  /// Convert Bot to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'imagePath': imagePath,
+      'botType': botType == BotType.offical ? 'official' : 'createdBot',
+      'prompt': prompt,
+      'knowledgeSources':
+          knowledgeSources?.map((source) => source.toJson()).toList(),
+    };
+  }
 }
 
 enum BotType { offical, createdBot }

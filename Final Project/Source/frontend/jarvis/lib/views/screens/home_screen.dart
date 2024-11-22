@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/chat_info.dart';
 import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
@@ -8,6 +10,7 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
+import 'package:provider/provider.dart';
 
 class Suggestion {
   final String title;
@@ -109,10 +112,11 @@ class HomeScreen extends StatelessWidget {
                           subtitle: suggestion.subtitle,
                           onTap: () {
                             ChatMessage chatMessage = ChatMessage(
-                                textMessage:
-                                    "${suggestion.title} ${suggestion.subtitle}",
-                                messageType: MessageType.user,
-                                sendTime: DateTime.now());
+                              textMessage:
+                                  "${suggestion.title} ${suggestion.subtitle}",
+                              messageType: MessageType.user,
+                              file: null,
+                            );
                             _startNewChat(context, chatMessage);
                           },
                         );
@@ -145,7 +149,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startNewChat(BuildContext context, ChatMessage message) {
+  void _startNewChat(BuildContext context, ChatMessage message) async {
     final selectedBot = botBarKey.currentState?.getSelectedBot;
 
     if (selectedBot == null) {
@@ -159,6 +163,8 @@ class HomeScreen extends StatelessWidget {
       bot: selectedBot,
       mainContent: "New Chat",
       latestMessage: message,
+      conversationId: '',
+      lastUpdated: DateTime.now(),
     );
 
     Navigator.push(

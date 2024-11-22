@@ -28,7 +28,7 @@ class ChatBar extends StatefulWidget {
 class _ChatBarState extends State<ChatBar> {
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  File? _selectedImage;
+  File? _selectedFile;
   bool _showDropdown = false;
   final List<Prompt> _promptList = [
     Prompt(
@@ -174,7 +174,7 @@ class _ChatBarState extends State<ChatBar> {
     if (image != null) {
       File imageFile = File(image.path);
       setState(() {
-        _selectedImage = imageFile;
+        _selectedFile = imageFile;
       });
     }
   }
@@ -184,13 +184,13 @@ class _ChatBarState extends State<ChatBar> {
     if (image != null) {
       File imageFile = File(image.path);
       setState(() {
-        _selectedImage = imageFile;
+        _selectedFile = imageFile;
       });
     }
   }
 
   Widget _buildImageThumbnail() {
-    if (_selectedImage != null) {
+    if (_selectedFile != null) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Stack(
@@ -203,7 +203,7 @@ class _ChatBarState extends State<ChatBar> {
                 border: Border.all(color: Colors.grey, width: 1),
                 borderRadius: BorderRadius.circular(8.0),
                 image: DecorationImage(
-                  image: FileImage(_selectedImage!),
+                  image: FileImage(_selectedFile!),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -220,7 +220,7 @@ class _ChatBarState extends State<ChatBar> {
                 icon: const Icon(size: 20, Icons.close, color: Colors.white),
                 onPressed: () {
                   setState(() {
-                    _selectedImage = null;
+                    _selectedFile = null;
                   });
                 },
               ),
@@ -360,22 +360,21 @@ class _ChatBarState extends State<ChatBar> {
                       onPressed: () {
                         ChatMessage message = ChatMessage(
                           messageType: MessageType.user,
-                          sendTime: DateTime.now(),
                           textMessage: '',
                         );
                         if (_messageController.text.isEmpty &&
-                            (_selectedImage == null)) {
+                            (_selectedFile == null)) {
                           return;
                         }
 
                         message.textMessage = _messageController.text;
-                        message.image = _selectedImage;
+                        message.file = _selectedFile;
 
                         widget.onSendMessage(message);
 
                         _messageController.clear();
                         setState(() {
-                          _selectedImage = null;
+                          _selectedFile = null;
                         });
                       },
                     ),

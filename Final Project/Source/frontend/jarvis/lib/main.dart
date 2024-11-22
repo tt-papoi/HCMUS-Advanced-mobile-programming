@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
+import 'package:jarvis/providers/token_provider.dart';
 import 'package:jarvis/views/screens/home_screen.dart';
 import 'package:jarvis/views/screens/login_register_screen.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +14,8 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => TokenProvider()),
       ],
       child: const JarvisApp(),
     ),

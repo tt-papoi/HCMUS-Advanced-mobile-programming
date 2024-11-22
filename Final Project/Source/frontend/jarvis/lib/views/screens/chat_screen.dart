@@ -32,11 +32,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _receiveMessage() {
     ChatMessage message = ChatMessage(
-        textMessage: "Coming soon!",
-        messageType: MessageType.bot,
-        sendTime: DateTime.now(),
-        image: null,
-        code: "print('Hello, World!')");
+      textMessage: "Coming soon!",
+      messageType: MessageType.model,
+      file: null,
+    );
     setState(() {
       listMessages.add(message);
     });
@@ -171,9 +170,8 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               if (message.textMessage != "")
                 _displayTextMessage(message.textMessage),
-              if (message.code != null) _displayCode(message.code!),
-              if (message.image != null)
-                _displayImage(message.messageType, message.image!),
+              if (message.file != null)
+                _displayImage(message.messageType, message.file!),
             ],
           ),
         ),
@@ -205,41 +203,41 @@ class _ChatScreenState extends State<ChatScreen> {
           );
   }
 
-  Widget _displayCode(String code) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(200, 0, 0, 0),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            child: const Text(
-              "Code",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
-            ),
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              code,
-              style: const TextStyle(
-                  fontFamily: 'monospace',
-                  color: Color.fromARGB(255, 255, 255, 255)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _displayCode(String code) {
+  //   return Container(
+  //     margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+  //     decoration: BoxDecoration(
+  //       color: const Color.fromARGB(200, 0, 0, 0),
+  //       borderRadius: BorderRadius.circular(8.0),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Container(
+  //           padding: const EdgeInsets.all(12),
+  //           child: const Text(
+  //             "Code",
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //         ),
+  //         Container(
+  //           decoration: const BoxDecoration(
+  //             color: Colors.black87,
+  //             borderRadius: BorderRadius.only(
+  //               bottomLeft: Radius.circular(8),
+  //               bottomRight: Radius.circular(8),
+  //             ),
+  //           ),
+  //           padding: const EdgeInsets.all(12.0),
+  //           child: Text(
+  //             code,
+  //             style: const TextStyle(
+  //                 fontFamily: 'monospace',
+  //                 color: Color.fromARGB(255, 255, 255, 255)),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
