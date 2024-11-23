@@ -32,6 +32,10 @@ class _RemainTokenState extends State<RemainToken> {
     }
   }
 
+  Future<void> refreshTokens() async {
+    await _checkAndUpdateTokens();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TokenProvider>(

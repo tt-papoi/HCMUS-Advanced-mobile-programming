@@ -39,11 +39,24 @@ class _ChatScreenState extends State<ChatScreen> {
   // ValueNotifier to manage AssistantBar visibility
   final ValueNotifier<bool> _isAssistantBarVisible = ValueNotifier<bool>(true);
 
-  void _sendMessage(Message message) {
-    _receiveMessage();
-  }
+  void _sendMessage(Message message) async {
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
-  void _receiveMessage() {}
+    await _authProvider.refreshAccessToken();
+
+    try {
+      await _chatProvider.sendFollowUpMessage(
+        accessToken: _authProvider.accessToken!,
+        conversationId: _chatProvider.currentConversation!.conversationId,
+        content: message.content,
+        assistantId: _chatProvider.selectedAssistant.id,
+        assistantModel: _chatProvider.selectedAssistant.model,
+      );
+    } catch (e) {
+      debugPrint('Error while sending message: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -153,6 +166,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _displayBotInfo() {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final selectedAssistant = chatProvider.selectedAssistant;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 0, 10),
       child: Row(
@@ -160,12 +176,15 @@ class _ChatScreenState extends State<ChatScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Image.asset(
-            "lib/assets/icons/logo_blueAccent.png",
+            selectedAssistant.imagePath ?? 'assets/default_image.png',
             width: 30,
             height: 30,
           ),
           const SizedBox(width: 8),
-          const Text("Jarvis", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            selectedAssistant.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

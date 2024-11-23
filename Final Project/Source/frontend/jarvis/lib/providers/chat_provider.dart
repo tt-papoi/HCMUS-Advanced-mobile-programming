@@ -144,20 +144,29 @@ class ChatProvider with ChangeNotifier {
     String? jarvisGuid,
   }) async {
     try {
-      // final response = await _chatService.sendFollowUpMessage(
-      //   accessToken: accessToken,
-      //   conversationId: conversationId,
-      //   content: content,
-      //   assistantId: assistantId,
-      //   assistantModel: assistantModel,
-      //   messages: messages,
-      //   jarvisGuid: jarvisGuid,
-      // );
+      // print(currentConversation!.messages!.length);
+      // print(currentConversation!.messages!
+      //     .map((message) => message.content)
+      //     .toList());
 
-      //final newMessage = Message.fromJson(response);
+      final response = await _chatService.sendFollowUpMessage(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        content: content,
+        assistantId: assistantId,
+        assistantModel: assistantModel,
+        messages: messages,
+        jarvisGuid: jarvisGuid,
+      );
+      currentConversation!.messages!.add(Message(
+        content: content,
+        role: Role.user,
+      ));
+      currentConversation!.messages!.add(Message(
+        content: response['message'],
+        role: Role.model,
+      ));
 
-      // Add to local history
-      //_chatHistories[conversationId]?.add(newMessage);
       notifyListeners();
     } catch (e) {
       rethrow;
