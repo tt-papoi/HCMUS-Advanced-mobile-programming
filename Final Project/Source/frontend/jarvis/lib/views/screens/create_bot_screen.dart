@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:jarvis/models/bot.dart';
+import 'package:jarvis/models/my_bot.dart';
+
 import 'package:jarvis/utils/dialog_utils.dart';
 
 class CreateBotScreen extends StatefulWidget {
@@ -53,7 +54,7 @@ class _CreateBotScreenState extends State<CreateBotScreen> {
     }
 
     // If everything is valid, create the bot
-    Bot newBot = Bot(
+    Assistant newBot = Assistant(
       name: botName,
       description: botPrompt, // Using prompt as description for now
       prompt: botPrompt,

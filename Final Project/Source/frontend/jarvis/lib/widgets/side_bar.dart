@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/all_chats_screen.dart';
-import 'package:jarvis/views/screens/explore_screen.dart';
 import 'package:jarvis/views/screens/mybot_screen.dart';
 import 'package:jarvis/views/screens/profile_screen.dart';
 import 'package:jarvis/views/screens/subscribe_screen.dart';
@@ -23,9 +22,13 @@ class SideBar extends StatelessWidget {
               child: const TokenUsageCard(),
             ),
 
-            _buildExploreAndMyBotRow(context),
-            const SizedBox(height: 10.0),
-
+            _buildListTile(
+              icon: CustomIcons.robot,
+              title: 'My bots',
+              customOnTap: () {
+                _navigateTo(context, const MybotScreen());
+              },
+            ),
             // navigate to all chats screen
             _buildListTile(
               icon: Icons.chat_outlined,
@@ -64,89 +67,16 @@ class SideBar extends StatelessWidget {
     );
   }
 
-  Widget _buildExploreAndMyBotRow(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Row(
-        children: [
-          _buildExploreContainer(context),
-          const SizedBox(width: 10.0),
-          _buildMyBotContainer(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExploreContainer(BuildContext context) {
-    return _buildContainer(
-      icon: CustomIcons.search,
-      text: 'Explore',
-      trailingIcon: Icons.arrow_forward_ios,
-      onTap: () {
-        _navigateTo(context, const ExploreScreen());
-      },
-    );
-  }
-
-  Widget _buildMyBotContainer(BuildContext context) {
-    return _buildContainer(
-      icon: CustomIcons.robot,
-      text: 'My bots',
-      trailingIcon: Icons.add,
-      onTap: () => _navigateTo(context, const MybotScreen()),
-    );
-  }
-
-  Widget _buildContainer(
-      {required IconData icon,
-      required String text,
-      required IconData trailingIcon,
-      required VoidCallback onTap}) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(15, 0, 0, 0),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    trailingIcon,
-                    size: 15.0,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildListTile({
     required IconData icon,
     required String title,
     required VoidCallback customOnTap,
   }) {
     return ListTile(
-      leading: Icon(icon),
+      leading: Icon(
+        icon,
+        size: 22,
+      ),
       title: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.bold),

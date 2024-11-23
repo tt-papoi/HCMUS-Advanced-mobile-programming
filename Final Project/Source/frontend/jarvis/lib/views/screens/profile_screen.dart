@@ -22,9 +22,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
-  int currentToken = 30;
-  final int maxToken = 50;
-
   void _logout(BuildContext context) {
     authProvider.logout();
     Navigator.pushAndRemoveUntil(

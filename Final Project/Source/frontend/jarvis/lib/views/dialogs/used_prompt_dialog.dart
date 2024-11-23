@@ -18,7 +18,7 @@ class _UsedPromptDialogState extends State<UsedPromptDialog> {
   @override
   void initState() {
     super.initState();
-    promptController.text = widget.prompt.prompt;
+    promptController.text = widget.prompt.content;
     for (int i = 0; i < widget.prompt.placeholders!.length; i++) {
       inputControllerList.add(TextEditingController());
     }
@@ -127,15 +127,25 @@ class _UsedPromptDialogState extends State<UsedPromptDialog> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   color: Colors.black12),
-              child: const Text(
-                "Username",
-                style: TextStyle(
+              child: Text(
+                widget.prompt.username,
+                style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black54,
                     fontWeight: FontWeight.bold),
               ),
             ),
           ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          widget.prompt.description,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black54,
+          ),
         ),
         const SizedBox(
           height: 10,

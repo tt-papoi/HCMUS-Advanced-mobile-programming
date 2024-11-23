@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/chat_info.dart';
-import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/models/message.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/chat_screen.dart';
-import 'package:jarvis/widgets/bots_bar.dart';
+import 'package:jarvis/widgets/assistants_bar.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
@@ -20,7 +19,8 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   // Define a GlobalKey for BotBar
-  final GlobalKey<BotBarState> botBarKey = GlobalKey<BotBarState>();
+  final GlobalKey<AssistantBarState> assistantBarKey =
+      GlobalKey<AssistantBarState>();
 
   // ValueNotifier to manage BotBar visibility
   final ValueNotifier<bool> _isBotBarVisible = ValueNotifier<bool>(true);
@@ -108,11 +108,12 @@ class HomeScreen extends StatelessWidget {
                           title: suggestion.title,
                           subtitle: suggestion.subtitle,
                           onTap: () {
-                            ChatMessage chatMessage = ChatMessage(
-                                textMessage:
-                                    "${suggestion.title} ${suggestion.subtitle}",
-                                messageType: MessageType.user,
-                                sendTime: DateTime.now());
+                            Message chatMessage = Message(
+                              content:
+                                  "${suggestion.title} ${suggestion.subtitle}",
+                              role: Role.user,
+                              file: null,
+                            );
                             _startNewChat(context, chatMessage);
                           },
                         );
@@ -128,12 +129,14 @@ class HomeScreen extends StatelessWidget {
           ValueListenableBuilder<bool>(
             valueListenable: _isBotBarVisible,
             builder: (context, isVisible, child) {
-              return isVisible ? BotBar(key: botBarKey) : Container();
+              return isVisible
+                  ? AssistantBar(key: assistantBarKey)
+                  : Container();
             },
           ),
           ChatBar(
             hintMessage: 'Start a new chat',
-            onSendMessage: (ChatMessage message) {
+            onSendMessage: (Message message) {
               _startNewChat(context, message);
             },
             onSlashTyped: (bool isSlashTyped) {
@@ -145,25 +148,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startNewChat(BuildContext context, ChatMessage message) {
-    final selectedBot = botBarKey.currentState?.getSelectedBot;
-
-    if (selectedBot == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a bot first!')),
-      );
-      return; // Exit early if no bot is selected
-    }
-
-    ChatInfo newChatInfo = ChatInfo(
-      bot: selectedBot,
-      mainContent: "New Chat",
-      latestMessage: message,
-    );
-
+  void _startNewChat(BuildContext context, Message message) async {
     Navigator.push(
+      // ignore: use_build_context_synchronously
       context,
-      FadeRoute(page: ChatScreen(isNewChat: true, chatInfo: newChatInfo)),
+      FadeRoute(page: ChatScreen(isNewChat: true, newMessage: message)),
     );
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/prompt_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
+import 'package:jarvis/providers/token_provider.dart';
 import 'package:jarvis/views/screens/home_screen.dart';
 import 'package:jarvis/views/screens/login_register_screen.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +15,9 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => PromptProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => TokenProvider()),
       ],
       child: const JarvisApp(),
     ),
@@ -37,6 +43,10 @@ class _JarvisAppState extends State<JarvisApp> {
   Future<void> init() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.loadTokens();
+    if (authProvider.isLoggedIn) {
+      await authProvider.refreshAccessToken();
+      await authProvider.getCurrentUser();
+    }
     setState(() {
       _isLoggedIn = authProvider.isLoggedIn;
     });
