@@ -17,9 +17,11 @@ class Conversation {
   /// Convert JSON to ChatInfo
   factory Conversation.fromJson(Map<String, dynamic> json) {
     return Conversation(
-      conversationId: json['id'] as String,
-      title: json['title'] as String,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      conversationId: (json['conversationId'] ?? json['id']) as String,
+      title: (json['title'] ?? json['message']) as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int)
+          : DateTime.now(), // Sử dụng thời gian hiện tại nếu thiếu
     );
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/conversation.dart';
 import 'package:jarvis/models/message.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/chat_screen.dart';
 import 'package:jarvis/widgets/bots_bar.dart';
@@ -8,6 +10,7 @@ import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
+import 'package:provider/provider.dart';
 
 class Suggestion {
   final String title;
@@ -147,6 +150,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _startNewChat(BuildContext context, Message message) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+
     final selectedBot = botBarKey.currentState?.getSelectedBot;
 
     if (selectedBot == null) {
@@ -155,16 +161,21 @@ class HomeScreen extends StatelessWidget {
       );
       return; // Exit early if no bot is selected
     }
-
-    Conversation newChatInfo = Conversation(
-      title: "New Chat",
-      conversationId: '',
-      createdAt: DateTime.now(),
+    await chatProvider.sendMessage(
+      accessToken: authProvider.accessToken!,
+      content: message.content,
+      assistantId: 'gpt-4o-mini',
+      assistantModel: 'dify',
     );
 
+    final newConversation = chatProvider.conversationList.first;
+    print(newConversation.title);
+    print(newConversation.conversationId);
+    print(newConversation.createdAt);
     Navigator.push(
       context,
-      FadeRoute(page: ChatScreen(isNewChat: true, conversation: newChatInfo)),
+      FadeRoute(
+          page: ChatScreen(isNewChat: true, conversation: newConversation)),
     );
   }
 }

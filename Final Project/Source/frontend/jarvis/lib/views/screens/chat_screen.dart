@@ -42,6 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void init() async {
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+
     _chatProvider.isLoading = true;
     await _chatProvider.fetchChatHistory(
         accessToken: _authProvider.accessToken!,
@@ -66,7 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.isNewChat ? "New chat" : widget.conversation.title,
+              widget.conversation.title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],

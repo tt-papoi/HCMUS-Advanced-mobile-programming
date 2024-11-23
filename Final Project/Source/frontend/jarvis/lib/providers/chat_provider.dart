@@ -69,6 +69,7 @@ class ChatProvider with ChangeNotifier {
 
       final newChat = Conversation.fromJson(response);
       _conversationList.insert(0, newChat);
+
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -88,7 +89,6 @@ class ChatProvider with ChangeNotifier {
       if (loadMore && _nextCursor == null) return;
 
       _isLoading = true;
-      notifyListeners();
 
       final result = await _chatService.fetchChatHistory(
         accessToken: accessToken,
