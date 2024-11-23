@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/message.dart';
-import 'package:jarvis/providers/auth_provider.dart';
-import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/chat_screen.dart';
-import 'package:jarvis/widgets/bots_bar.dart';
+import 'package:jarvis/widgets/assistants_bar.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
 import 'package:jarvis/widgets/side_bar.dart';
 import 'package:jarvis/widgets/suggestion_prompt.dart';
-import 'package:provider/provider.dart';
 
 class Suggestion {
   final String title;
@@ -22,7 +19,8 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   // Define a GlobalKey for BotBar
-  final GlobalKey<BotBarState> botBarKey = GlobalKey<BotBarState>();
+  final GlobalKey<AssistantBarState> assistantBarKey =
+      GlobalKey<AssistantBarState>();
 
   // ValueNotifier to manage BotBar visibility
   final ValueNotifier<bool> _isBotBarVisible = ValueNotifier<bool>(true);
@@ -131,7 +129,9 @@ class HomeScreen extends StatelessWidget {
           ValueListenableBuilder<bool>(
             valueListenable: _isBotBarVisible,
             builder: (context, isVisible, child) {
-              return isVisible ? BotBar(key: botBarKey) : Container();
+              return isVisible
+                  ? AssistantBar(key: assistantBarKey)
+                  : Container();
             },
           ),
           ChatBar(
@@ -149,31 +149,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _startNewChat(BuildContext context, Message message) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-
-    final selectedBot = botBarKey.currentState?.getSelectedBot;
-
-    if (selectedBot == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a bot first!')),
-      );
-      return; // Exit early if no bot is selected
-    }
-    await chatProvider.sendMessage(
-      accessToken: authProvider.accessToken!,
-      content: message.content,
-      assistantId: 'gpt-4o-mini',
-      assistantModel: 'dify',
-    );
-
-    final newConversation = chatProvider.conversationList.first;
-
     Navigator.push(
       // ignore: use_build_context_synchronously
       context,
-      FadeRoute(
-          page: ChatScreen(isNewChat: true, conversation: newConversation)),
+      FadeRoute(page: ChatScreen(isNewChat: true, newMessage: message)),
     );
   }
 }

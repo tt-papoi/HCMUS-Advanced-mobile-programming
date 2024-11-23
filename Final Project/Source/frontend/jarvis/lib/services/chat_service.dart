@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:jarvis/models/assistant.dart';
 import 'package:jarvis/models/message.dart';
 import '../models/conversation.dart';
 import 'package:jarvis/utils/constants.dart';
@@ -70,12 +71,10 @@ class ChatService {
   }
 
   /// 2. Send a message to start a new conversation
-  Future<Map<String, dynamic>> sendMessage({
+  Future<Map<String, dynamic>> startNewChat({
     required String accessToken,
     required String content,
-    String assistantId = 'gpt-4o-mini',
-    String assistantModel = 'dify',
-    String? jarvisGuid, // optional x-jarvis-guid header
+    required Assistant assistant,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/api/v1/ai-chat');
@@ -83,13 +82,12 @@ class ChatService {
       final headers = {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
-        if (jarvisGuid != null) 'x-jarvis-guid': jarvisGuid,
       };
 
       final body = json.encode({
         "assistant": {
-          "id": assistantId,
-          "model": assistantModel,
+          "id": assistant.id,
+          "model": assistant.model,
         },
         "content": content,
       });

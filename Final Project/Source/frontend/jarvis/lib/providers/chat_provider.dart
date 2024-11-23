@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/models/assistant.dart';
 import '../services/chat_service.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
@@ -8,16 +9,19 @@ class ChatProvider with ChangeNotifier {
 
   List<Conversation> _conversationList = [];
   List<Message> _messages = [];
-  bool _isLoading = false;
+  bool isLoading = false;
   String? _nextCursor;
+
+  Conversation? currentConversation;
+
+  Assistant selectedAssistant = Assistant(
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o Mini',
+    model: 'dify',
+  );
 
   List<Conversation> get conversationList => _conversationList;
   List<Message> get messages => _messages;
-  bool get isLoading => _isLoading;
-  set isLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
 
   bool get hasMore => _nextCursor != null;
 
@@ -27,7 +31,7 @@ class ChatProvider with ChangeNotifier {
     if (loadMore && _nextCursor == null) return;
 
     try {
-      _isLoading = true;
+      isLoading = true;
       notifyListeners();
 
       final result = await _chatService.fetchAllChats(
@@ -47,32 +51,43 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       rethrow;
     } finally {
-      _isLoading = false;
+      isLoading = false;
       notifyListeners();
     }
   }
 
   /// 2. Send a new message to start a conversation
-  Future<void> sendMessage({
+  Future<void> startNewChat({
     required String accessToken,
     required String content,
-    String assistantId = 'gpt-4o-mini',
-    String assistantModel = 'dify',
+    required Assistant assistant,
   }) async {
     try {
-      final response = await _chatService.sendMessage(
+      final response = await _chatService.startNewChat(
         accessToken: accessToken,
         content: content,
-        assistantId: assistantId,
-        assistantModel: assistantModel,
+        assistant: assistant,
       );
 
-      final newChat = Conversation.fromJson(response);
-      _conversationList.insert(0, newChat);
-
-      notifyListeners();
+      currentConversation = Conversation(
+        conversationId: response['conversationId'],
+        title: content,
+        createdAt: DateTime.now(),
+      );
+      currentConversation!.messages = <Message>[];
+      currentConversation!.messages!.add(Message(
+        content: content,
+        role: Role.user,
+      ));
+      currentConversation!.messages!.add(Message(
+        content: response['message'],
+        role: Role.model,
+      ));
     } catch (e) {
       rethrow;
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -88,7 +103,7 @@ class ChatProvider with ChangeNotifier {
     try {
       if (loadMore && _nextCursor == null) return;
 
-      _isLoading = true;
+      isLoading = true;
 
       final result = await _chatService.fetchChatHistory(
         accessToken: accessToken,
@@ -97,17 +112,23 @@ class ChatProvider with ChangeNotifier {
         assistantModel: assistantModel,
       );
 
+      currentConversation = Conversation(
+        conversationId: conversationId,
+        title: '',
+        createdAt: DateTime.now(),
+      );
+
       for (var item in result['messages']) {
         List<Message> res = Message.fromJson(item);
-        _messages.add(res[0]);
-        _messages.add(res[1]);
+        currentConversation!.messages!.add(res[0]);
+        currentConversation!.messages!.add(res[1]);
       }
 
       _nextCursor = result['nextCursor'];
     } catch (e) {
       rethrow;
     } finally {
-      _isLoading = false;
+      isLoading = false;
       notifyListeners();
     }
   }
@@ -123,15 +144,15 @@ class ChatProvider with ChangeNotifier {
     String? jarvisGuid,
   }) async {
     try {
-      final response = await _chatService.sendFollowUpMessage(
-        accessToken: accessToken,
-        conversationId: conversationId,
-        content: content,
-        assistantId: assistantId,
-        assistantModel: assistantModel,
-        messages: messages,
-        jarvisGuid: jarvisGuid,
-      );
+      // final response = await _chatService.sendFollowUpMessage(
+      //   accessToken: accessToken,
+      //   conversationId: conversationId,
+      //   content: content,
+      //   assistantId: assistantId,
+      //   assistantModel: assistantModel,
+      //   messages: messages,
+      //   jarvisGuid: jarvisGuid,
+      // );
 
       //final newMessage = Message.fromJson(response);
 

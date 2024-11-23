@@ -2,11 +2,13 @@ class Assistant {
   final String name;
   final String model;
   final String id;
+  final String? imagePath;
 
   Assistant({
     required this.name,
     required this.model,
     required this.id,
+    this.imagePath,
   });
 
   /// Convert JSON to Assistant

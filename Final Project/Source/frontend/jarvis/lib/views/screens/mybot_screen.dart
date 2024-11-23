@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/bot.dart';
+
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/models/my_bot.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/create_bot_screen.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
@@ -18,8 +19,8 @@ class MybotScreen extends StatefulWidget {
 class MybotScreenState extends State<MybotScreen> {
   bool isMyBotScreen = true;
 
-  List<Bot> botList = [
-    Bot(
+  List<Assistant> botList = [
+    Assistant(
       name: "Assistant",
       description: "AI Assistant",
       imagePath: 'lib/assets/icons/robot.png',
@@ -28,7 +29,7 @@ class MybotScreenState extends State<MybotScreen> {
       prompt: 'You are my assistant',
       knowledgeSources: [],
     ),
-    Bot(
+    Assistant(
       name: "Supper Hero",
       description: "Supper Hero",
       imagePath: 'lib/assets/icons/robot.png',
@@ -37,7 +38,7 @@ class MybotScreenState extends State<MybotScreen> {
       prompt: 'You are my hero',
       knowledgeSources: [],
     ),
-    Bot(
+    Assistant(
       name: "AI Luto",
       description: "AI Luto",
       imagePath: 'lib/assets/icons/robot.png',
@@ -46,7 +47,7 @@ class MybotScreenState extends State<MybotScreen> {
       prompt: 'You are my Assistant of Luto Project',
       knowledgeSources: [],
     ),
-    Bot(
+    Assistant(
       name: "Turbo",
       description: "Turbo",
       imagePath: 'lib/assets/icons/robot.png',
@@ -80,7 +81,7 @@ class MybotScreenState extends State<MybotScreen> {
         description: "This knowledge source is used for my car"),
   ];
 
-  List<Bot> filteredBotList = []; // List to store filtered bots
+  List<Assistant> filteredBotList = []; // List to store filtered bots
 
   @override
   void initState() {
@@ -280,7 +281,7 @@ class MybotScreenState extends State<MybotScreen> {
     );
   }
 
-  void editBot(Bot bot) async {
+  void editBot(Assistant bot) async {
     final result = await Navigator.of(context).push(FadeRoute(
       page: EditBotScreen(
         bot: bot,

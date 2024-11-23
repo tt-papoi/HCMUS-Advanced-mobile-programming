@@ -1,22 +1,27 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:jarvis/models/conversation.dart';
 import 'package:jarvis/models/message.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/providers/chat_provider.dart';
+import 'package:jarvis/widgets/assistants_bar.dart';
 import 'package:jarvis/widgets/chat_bar.dart';
 import 'package:jarvis/widgets/remain_token.dart';
-import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewChat;
-  final Conversation conversation;
+  final Conversation? conversation;
+  final Message? newMessage;
 
   const ChatScreen({
     super.key,
     required this.isNewChat,
-    required this.conversation,
+    this.conversation,
+    this.newMessage,
   });
 
   @override
@@ -26,6 +31,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late ChatProvider _chatProvider;
   late AuthProvider _authProvider;
+
+  // Define a GlobalKey for AssistantBar
+  final GlobalKey<AssistantBarState> assistantBarKey =
+      GlobalKey<AssistantBarState>();
+
+  // ValueNotifier to manage AssistantBar visibility
+  final ValueNotifier<bool> _isAssistantBarVisible = ValueNotifier<bool>(true);
 
   void _sendMessage(Message message) {
     _receiveMessage();
@@ -43,15 +55,27 @@ class _ChatScreenState extends State<ChatScreen> {
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
-    _chatProvider.isLoading = true;
-    await _chatProvider.fetchChatHistory(
-        accessToken: _authProvider.accessToken!,
-        conversationId: widget.conversation.conversationId);
+    if (widget.isNewChat) {
+      _chatProvider.isLoading = true;
+      _chatProvider.messages.add(widget.newMessage!);
+
+      await _authProvider.refreshAccessToken();
+      await _chatProvider.startNewChat(
+          accessToken: _authProvider.accessToken!,
+          assistant: _chatProvider.selectedAssistant,
+          content: widget.newMessage!.content);
+    } else {
+      _chatProvider.isLoading = true;
+      await _chatProvider.fetchChatHistory(
+          accessToken: _authProvider.accessToken!,
+          conversationId: widget.conversation!.conversationId);
+    }
   }
 
   @override
   void dispose() {
     _chatProvider.clearChatHistories();
+    _chatProvider.currentConversation = null;
     super.dispose();
   }
 
@@ -67,7 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.conversation.title,
+              widget.isNewChat ? "New chat" : widget.conversation!.title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
@@ -84,16 +108,27 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: _chatProvider.messages.length,
+                itemCount: _chatProvider.currentConversation!.messages?.length,
                 itemBuilder: (context, index) {
                   return _displayMessageContainer(
-                      _chatProvider.messages[index]);
+                      _chatProvider.currentConversation!.messages![index]);
                 },
               ),
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: _isAssistantBarVisible,
+              builder: (context, isVisible, child) {
+                return isVisible
+                    ? AssistantBar(key: assistantBarKey)
+                    : Container();
+              },
             ),
             ChatBar(
               hintMessage: 'Message',
               onSendMessage: _sendMessage,
+              onSlashTyped: (bool isSlashTyped) {
+                _isAssistantBarVisible.value = !isSlashTyped;
+              },
             ),
           ],
         );
@@ -208,42 +243,4 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Image.file(image),
           );
   }
-
-  // Widget _displayCode(String code) {
-  //   return Container(
-  //     margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-  //     decoration: BoxDecoration(
-  //       color: const Color.fromARGB(200, 0, 0, 0),
-  //       borderRadius: BorderRadius.circular(8.0),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Container(
-  //           padding: const EdgeInsets.all(12),
-  //           child: const Text(
-  //             "Code",
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //         ),
-  //         Container(
-  //           decoration: const BoxDecoration(
-  //             color: Colors.black87,
-  //             borderRadius: BorderRadius.only(
-  //               bottomLeft: Radius.circular(8),
-  //               bottomRight: Radius.circular(8),
-  //             ),
-  //           ),
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Text(
-  //             code,
-  //             style: const TextStyle(
-  //                 fontFamily: 'monospace',
-  //                 color: Color.fromARGB(255, 255, 255, 255)),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
