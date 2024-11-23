@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/conversation.dart';
 import 'package:jarvis/models/message.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/providers/chat_provider.dart';
@@ -169,10 +168,9 @@ class HomeScreen extends StatelessWidget {
     );
 
     final newConversation = chatProvider.conversationList.first;
-    print(newConversation.title);
-    print(newConversation.conversationId);
-    print(newConversation.createdAt);
+
     Navigator.push(
+      // ignore: use_build_context_synchronously
       context,
       FadeRoute(
           page: ChatScreen(isNewChat: true, conversation: newConversation)),

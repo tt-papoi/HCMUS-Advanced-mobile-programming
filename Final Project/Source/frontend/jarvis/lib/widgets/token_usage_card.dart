@@ -38,7 +38,7 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
         }
 
         final int availableTokens = tokenUsage['availableTokens'] ?? 0;
-        final int totalTokens = tokenUsage['totalTokens'] ?? 0;
+        final int totalTokens = tokenUsage['totalTokens'] ?? 1; // Tránh chia 0
         final bool unlimited = tokenUsage['unlimited'] ?? false;
 
         return Container(
@@ -50,32 +50,40 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header với avatar và thông tin người dùng
               Row(
                 children: [
-                  // Profile Icon
                   const CircleAvatar(
                     radius: 24,
                     backgroundColor: Colors.blueAccent,
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                   const SizedBox(width: 12.0),
-                  // User Info
+                  // Thông tin user
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        authProvider.username ?? 'User',
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+                      SizedBox(
+                        width: 150.0, // Giới hạn chiều rộng
+                        child: Text(
+                          authProvider.username ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Cắt nếu dài
                         ),
                       ),
                       const SizedBox(height: 4.0),
-                      Text(
-                        authProvider.email ?? 'Email',
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.grey,
+                      SizedBox(
+                        width: 150.0, // Giới hạn chiều rộng
+                        child: Text(
+                          authProvider.email ?? 'Email',
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Cắt nếu dài
                         ),
                       ),
                     ],
@@ -83,7 +91,8 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
                 ],
               ),
               const SizedBox(height: 12.0),
-              // Token Usage and Progress Bar
+
+              // Token Usage và thanh tiến trình
               Row(
                 children: [
                   const Text(
@@ -93,21 +102,27 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                    width: 8,
-                  ),
+                  const SizedBox(width: 8),
                   Icon(CustomIcons.coins,
                       size: 14.0, color: Colors.deepOrange[800]),
                 ],
               ),
               const SizedBox(height: 6.0),
-              // Progress bar with token count
+
+              // Thanh tiến trình với giá trị token
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(unlimited
-                      ? 'Unlimited'
-                      : '$availableTokens'), // Unlimited or token count
+                  SizedBox(
+                    width: 80.0, // Giới hạn chiều rộng
+                    child: Text(
+                      unlimited ? 'Unlimited' : '$availableTokens',
+                      style: const TextStyle(
+                        overflow: TextOverflow.ellipsis, // Cắt nếu dài
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -120,9 +135,17 @@ class _TokenUsageCardState extends State<TokenUsageCard> {
                       ),
                     ),
                   ),
-                  Text(unlimited
-                      ? '∞'
-                      : '$totalTokens'), // Max token or infinity
+                  SizedBox(
+                    width: 80.0, // Giới hạn chiều rộng
+                    child: Text(
+                      unlimited ? '∞' : '$totalTokens',
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                        overflow: TextOverflow.ellipsis, // Cắt nếu dài
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
                 ],
               ),
             ],
