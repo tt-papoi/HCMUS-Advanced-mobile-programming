@@ -1,20 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/prompt_provider.dart';
+import 'package:jarvis/providers/chat_provider.dart';
+import 'package:jarvis/providers/token_provider.dart';
+import 'package:jarvis/views/screens/home_screen.dart';
 import 'package:jarvis/views/screens/login_register_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
-  runApp(const JarvisApp());
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => PromptProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => TokenProvider()),
+      ],
+      child: const JarvisApp(),
+    ),
+  );
 }
 
-class JarvisApp extends StatelessWidget {
+class JarvisApp extends StatefulWidget {
   const JarvisApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<JarvisApp> createState() => _JarvisAppState();
+}
+
+class _JarvisAppState extends State<JarvisApp> {
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  Future<void> init() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadTokens();
+    if (authProvider.isLoggedIn) {
+      await authProvider.refreshAccessToken();
+      await authProvider.getCurrentUser();
+    }
+    setState(() {
+      _isLoggedIn = authProvider.isLoggedIn;
+    });
+    FlutterNativeSplash.remove();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Jarvis',
       debugShowCheckedModeBanner: false,
-      home: LoginRegisterScreen(),
+      home: _isLoggedIn ? HomeScreen() : const LoginRegisterScreen(),
     );
   }
 }

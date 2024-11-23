@@ -34,20 +34,16 @@ dependencies:
   image_picker: ^0.8.4+4
   url_launcher: ^6.0.20
   file_picker: ^8.1.2
-  
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-
+  shared_preferences: ^2.3.3
+  flutter_secure_storage: ^9.2.2
+  http: ^1.2.2
+  provider: ^6.1.2
+  flutter_native_splash: ^2.4.3
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
@@ -63,7 +59,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/assets/icons/chatgpt_icon.png
+    - lib/assets/icons/gpt-4o-mini.png
+    - lib/assets/icons/gpt-4o.png
+    - lib/assets/icons/claude-ai-icon.png
+    - lib/assets/icons/google-gemini-icon.png
     - lib/assets/icons/robot.png
     - lib/assets/icons/category.png
     - lib/assets/icons/logo.png
@@ -77,6 +76,7 @@ flutter:
     - lib/assets/icons/shedule.png
     - lib/assets/icons/sad.png
     - lib/assets/icons/terminal.png
+    - lib/assets/icons/JARVIS.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

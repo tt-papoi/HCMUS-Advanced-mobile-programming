@@ -1,61 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/bot.dart';
-import 'package:jarvis/widgets/custom_search_bar.dart';
+import 'package:jarvis/models/assistant.dart';
+import 'package:jarvis/providers/chat_provider.dart';
 
-class BotBar extends StatefulWidget {
-  const BotBar({super.key});
+import 'package:jarvis/utils/constants.dart';
+import 'package:provider/provider.dart';
+
+class AssistantBar extends StatefulWidget {
+  const AssistantBar({super.key});
 
   @override
-  State<BotBar> createState() => BotBarState();
+  State<AssistantBar> createState() => AssistantBarState();
 }
 
-class BotBarState extends State<BotBar> {
-  Bot? selectedBot;
-
+class AssistantBarState extends State<AssistantBar> {
   // Original list of bots
-  final List<Bot> botList = [
-    Bot(
-      name: "Assistant",
-      description: "AI Assistant",
-      imagePath: 'lib/assets/icons/robot.png',
-      id: '',
-      botType: BotType.createdBot,
-    ),
-    Bot(
-      name: "GPT-4.0",
-      description: "GPT-4.0",
-      imagePath: 'lib/assets/icons/chatgpt_icon.png',
-      id: '',
-      botType: BotType.offical,
-    ),
-    Bot(
-      name: "GPT-3.5",
-      description: "GPT-3.5",
-      imagePath: 'lib/assets/icons/chatgpt_icon.png',
-      id: '',
-      botType: BotType.offical,
-    ),
-    Bot(
-      name: "GPT-4.0-Turbo",
-      description: "GPT-4.0-Turbo",
-      imagePath: 'lib/assets/icons/chatgpt_icon.png',
-      id: '',
-      botType: BotType.offical,
-    ),
-  ];
+  final List<Assistant> assistantList = ProjectConstants.defaultAssistants;
 
   // List for displaying bots
-  List<Bot> displayedBots = [];
-
-  Bot? get getSelectedBot => selectedBot;
+  List<Assistant> displayedAssistants = [];
 
   @override
   void initState() {
     super.initState();
     // Initialize the displayed bots with the first three bots from the original list
-    displayedBots = List.from(botList.take(3));
-    if (displayedBots.isNotEmpty) {
-      selectedBot = displayedBots.first;
+    displayedAssistants = List.from(assistantList.take(3));
+    if (displayedAssistants.isNotEmpty) {
+      Provider.of<ChatProvider>(context, listen: false).selectedAssistant =
+          displayedAssistants.first;
     }
   }
 
@@ -67,31 +38,33 @@ class BotBarState extends State<BotBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          for (var i = 0; i < displayedBots.length; i++) ...[
+          for (var i = 0; i < displayedAssistants.length; i++) ...[
             _buildNavItem(
               context: context,
-              bot: displayedBots[i],
-              isSelected: selectedBot == displayedBots[i],
+              bot: displayedAssistants[i],
+              isSelected: Provider.of<ChatProvider>(context, listen: false)
+                      .selectedAssistant ==
+                  displayedAssistants[i],
               onTap: () {
                 setState(() {
-                  selectedBot = displayedBots[i];
+                  Provider.of<ChatProvider>(context, listen: false)
+                      .selectedAssistant = displayedAssistants[i];
                 });
               },
             ),
             // add space between 2 bots
-            if (i < displayedBots.length - 1) const SizedBox(width: 5.0),
+            if (i < displayedAssistants.length - 1) const SizedBox(width: 5.0),
           ],
 
           const SizedBox(width: 5.0),
           // Display the "More" option
           _buildNavItem(
             context: context,
-            bot: Bot(
+            bot: Assistant(
               name: 'More',
-              description: 'More options',
+              model: "dify",
               imagePath: 'lib/assets/icons/category.png',
               id: '',
-              botType: BotType.offical,
             ),
             isSelected: false,
             onTap: () {
@@ -117,54 +90,42 @@ class BotBarState extends State<BotBar> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              CustomSearchBar(hintText: "Search", onChanged: (String value) {}),
               Expanded(
                 child: ListView.separated(
-                  itemCount: botList.length,
+                  itemCount: assistantList.length,
                   itemBuilder: (context, index) {
-                    final bot = botList[index];
+                    final assistant = assistantList[index];
                     return ListTile(
-                      leading:
-                          Image.asset(bot.imagePath, width: 45.0, height: 45.0),
+                      leading: Image.asset(
+                          assistant.imagePath ?? 'lib/assets/icons/robot.png',
+                          width: 30.0,
+                          height: 30.0),
                       title: Text(
-                        bot.name,
+                        assistant.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius:
-                                  BorderRadius.circular(5), // Rounded corners
-                            ),
-                            child: Text(
-                              bot.botType == BotType.offical
-                                  ? 'OFFICIAL'
-                                  : "MY BOT",
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                       onTap: () {
                         setState(() {
-                          selectedBot = bot;
+                          Provider.of<ChatProvider>(context, listen: false)
+                              .selectedAssistant = assistant;
+                          Provider.of<ChatProvider>(context, listen: false)
+                              .selectedAssistant = assistant;
                           // Check if the selected bot is already in the displayed list
-                          if (!displayedBots.contains(selectedBot)) {
+                          if (!displayedAssistants.contains(
+                              Provider.of<ChatProvider>(context, listen: false)
+                                  .selectedAssistant)) {
                             // Move the selected bot to the front of the displayed list
-                            displayedBots.insert(0, selectedBot!);
+                            displayedAssistants.insert(
+                                0,
+                                Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .selectedAssistant);
                             // Ensure displayedBots contains only three bots
-                            if (displayedBots.length > 3) {
-                              displayedBots.removeLast();
+                            if (displayedAssistants.length > 3) {
+                              displayedAssistants.removeLast();
                             }
                           }
                         });
@@ -189,7 +150,7 @@ class BotBarState extends State<BotBar> {
 
   Widget _buildNavItem({
     required BuildContext context,
-    required Bot bot,
+    required Assistant bot,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
@@ -209,7 +170,8 @@ class BotBarState extends State<BotBar> {
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Row(
           children: [
-            Image.asset(bot.imagePath, width: 24.0, height: 24.0),
+            Image.asset(bot.imagePath ?? 'lib/assets/icons/robot.png',
+                width: 24.0, height: 24.0),
             const SizedBox(width: 8.0),
             Text(
               bot.name,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/bot.dart';
+
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/models/my_bot.dart';
 import 'package:jarvis/utils/dialog_utils.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
@@ -8,7 +9,7 @@ import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
 import 'package:jarvis/widgets/custom_search_bar.dart';
 
 class EditBotScreen extends StatefulWidget {
-  final Bot bot;
+  final Assistant bot;
   final List<KnowledgeSource> knowledgeSourceList;
 
   const EditBotScreen({

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:jarvis/models/chat_message.dart';
+import 'package:jarvis/models/message.dart';
 import 'package:jarvis/models/prompt.dart';
+import 'package:jarvis/providers/prompt_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/dialogs/used_prompt_dialog.dart';
 import 'package:jarvis/views/screens/email_reply_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/views/dialogs/prompt_library_dialog.dart';
+import 'package:provider/provider.dart';
 
 class ChatBar extends StatefulWidget {
   final String hintMessage;
-  final Function(ChatMessage) onSendMessage;
+  final Function(Message) onSendMessage;
   final Function(bool)? onSlashTyped;
 
   const ChatBar({
@@ -28,58 +30,14 @@ class ChatBar extends StatefulWidget {
 class _ChatBarState extends State<ChatBar> {
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  File? _selectedImage;
+  File? _selectedFile;
   bool _showDropdown = false;
-  final List<Prompt> _promptList = [
-    Prompt(
-        id: "0",
-        prompt:
-            "You are a machine that check all language grammar mistake and make the sentence more fluent.You take all the user input and auto correct it. Just reply to user input with correct grammar\nyou: correct tex\nuser:Grammatically correct text\nyou: Sounds good.\nUser input is : [Text]",
-        category: Category.Education,
-        promptType: PromptType.private,
-        name: 'Grammar corrector',
-        isFavorite: false,
-        isMine: true),
-    Prompt(
-        id: "1",
-        prompt:
-            "I want you to act as a professional writer. You will need to research a given topic , formulate a thesis outline based on the topic described by the user, and create a persuasive piece of work that is both informative and engaging . \nUser input is: [Thesis Topic]",
-        category: Category.Writing,
-        promptType: PromptType.public,
-        name: 'Essay outline',
-        isFavorite: false,
-        isMine: false),
-    Prompt(
-        id: "2",
-        prompt:
-            "I want you to act as a resume editor . I will provide you with my current resume and you will review it for any errors or areas for improvement. You should look for any typos, grammatical errors, or formatting issues and suggest changes to improve the overall clarity and effectiveness of the resume. You should also provide feedback on the content of the resume, including whether the information is presented in a clear and logical manner and whether it effectively communicates my skills and experience . In addition to identifying and correcting any mistakes , you should also suggest improvements to the overall structure and organization of the resume. Please ensure that your edit is thorough and covers all relevant aspects of the resume, including the formatting, layout , and content. Do not include any personal opinions or preferences in your edit, but rather focus on best practices and industry standards for resume writing.\nHere is my resume: [Resume]",
-        category: Category.Career,
-        promptType: PromptType.public,
-        name: 'Resume Editing',
-        isFavorite: false,
-        isMine: false),
-    Prompt(
-        id: "3",
-        prompt:
-            "SOLVE [User Input] GIVE ONLY THE ANSWER DO NOT PROVIDE ANYTHING ELSE ONLY THE ANSWER!!!",
-        category: Category.Writing,
-        promptType: PromptType.public,
-        name: 'SOLVE PROBLEM',
-        isFavorite: false,
-        isMine: false),
-    Prompt(
-        id: "4",
-        prompt: "Please tell me a story about [characters] related to [Topic]",
-        category: Category.Fun,
-        promptType: PromptType.private,
-        name: 'Tell a story',
-        isFavorite: false,
-        isMine: true),
-  ];
+  late PromptProvider promptProvider;
 
   @override
   void initState() {
     super.initState();
+    promptProvider = Provider.of<PromptProvider>(context, listen: false);
     _messageController.addListener(_onMessageChanged);
   }
 
@@ -90,14 +48,24 @@ class _ChatBarState extends State<ChatBar> {
     super.dispose();
   }
 
-  void _onMessageChanged() {
-    if (_messageController.text.endsWith('/')) {
+  Future<void> _onMessageChanged() async {
+    String text = _messageController.text;
+    String lastWord = text.split(' ').last;
+    String query = lastWord.replaceAll(RegExp(r'^/'), "");
+
+    if (lastWord.startsWith('/') && !lastWord.endsWith(' ')) {
       setState(() {
         _showDropdown = true;
+        promptProvider.isLoading = true;
       });
       if (widget.onSlashTyped != null) {
         widget.onSlashTyped!(true);
       }
+      await promptProvider.fetchPrompts(query: query);
+
+      setState(() {
+        promptProvider.isLoading = false;
+      });
     } else {
       setState(() {
         _showDropdown = false;
@@ -174,7 +142,7 @@ class _ChatBarState extends State<ChatBar> {
     if (image != null) {
       File imageFile = File(image.path);
       setState(() {
-        _selectedImage = imageFile;
+        _selectedFile = imageFile;
       });
     }
   }
@@ -184,13 +152,13 @@ class _ChatBarState extends State<ChatBar> {
     if (image != null) {
       File imageFile = File(image.path);
       setState(() {
-        _selectedImage = imageFile;
+        _selectedFile = imageFile;
       });
     }
   }
 
   Widget _buildImageThumbnail() {
-    if (_selectedImage != null) {
+    if (_selectedFile != null) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Stack(
@@ -203,7 +171,7 @@ class _ChatBarState extends State<ChatBar> {
                 border: Border.all(color: Colors.grey, width: 1),
                 borderRadius: BorderRadius.circular(8.0),
                 image: DecorationImage(
-                  image: FileImage(_selectedImage!),
+                  image: FileImage(_selectedFile!),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -220,7 +188,7 @@ class _ChatBarState extends State<ChatBar> {
                 icon: const Icon(size: 20, Icons.close, color: Colors.white),
                 onPressed: () {
                   setState(() {
-                    _selectedImage = null;
+                    _selectedFile = null;
                   });
                 },
               ),
@@ -270,6 +238,9 @@ class _ChatBarState extends State<ChatBar> {
   }
 
   Widget _showQuickAccessPrompt() {
+    if (promptProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Material(
       elevation: 4.0,
       borderRadius: BorderRadius.circular(8.0),
@@ -278,27 +249,41 @@ class _ChatBarState extends State<ChatBar> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
         ),
-        constraints: const BoxConstraints(maxHeight: 180), // Limit the height
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: _promptList.length,
-          itemBuilder: (context, index) {
-            final Prompt prompt = _promptList[index];
-            return ListTile(
-              title: Text(
-                prompt.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+        constraints: promptProvider.prompts.isEmpty
+            ? const BoxConstraints(maxHeight: 50)
+            : const BoxConstraints(maxHeight: 180), // Limit the height
+        child: promptProvider.prompts.isEmpty
+            ? const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text(
+                    'No prompts found',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                  ),
+                ),
+              )
+            : ListView.builder(
+                shrinkWrap: true,
+                itemCount: promptProvider.prompts.length,
+                itemBuilder: (context, index) {
+                  final prompt = promptProvider.prompts[index];
+                  return ListTile(
+                    title: Text(
+                      prompt.name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 16),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _messageController.text = '';
+                        _showDropdown = false;
+                      });
+                      _showPromptInput(prompt);
+                    },
+                  );
+                },
               ),
-              onTap: () {
-                setState(() {
-                  _messageController.text = '';
-                  _showDropdown = false;
-                });
-                _showPromptInput(prompt);
-              },
-            );
-          },
-        ),
       ),
     );
   }
@@ -358,24 +343,23 @@ class _ChatBarState extends State<ChatBar> {
                     IconButton(
                       icon: const Icon(Icons.send_rounded),
                       onPressed: () {
-                        ChatMessage message = ChatMessage(
-                          messageType: MessageType.user,
-                          sendTime: DateTime.now(),
-                          textMessage: '',
+                        Message message = Message(
+                          role: Role.user,
+                          content: '',
                         );
                         if (_messageController.text.isEmpty &&
-                            (_selectedImage == null)) {
+                            (_selectedFile == null)) {
                           return;
                         }
 
-                        message.textMessage = _messageController.text;
-                        message.image = _selectedImage;
+                        message.content = _messageController.text;
+                        message.file = _selectedFile;
 
                         widget.onSendMessage(message);
 
                         _messageController.clear();
                         setState(() {
-                          _selectedImage = null;
+                          _selectedFile = null;
                         });
                       },
                     ),

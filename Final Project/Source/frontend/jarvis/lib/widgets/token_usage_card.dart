@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:jarvis/providers/token_provider.dart';
 import 'package:jarvis/widgets/icons.dart';
 
 class TokenUsageCard extends StatefulWidget {
@@ -9,100 +12,156 @@ class TokenUsageCard extends StatefulWidget {
 }
 
 class _TokenUsageCardState extends State<TokenUsageCard> {
-  int _currentToken = 30;
-  final int _maxToken = 50;
+  late AuthProvider authProvider;
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  void init() async {
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final tokenProvider = Provider.of<TokenProvider>(context, listen: false);
+    tokenProvider.fetchTokenUsage(authProvider.accessToken!);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(15, 0, 0, 0),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
+    return Consumer<TokenProvider>(
+      builder: (context, tokenProvider, child) {
+        final tokenUsage = tokenProvider.tokenUsage;
+
+        // Check if token usage is null or empty
+        if (tokenUsage == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final int availableTokens = tokenUsage['availableTokens'] ?? 0;
+        final int totalTokens = tokenUsage['totalTokens'] ?? 1; // Tránh chia 0
+        final bool unlimited = tokenUsage['unlimited'] ?? false;
+
+        return Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(15, 0, 0, 0),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Profile Icon
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.blueAccent,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              SizedBox(width: 12.0),
-              // User Info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // Header với avatar và thông tin người dùng
+              Row(
                 children: [
-                  Text(
-                    'trantien4868',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.blueAccent,
+                    child: Icon(Icons.person, color: Colors.white),
                   ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    'trantien4868@gmail.com',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-                    ),
+                  const SizedBox(width: 12.0),
+                  // Thông tin user
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 150.0, // Giới hạn chiều rộng
+                        child: Text(
+                          authProvider.username ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Cắt nếu dài
+                        ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      SizedBox(
+                        width: 150.0, // Giới hạn chiều rộng
+                        child: Text(
+                          authProvider.email ?? 'Email',
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Cắt nếu dài
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 12.0),
-          // Token Usage and Progress Bar
-          Row(
-            children: [
-              const Text(
-                'Token Usage',
-                style: TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              Icon(CustomIcons.coins,
-                  size: 14.0, color: Colors.deepOrange[800]),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          // Progress bar with token count
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('$_currentToken'), // Display current token
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(50.0),
-                    value: _currentToken / _maxToken,
-                    backgroundColor: Colors.black12,
-                    color: Colors.blueAccent,
-                    minHeight: 6.0,
-                  ),
-                ),
-              ),
-              Text('$_maxToken'), // Display max token
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+              const SizedBox(height: 12.0),
 
-  // update current token
-  void updateToken(int newToken) {
-    setState(() {
-      _currentToken = newToken;
-    });
+              // Token Usage và thanh tiến trình
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Tiêu đề "Token Usage" và icon
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              'Token Usage',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              CustomIcons.coins,
+                              size: 14.0,
+                              color: Colors.deepOrange[800],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6.0),
+                  // Thanh tiến trình và thông tin token
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(50.0),
+                          child: LinearProgressIndicator(
+                            value:
+                                unlimited ? 1.0 : availableTokens / totalTokens,
+                            backgroundColor: Colors.black12,
+                            color: Colors.blueAccent,
+                            minHeight: 6.0,
+                          ),
+                        ),
+                        const SizedBox(height: 6.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              unlimited ? 'Unlimited' : '$availableTokens',
+                              style: const TextStyle(fontSize: 12.0),
+                            ),
+                            Text(
+                              unlimited ? '∞' : '$totalTokens',
+                              style: const TextStyle(fontSize: 12.0),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }
