@@ -2,6 +2,7 @@ import 'package:jarvis/models/assistant.dart';
 
 class ProjectConstants {
   static const String baseUrl = 'https://api.dev.jarvis.cx';
+  static const String kbUrl = 'https://knowledge-api.dev.jarvis.cx/';
 
   static List<Assistant> defaultAssistants = [
     Assistant(
