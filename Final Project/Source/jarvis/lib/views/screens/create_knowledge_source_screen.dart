@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/utils/dialog_utils.dart';
+import 'package:provider/provider.dart';
 
 class CreateKnowledgeSourceScreen extends StatefulWidget {
   const CreateKnowledgeSourceScreen({super.key});
@@ -23,7 +26,7 @@ class _CreateKnowledgeSourceScreenState
   }
 
   // Method to create the knowledge source
-  void _createKnowledgeSource() {
+  Future<void> _createKnowledgeSource() async {
     String sourceName = nameController.text.trim();
     String sourceDescription = descriptionController.text.trim();
 
@@ -33,18 +36,39 @@ class _CreateKnowledgeSourceScreenState
           context, "Name must be between 4 and 20 characters.");
       return;
     }
-
+    final knowledgeBaseProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     // If everything is valid, create the knowledge source
-    KnowledgeSource newSource = KnowledgeSource(
-      name: sourceName,
-      description: sourceDescription.isNotEmpty
-          ? sourceDescription
-          : "No description provided",
-      id: '', // Assign a unique ID here if needed
-    );
+    try {
+      // Gọi API tạo Knowledge Base
+      await knowledgeBaseProvider.createKnowledgeBase(
+        knowledgeName: sourceName,
+        description: sourceDescription.isNotEmpty
+            ? sourceDescription
+            : "No description provided",
+        authProvider: authProvider,
+      );
 
-    // Return the newly created knowledge source to the previous screen
-    Navigator.pop(context, newSource);
+      // Quay lại màn hình trước và trả về knowledge source mới
+      Navigator.pop(
+        context,
+      );
+    } catch (e) {
+      DialogUtils.showErrorDialog(
+          context, 'Failed to create knowledge source.');
+    }
+
+    // KnowledgeSource newSource = KnowledgeSource(
+    //   name: sourceName,
+    //   description: sourceDescription.isNotEmpty
+    //       ? sourceDescription
+    //       : "No description provided",
+    //   id: '', // Assign a unique ID here if needed
+    // );
+
+    // // Return the newly created knowledge source to the previous screen
+    // Navigator.pop(context, newSource);
   }
 
   @override

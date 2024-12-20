@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/all_chats_screen.dart';
 import 'package:jarvis/views/screens/mybot_screen.dart';
@@ -6,6 +7,7 @@ import 'package:jarvis/views/screens/profile_screen.dart';
 import 'package:jarvis/views/screens/subscribe_screen.dart';
 import 'package:jarvis/widgets/icons.dart';
 import 'package:jarvis/widgets/token_usage_card.dart';
+import 'package:provider/provider.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({super.key});
@@ -25,8 +27,20 @@ class SideBar extends StatelessWidget {
             _buildListTile(
               icon: CustomIcons.robot,
               title: 'My bots',
-              customOnTap: () {
-                _navigateTo(context, const MybotScreen());
+              // customOnTap: () {
+              //   _navigateTo(context, const MybotScreen());
+              // },
+              customOnTap: () async {
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                authProvider.loadTokens();
+                try {
+                  await authProvider.signInToKnowledgeBase();
+                  print('Navigating to Knowledge Base...');
+                  _navigateTo(context, const MybotScreen());
+                } catch (e) {
+                  print('Failed to sign in to Knowledge Base: $e');
+                }
               },
             ),
             // navigate to all chats screen

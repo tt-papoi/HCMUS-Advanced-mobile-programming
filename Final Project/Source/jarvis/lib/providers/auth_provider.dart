@@ -8,13 +8,38 @@ class AuthProvider with ChangeNotifier {
 
   String? _accessToken;
   String? _refreshToken;
+  String? _kbToken;
   String? userId;
   String? username;
   String? email;
 
   String? get accessToken => _accessToken;
+  String? get refreshToken => _refreshToken;
+  String? get kbToken => _kbToken;
 
   bool get isLoggedIn => _accessToken != null || _refreshToken != null;
+
+  Future<void> signInToKnowledgeBase() async {
+    if (_accessToken == null) {
+      throw Exception('Access token is missing. Please log in first.');
+    }
+
+    try {
+      final response =
+          await _authService.externalSignInToKnowledgeBase(_accessToken!);
+      if (response.containsKey('token')) {
+        _kbToken = response['token']['accessToken']; // Đây là kb_token
+
+        print('Knowledge Base Sign-In Successful: $_kbToken');
+      } else {
+        throw Exception('Token for Knowledge Base not found in response');
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error signing in to Knowledge Base: $e');
+      rethrow;
+    }
+  }
 
   Future<void> signIn(String email, String password) async {
     try {

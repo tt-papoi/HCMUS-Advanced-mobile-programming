@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/models/my_bot.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/create_bot_screen.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
 import 'package:jarvis/views/screens/edit_bot_screen.dart';
 import 'package:jarvis/views/screens/edit_knowledge_source_screen.dart';
 import 'package:jarvis/widgets/custom_search_bar.dart';
+import 'package:provider/provider.dart';
 
 class MybotScreen extends StatefulWidget {
   const MybotScreen({super.key});
@@ -58,34 +61,17 @@ class MybotScreenState extends State<MybotScreen> {
     ),
   ];
 
-  List<KnowledgeSource> knowledgeSourceList = [
-    KnowledgeSource(
-        id: "01",
-        name: "My Job",
-        description: "This knowledge source is used for my job"),
-    KnowledgeSource(
-        id: "02",
-        name: "My house",
-        description: "This knowledge source is used for my house"),
-    KnowledgeSource(
-        id: "03",
-        name: "My dog",
-        description: "This knowledge source is used for my dog"),
-    KnowledgeSource(
-        id: "04",
-        name: "My cat",
-        description: "This knowledge source is used for my cat"),
-    KnowledgeSource(
-        id: "05",
-        name: "My car",
-        description: "This knowledge source is used for my car"),
-  ];
+  List<KnowledgeSource> knowledgeSourceList = [];
 
   List<Assistant> filteredBotList = []; // List to store filtered bots
 
   @override
   void initState() {
     super.initState();
+    Future.microtask(() =>
+        Provider.of<KnowledgeBaseProvider>(context, listen: false)
+            .fetchKnowledgeBases(
+                Provider.of<AuthProvider>(context, listen: false)));
     filteredBotList = botList; // Initialize the filtered list to show all bots
   }
 
