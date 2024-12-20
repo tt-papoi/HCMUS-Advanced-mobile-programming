@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/utils/dialog_utils.dart';
@@ -49,14 +48,12 @@ class _CreateKnowledgeSourceScreenState
             : "No description provided",
         authProvider: authProvider,
       );
-
+      await knowledgeBaseProvider.fetchKnowledgeBases(authProvider);
       // Quay lại màn hình trước và trả về knowledge source mới
-      Navigator.pop(
-        context,
-      );
+      if (!mounted) return;
+      Navigator.pop(context);
     } catch (e) {
-      DialogUtils.showErrorDialog(
-          context, 'Failed to create knowledge source.');
+      throw Exception('Failed to create Knowledge Base: $e');
     }
 
     // KnowledgeSource newSource = KnowledgeSource(

@@ -66,13 +66,26 @@ class MybotScreenState extends State<MybotScreen> {
   List<Assistant> filteredBotList = []; // List to store filtered bots
 
   @override
+  @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        Provider.of<KnowledgeBaseProvider>(context, listen: false)
-            .fetchKnowledgeBases(
-                Provider.of<AuthProvider>(context, listen: false)));
-    filteredBotList = botList; // Initialize the filtered list to show all bots
+
+    final kbProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    Future.microtask(() async {
+      await kbProvider.fetchKnowledgeBases(authProvider);
+
+      if (!mounted) return;
+      // Cập nhật danh sách knowledgeSourceList
+      setState(() {
+        knowledgeSourceList = kbProvider.knowledgeSources;
+      });
+    });
+
+    // Khởi tạo danh sách lọc
+    filteredBotList = botList;
   }
 
   @override
@@ -115,7 +128,12 @@ class MybotScreenState extends State<MybotScreen> {
           Expanded(
             child: isMyBotScreen
                 ? _buildMyBotScreen(context)
-                : _buildKnowledgeSourcesScreen(context),
+                : Consumer<KnowledgeBaseProvider>(
+                    builder: (context, kbProvider, child) {
+                      knowledgeSourceList = kbProvider.knowledgeSources;
+                      return _buildKnowledgeSourcesScreen(context);
+                    },
+                  ),
           ),
           const SizedBox(height: 60),
         ],
@@ -292,12 +310,69 @@ class MybotScreenState extends State<MybotScreen> {
         knowledgeSource: knowledgesource,
       ),
     ));
+    if (!mounted) return;
     if (result != null) {
-      setState(() {});
+      final kbProvider =
+          Provider.of<KnowledgeBaseProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      try {
+        await kbProvider.updateKnowledgeBase(
+          id: result.id,
+          knowledgeName: result.knowledgeName,
+          description: result.description,
+          authProvider: authProvider,
+        );
+      } catch (e) {
+        // Xử lý lỗi
+        throw Exception('Error updating Knowledge Base: $e');
+      }
+    }
+  }
+
+  Future<void> deleteKnowledgeSource(int index) async {
+    try {
+      final kbProvider =
+          Provider.of<KnowledgeBaseProvider>(context, listen: false);
+      await kbProvider.deleteKnowledgeBase(
+        id: knowledgeSourceList[index].id,
+        authProvider: Provider.of<AuthProvider>(context, listen: false),
+      );
+
+      setState(() {
+        knowledgeSourceList.removeAt(index); // Xóa khỏi danh sách cục bộ
+      });
+
+      if (!mounted) return; // Kiểm tra lại trước khi hiển thị Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Knowledge Source deleted successfully')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return; // Kiểm tra nếu widget đã bị hủy trước khi hiển thị Snackbar
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting Knowledge Source: $error')),
+      );
     }
   }
 
   Widget _buildKnowledgeSourcesScreen(BuildContext context) {
+    final kbProvider = Provider.of<KnowledgeBaseProvider>(context);
+    if (kbProvider.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (knowledgeSourceList.isEmpty) {
+      return const Center(
+        child: Text(
+          'No Knowledge Sources available.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Column(
@@ -330,9 +405,10 @@ class MybotScreenState extends State<MybotScreen> {
                     color: Colors.white,
                     onSelected: (String result) {},
                     itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'Delete',
-                        child: Text('Delete'),
+                        child: const Text('Delete'),
+                        onTap: () => deleteKnowledgeSource(index),
                       ),
                     ],
                   ),

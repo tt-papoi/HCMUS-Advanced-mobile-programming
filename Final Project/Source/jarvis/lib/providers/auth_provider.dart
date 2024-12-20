@@ -25,12 +25,15 @@ class AuthProvider with ChangeNotifier {
     }
 
     try {
+      await refreshAccessToken();
       final response =
           await _authService.externalSignInToKnowledgeBase(_accessToken!);
       if (response.containsKey('token')) {
         _kbToken = response['token']['accessToken']; // Đây là kb_token
-
-        print('Knowledge Base Sign-In Successful: $_kbToken');
+        await _storageService.saveKbToken(_kbToken!);
+        if (kDebugMode) {
+          print('Knowledge Base Sign-In Successful: $_kbToken');
+        }
       } else {
         throw Exception('Token for Knowledge Base not found in response');
       }
@@ -60,6 +63,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> loadTokens() async {
     _accessToken = await _storageService.getAccessToken();
     _refreshToken = await _storageService.getRefreshToken();
+    _kbToken = await _storageService.getKbToken();
     notifyListeners();
   }
 

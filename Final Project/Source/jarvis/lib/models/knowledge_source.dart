@@ -9,8 +9,8 @@ class KnowledgeSource {
   String? updatedBy;
   String? deletedAt;
   String id;
-  int numUnits;
-  int totalSize;
+  int? numUnits;
+  int? totalSize;
   KnowledgeSource({
     required this.userId,
     required this.knowledgeName,

@@ -36,10 +36,10 @@ class SideBar extends StatelessWidget {
                 authProvider.loadTokens();
                 try {
                   await authProvider.signInToKnowledgeBase();
-                  print('Navigating to Knowledge Base...');
+                  if (!context.mounted) return;
                   _navigateTo(context, const MybotScreen());
                 } catch (e) {
-                  print('Failed to sign in to Knowledge Base: $e');
+                  throw Exception('Failed to sign in to Knowledge Base: $e');
                 }
               },
             ),

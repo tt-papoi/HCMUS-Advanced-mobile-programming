@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
+
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/services/kb_service.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 
 class KnowledgeBaseProvider with ChangeNotifier {
   final KnowledgeBaseService _knowledgeBaseService = KnowledgeBaseService();
-  List<dynamic> _knowledgeBases = [];
+  List<KnowledgeSource> _knowledgeSources = [];
   bool _isLoading = false;
 
-//   List<KnowledgeSource> _knowledgeSources = [];
-// List<KnowledgeSource> get knowledgeSources => _knowledgeSources;
-  List<dynamic> get knowledgeBases => _knowledgeBases;
-
+  List<KnowledgeSource> get knowledgeSources => _knowledgeSources;
   bool get isLoading => _isLoading;
 
   Future<void> createKnowledgeBase({
@@ -27,16 +25,14 @@ class KnowledgeBaseProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _knowledgeBaseService.createKnowledgeBase(
+      await _knowledgeBaseService.createKnowledgeBase(
         token: accessToken,
         knowledgeName: knowledgeName,
         description: description,
       );
 
-      print('Knowledge Base created successfully: $response');
+      //_knowledgeSources.add(KnowledgeSource.fromJson(response['data']));
     } catch (e) {
-      print('Error creating Knowledge Base: $e');
-
       rethrow;
     } finally {
       _isLoading = false;
@@ -45,6 +41,14 @@ class KnowledgeBaseProvider with ChangeNotifier {
   }
 
   Future<void> fetchKnowledgeBases(AuthProvider authProvider) async {
+    try {
+      await authProvider.refreshAccessToken();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing access token: $e');
+      }
+      rethrow;
+    }
     final accessToken = authProvider.kbToken;
     if (accessToken == null) throw Exception("Access token is not available");
 
@@ -55,12 +59,89 @@ class KnowledgeBaseProvider with ChangeNotifier {
       final data = await _knowledgeBaseService.getKnowledgeBase(
         token: accessToken,
       );
-
-      print('Knowledge Bases fetched successfully: $data');
-      //_knowledgeBases = data;
+      _knowledgeSources = data['data'] as List<KnowledgeSource>;
+      for (var knowledgeSource in _knowledgeSources) {
+        print(knowledgeSource.id);
+      }
     } catch (e) {
-      print("Error fetching Knowledge Bases: $e");
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateKnowledgeBase({
+    required String id,
+    required String knowledgeName,
+    required String description,
+    required AuthProvider authProvider,
+  }) async {
+    final accessToken =
+        authProvider.kbToken; // Lấy access token từ AuthProvider
+    if (accessToken == null) throw Exception("Access token is not available");
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _knowledgeBaseService.updateKnowledgeBase(
+        token: accessToken,
+        id: id,
+        knowledgeName: knowledgeName,
+        description: description,
+      );
+    } catch (e) {
+      throw Exception('Error updating Knowledge Base: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteKnowledgeBase({
+    required String id,
+    required AuthProvider authProvider,
+  }) async {
+    final accessToken =
+        authProvider.kbToken; // Lấy access token từ AuthProvider
+    if (accessToken == null) throw Exception("Access token is not available");
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _knowledgeBaseService.deleteKnowledgeBase(
+        token: accessToken,
+        id: id,
+      );
+    } catch (e) {
+      throw Exception('Error deleting Knowledge Base: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getUnitKnowledge({
+    required String id,
+    required AuthProvider authProvider,
+  }) async {
+    final accessToken =
+        authProvider.kbToken; // Lấy access token từ AuthProvider
+    if (accessToken == null) throw Exception("Access token is not available");
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final respond = await _knowledgeBaseService.getUnitKnowledge(
+        token: accessToken,
+        id: id,
+      );
+      print(respond);
+    } catch (e) {
+      throw Exception('Error getting unit knowledge: $e');
     } finally {
       _isLoading = false;
       notifyListeners();

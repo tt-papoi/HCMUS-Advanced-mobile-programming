@@ -54,7 +54,6 @@ class KnowledgeBaseService {
     );
 
     final response = await http.get(uri, headers: headers);
-    print('Response: ${response.body}');
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
@@ -76,6 +75,80 @@ class KnowledgeBaseService {
       };
     } else {
       throw Exception('Failed to fetch Knowledge Base');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateKnowledgeBase({
+    required String token,
+    required String id, // ID của Knowledge Base cần cập nhật
+    required String knowledgeName,
+    required String description,
+  }) async {
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      "knowledgeName": knowledgeName,
+      "description": description,
+    });
+
+    final response = await http.patch(
+      Uri.parse('$kbUrl/$id'), // URL với ID cụ thể
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+          'Failed to update Knowledge Base: ${response.reasonPhrase}');
+    }
+  }
+
+  Future<bool> deleteKnowledgeBase({
+    required String token,
+    required String id,
+  }) async {
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    final response = await http.delete(
+      Uri.parse('$kbUrl/$id'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+          'Failed to delete Knowledge Base: ${response.reasonPhrase}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getUnitKnowledge({
+    required String token,
+    required String id,
+  }) async {
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    final response = await http.get(
+      Uri.parse('$kbUrl/$id/units'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+          'Failed to fetch Unit Knowledge: ${response.reasonPhrase}');
     }
   }
 }

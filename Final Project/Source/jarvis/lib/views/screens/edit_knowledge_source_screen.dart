@@ -365,7 +365,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                       _showKnowledgeSourceDialog();
                     },
                     child: const Icon(Icons.add_box_rounded,
-                        color: Colors.blueAccent, size: 25)),
+                        color: Colors.red, size: 25)),
               ],
             ),
             const SizedBox(height: 8),
