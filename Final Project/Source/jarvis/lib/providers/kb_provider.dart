@@ -55,7 +55,7 @@ class KnowledgeBaseProvider with ChangeNotifier {
       final data = await _knowledgeBaseService.getKnowledgeBase(
         token: accessToken,
       );
-      _knowledgeBases = data['data'];
+
       print('Knowledge Bases fetched successfully: $data');
       //_knowledgeBases = data;
     } catch (e) {

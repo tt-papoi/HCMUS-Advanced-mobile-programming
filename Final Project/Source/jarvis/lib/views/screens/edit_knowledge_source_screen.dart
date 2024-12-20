@@ -26,7 +26,8 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.knowledgeSource.name);
+    nameController =
+        TextEditingController(text: widget.knowledgeSource.knowledgeName);
     descriptionController =
         TextEditingController(text: widget.knowledgeSource.description);
     units = widget.knowledgeSource.units ?? [];
@@ -49,7 +50,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
       return;
     }
     setState(() {
-      widget.knowledgeSource.name = nameController.text;
+      widget.knowledgeSource.knowledgeName = nameController.text;
       widget.knowledgeSource.description = descriptionController.text;
       widget.knowledgeSource.units = units;
     });

@@ -1,19 +1,19 @@
 class KnowledgeSource {
   String userId; // Unique identifier for the knowledge source
-  String name; // Name of the source
+  String knowledgeName; // Name of the source
   String description; // Description of the source
   List<Unit>? units; // List of associated units (optional)
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   String? createdBy;
   String? updatedBy;
   String? deletedAt;
   String id;
-  String numUnits;
-  String totalSize;
+  int numUnits;
+  int totalSize;
   KnowledgeSource({
     required this.userId,
-    required this.name,
+    required this.knowledgeName,
     required this.description,
     this.units,
     this.createdAt,
@@ -30,19 +30,19 @@ class KnowledgeSource {
   factory KnowledgeSource.fromJson(Map<String, dynamic> json) {
     return KnowledgeSource(
       userId: json['userId'] as String,
-      name: json['name'] as String,
+      knowledgeName: json['knowledgeName'] as String,
       description: json['description'] as String,
       // units: (json['units'] as List<dynamic>?)
       //     ?.map((unit) => Unit.fromJson(unit))
       //     .toList(),
-      createdAt: json['createdAt'] as DateTime,
-      updatedAt: json['updatedAt'] as DateTime,
+      createdAt: json['createdAt'] as String,
+      updatedAt: json['updatedAt'] as String,
       createdBy: json['createdBy'] as Null,
       updatedBy: json['updatedBy'] as Null,
       deletedAt: json['deletedAt'] as Null,
       id: json['id'] as String,
-      numUnits: json['numUnits'] as String,
-      totalSize: json['totalSize'] as String,
+      numUnits: json['numUnits'] as int,
+      totalSize: json['totalSize'] as int,
     );
   }
 
@@ -50,7 +50,7 @@ class KnowledgeSource {
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
-      'name': name,
+      'name': knowledgeName,
       'description': description,
       'units': units?.map((unit) => unit.toJson()).toList(),
     };

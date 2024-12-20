@@ -120,7 +120,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
 
                           // Filter knowledge sources based on search query
                           if (searchQuery.isNotEmpty &&
-                              !knowledgeSource.name
+                              !knowledgeSource.knowledgeName
                                   .toLowerCase()
                                   .contains(searchQuery)) {
                             return const SizedBox
@@ -147,7 +147,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
                                     : Colors.blueAccent,
                               ),
                               title: Text(
-                                knowledgeSource.name,
+                                knowledgeSource.knowledgeName,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -408,7 +408,7 @@ class _EditBotScreenState extends State<EditBotScreen> {
                     color: Colors.blueAccent,
                   ),
                   title: Text(
-                    knowledgeSource.name,
+                    knowledgeSource.knowledgeName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

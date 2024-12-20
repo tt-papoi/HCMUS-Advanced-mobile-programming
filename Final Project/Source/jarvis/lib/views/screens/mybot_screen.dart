@@ -315,7 +315,7 @@ class MybotScreenState extends State<MybotScreen> {
                     color: Colors.blueAccent,
                   ),
                   title: Text(
-                    knowledgeSource.name,
+                    knowledgeSource.knowledgeName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

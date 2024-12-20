@@ -59,7 +59,6 @@ class KnowledgeBaseService {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
 
-      print(jsonResponse['data']);
       // Chuyển đổi `data` thành danh sách KnowledgeSource
       final List<KnowledgeSource> knowledgeSources =
           (jsonResponse['data'] as List)
@@ -70,6 +69,7 @@ class KnowledgeBaseService {
       //final MetaData metaData = MetaData.fromJson(jsonResponse['meta']);
 
       // Trả về cả data và metadata
+
       return {
         'data': knowledgeSources,
         //'meta': metaData,
