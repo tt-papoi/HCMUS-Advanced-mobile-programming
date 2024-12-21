@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarvis/models/Unit.dart';
+import 'package:jarvis/models/unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/providers/auth_provider.dart';
 import 'package:jarvis/providers/kb_provider.dart';
@@ -127,18 +127,39 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
   }
 
   void _showWebsiteDialog() {
+    final kbProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     showDialog(
-      context: context,
+      context: Navigator.of(context).context,
       builder: (BuildContext context) {
         return WebsiteDialog(
-          onConnect: (name, url) {
-            setState(() {
-              units.add(Unit(
-                id: DateTime.now().toString(),
-                name: name,
-                unitType: UnitType.web,
-              ));
-            });
+          onConnect: (name, url) async {
+            try {
+              print(name);
+              print(url);
+              // Gọi hàm addUnit với ID từ knowledgeSource
+              await kbProvider.addUnit(
+                token: authProvider.kbToken!,
+                id: widget.knowledgeSource.id,
+                unitName: name,
+                unitType: "web",
+                unitData: {'webUrl': url},
+              );
+              print('Website Unit added successfully!');
+              // Lấy lại danh sách units sau khi thêm
+              await _fetchKnowledgeUnits();
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Website Unit added successfully!")),
+                );
+              }
+            } catch (e) {
+              DialogUtils.showErrorDialog(context, e.toString());
+            }
           },
         );
       },

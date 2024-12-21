@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:jarvis/models/Unit.dart';
+import 'package:jarvis/models/unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/services/kb_service.dart';
 import 'package:jarvis/providers/auth_provider.dart';
@@ -149,6 +149,61 @@ class KnowledgeBaseProvider with ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Error getting unit knowledge: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addUnit({
+    required String token,
+    required String id,
+    required String unitType, // Loại unit (web, slack, confluence, ...)
+    required String unitName,
+    required Map<String, dynamic> unitData, // Dữ liệu động cho từng loại unit
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      switch (unitType) {
+        case 'web':
+          print(unitData['webUrl']);
+          await _knowledgeBaseService.addWebUnit(
+            token: token,
+            id: id,
+            unitName: unitName,
+            webUrl: unitData['webUrl'],
+          );
+          print(2);
+          break;
+
+        case 'slack':
+          await _knowledgeBaseService.addSlackUnit(
+            token: token,
+            id: id,
+            unitName: unitName,
+            slackWorkspace: unitData['slackWorkspace'],
+            slackbotToken: unitData['slackbotToken'],
+          );
+          break;
+
+        case 'confluence':
+          await _knowledgeBaseService.addConfluenceUnit(
+            token: token,
+            id: id,
+            unitName: unitName,
+            wikiPageUrl: unitData['wikiPageUrl'],
+            confluenceUsername: unitData['confluenceUsername'],
+            confluenceAccessToken: unitData['confluenceAccessToken'],
+          );
+          break;
+
+        default:
+          throw Exception('Unsupported unit type: $unitType');
+      }
+    } catch (e) {
+      throw Exception('Error adding unit: $e');
     } finally {
       _isLoading = false;
       notifyListeners();

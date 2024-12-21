@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:jarvis/models/Unit.dart';
+import 'package:jarvis/models/unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/constants.dart';
 
@@ -147,7 +147,7 @@ class KnowledgeBaseService {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      print(jsonResponse);
+
       final units = (jsonResponse['data'] as List<dynamic>)
           .map((item) => Unit.fromJson(item))
           .toList();
@@ -160,5 +160,86 @@ class KnowledgeBaseService {
       throw Exception(
           'Failed to fetch Unit Knowledge: ${response.reasonPhrase}');
     }
+  }
+
+  Future<void> _postUnit({
+    required String token,
+    required String endpoint, // Endpoint URL (web, slack, confluence, ...)
+    required Map<String, dynamic> payload, // Payload động
+  }) async {
+    final url = Uri.parse('$kbUrl/$endpoint');
+    print('URL: $url');
+    payload.forEach((key, value) {
+      print('$key: $value');
+    });
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(payload),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to add Unit: ${response.body}');
+    }
+
+    // Trả về response body nếu cần sử dụng sau này
+    return json.decode(response.body);
+  }
+
+  Future<void> addWebUnit({
+    required String token,
+    required String id,
+    required String unitName,
+    required String webUrl,
+  }) async {
+    await _postUnit(
+      token: token,
+      endpoint: '$id/web',
+      payload: {
+        "unitName": unitName,
+        "webUrl": webUrl,
+      },
+    );
+  }
+
+  Future<void> addSlackUnit({
+    required String token,
+    required String id,
+    required String unitName,
+    required String slackWorkspace,
+    required String slackbotToken,
+  }) async {
+    await _postUnit(
+      token: token,
+      endpoint: '$id/slack',
+      payload: {
+        "unitName": unitName,
+        "slackWorkspace": slackWorkspace,
+        "SlackbotToken": slackbotToken,
+      },
+    );
+  }
+
+  Future<void> addConfluenceUnit({
+    required String token,
+    required String id,
+    required String unitName,
+    required String wikiPageUrl,
+    required String confluenceUsername,
+    required String confluenceAccessToken,
+  }) async {
+    await _postUnit(
+      token: token,
+      endpoint: '$id/confluence',
+      payload: {
+        "unitName": unitName,
+        "wikiPageUrl": wikiPageUrl,
+        "confluenceUsername": confluenceUsername,
+        "confluenceAccessToken": confluenceAccessToken,
+      },
+    );
   }
 }

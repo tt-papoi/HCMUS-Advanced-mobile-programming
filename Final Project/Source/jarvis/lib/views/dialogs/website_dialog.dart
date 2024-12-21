@@ -33,21 +33,10 @@ class WebsiteDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            onTapOutside: (event) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
             controller: nameController,
             decoration: InputDecoration(
-              hintStyle: const TextStyle(
-                  color: Colors.black45, fontWeight: FontWeight.normal),
               labelText: "Name",
-              labelStyle: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14),
               hintText: "Enter a name",
-              filled: true,
-              fillColor: const Color.fromARGB(0, 0, 0, 0),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
                 borderSide: const BorderSide(color: Colors.black54, width: 1.0),
@@ -61,21 +50,10 @@ class WebsiteDialog extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextField(
-            onTapOutside: (event) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
             controller: urlController,
             decoration: InputDecoration(
-              hintStyle: const TextStyle(
-                  color: Colors.black45, fontWeight: FontWeight.normal),
               labelText: "Website URL",
-              labelStyle: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14),
               hintText: "Enter a Website URL",
-              filled: true,
-              fillColor: const Color.fromARGB(0, 0, 0, 0),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
                 borderSide: const BorderSide(color: Colors.black54, width: 1.0),
@@ -101,23 +79,23 @@ class WebsiteDialog extends StatelessWidget {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent, // Màu nền của nút
+            backgroundColor: Colors.blueAccent,
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Bo góc nút
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
-          onPressed: () {
-            if (nameController.text.isNotEmpty ||
+          onPressed: () async {
+            if (nameController.text.isNotEmpty &&
                 urlController.text.isNotEmpty) {
-              onConnect(nameController.text, urlController.text);
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Connected successfully!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              try {
+                await onConnect(nameController.text, urlController.text);
+                Navigator.of(context).pop();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Failed to add: $e")),
+                );
+              }
             }
           },
           child: const Text(
