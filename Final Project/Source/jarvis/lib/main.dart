@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/providers/prompt_provider.dart';
 import 'package:jarvis/providers/chat_provider.dart';
 import 'package:jarvis/providers/token_provider.dart';
@@ -18,6 +19,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PromptProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => TokenProvider()),
+        ChangeNotifierProvider(create: (_) => KnowledgeBaseProvider()),
       ],
       child: const JarvisApp(),
     ),

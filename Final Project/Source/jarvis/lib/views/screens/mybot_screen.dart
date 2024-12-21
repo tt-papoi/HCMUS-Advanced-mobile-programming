@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/models/my_bot.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/utils/fade_route.dart';
 import 'package:jarvis/views/screens/create_bot_screen.dart';
 import 'package:jarvis/views/screens/create_knowledge_source_screen.dart';
 import 'package:jarvis/views/screens/edit_bot_screen.dart';
 import 'package:jarvis/views/screens/edit_knowledge_source_screen.dart';
 import 'package:jarvis/widgets/custom_search_bar.dart';
+import 'package:provider/provider.dart';
 
 class MybotScreen extends StatefulWidget {
   const MybotScreen({super.key});
@@ -58,35 +61,31 @@ class MybotScreenState extends State<MybotScreen> {
     ),
   ];
 
-  List<KnowledgeSource> knowledgeSourceList = [
-    KnowledgeSource(
-        id: "01",
-        name: "My Job",
-        description: "This knowledge source is used for my job"),
-    KnowledgeSource(
-        id: "02",
-        name: "My house",
-        description: "This knowledge source is used for my house"),
-    KnowledgeSource(
-        id: "03",
-        name: "My dog",
-        description: "This knowledge source is used for my dog"),
-    KnowledgeSource(
-        id: "04",
-        name: "My cat",
-        description: "This knowledge source is used for my cat"),
-    KnowledgeSource(
-        id: "05",
-        name: "My car",
-        description: "This knowledge source is used for my car"),
-  ];
+  List<KnowledgeSource> knowledgeSourceList = [];
 
   List<Assistant> filteredBotList = []; // List to store filtered bots
 
   @override
+  @override
   void initState() {
     super.initState();
-    filteredBotList = botList; // Initialize the filtered list to show all bots
+
+    final kbProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    Future.microtask(() async {
+      await kbProvider.fetchKnowledgeBases(authProvider);
+
+      if (!mounted) return;
+      // Cập nhật danh sách knowledgeSourceList
+      setState(() {
+        knowledgeSourceList = kbProvider.knowledgeSources;
+      });
+    });
+
+    // Khởi tạo danh sách lọc
+    filteredBotList = botList;
   }
 
   @override
@@ -129,7 +128,12 @@ class MybotScreenState extends State<MybotScreen> {
           Expanded(
             child: isMyBotScreen
                 ? _buildMyBotScreen(context)
-                : _buildKnowledgeSourcesScreen(context),
+                : Consumer<KnowledgeBaseProvider>(
+                    builder: (context, kbProvider, child) {
+                      knowledgeSourceList = kbProvider.knowledgeSources;
+                      return _buildKnowledgeSourcesScreen(context);
+                    },
+                  ),
           ),
           const SizedBox(height: 60),
         ],
@@ -306,12 +310,69 @@ class MybotScreenState extends State<MybotScreen> {
         knowledgeSource: knowledgesource,
       ),
     ));
+    if (!mounted) return;
     if (result != null) {
-      setState(() {});
+      final kbProvider =
+          Provider.of<KnowledgeBaseProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      try {
+        await kbProvider.updateKnowledgeBase(
+          id: result.id,
+          knowledgeName: result.knowledgeName,
+          description: result.description,
+          authProvider: authProvider,
+        );
+      } catch (e) {
+        // Xử lý lỗi
+        throw Exception('Error updating Knowledge Base: $e');
+      }
+    }
+  }
+
+  Future<void> deleteKnowledgeSource(int index) async {
+    try {
+      final kbProvider =
+          Provider.of<KnowledgeBaseProvider>(context, listen: false);
+      await kbProvider.deleteKnowledgeBase(
+        id: knowledgeSourceList[index].id,
+        authProvider: Provider.of<AuthProvider>(context, listen: false),
+      );
+
+      setState(() {
+        knowledgeSourceList.removeAt(index); // Xóa khỏi danh sách cục bộ
+      });
+
+      if (!mounted) return; // Kiểm tra lại trước khi hiển thị Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Knowledge Source deleted successfully')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return; // Kiểm tra nếu widget đã bị hủy trước khi hiển thị Snackbar
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting Knowledge Source: $error')),
+      );
     }
   }
 
   Widget _buildKnowledgeSourcesScreen(BuildContext context) {
+    final kbProvider = Provider.of<KnowledgeBaseProvider>(context);
+    if (kbProvider.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (knowledgeSourceList.isEmpty) {
+      return const Center(
+        child: Text(
+          'No Knowledge Sources available.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Column(
@@ -329,7 +390,7 @@ class MybotScreenState extends State<MybotScreen> {
                     color: Colors.blueAccent,
                   ),
                   title: Text(
-                    knowledgeSource.name,
+                    knowledgeSource.knowledgeName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -344,9 +405,10 @@ class MybotScreenState extends State<MybotScreen> {
                     color: Colors.white,
                     onSelected: (String result) {},
                     itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'Delete',
-                        child: Text('Delete'),
+                        child: const Text('Delete'),
+                        onTap: () => deleteKnowledgeSource(index),
                       ),
                     ],
                   ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis/models/unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
+import 'package:jarvis/providers/auth_provider.dart';
+import 'package:jarvis/providers/kb_provider.dart';
 import 'package:jarvis/utils/dialog_utils.dart';
 import 'package:jarvis/views/dialogs/confirm_delete_dialog.dart';
 import 'package:jarvis/views/dialogs/confluence_dialog.dart';
@@ -7,6 +10,7 @@ import 'package:jarvis/views/dialogs/google_drive_dialog.dart';
 import 'package:jarvis/views/dialogs/local_file_dialog.dart';
 import 'package:jarvis/views/dialogs/website_dialog.dart';
 import 'package:jarvis/views/dialogs/slack_dialog.dart';
+import 'package:provider/provider.dart';
 
 class EditKnowledgeSourceScreen extends StatefulWidget {
   final KnowledgeSource knowledgeSource;
@@ -26,10 +30,33 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.knowledgeSource.name);
+
+    nameController =
+        TextEditingController(text: widget.knowledgeSource.knowledgeName);
     descriptionController =
         TextEditingController(text: widget.knowledgeSource.description);
-    units = widget.knowledgeSource.units ?? [];
+
+    //units = widget.knowledgeSource.units ?? [];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchKnowledgeUnits();
+    });
+  }
+
+  Future<void> _fetchKnowledgeUnits() async {
+    final kbProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      await kbProvider.getUnitKnowledge(
+          id: widget.knowledgeSource.id, authProvider: authProvider);
+
+      setState(() {
+        units = kbProvider.units;
+      });
+    } catch (e) {
+      DialogUtils.showErrorDialog(context, e.toString());
+    }
   }
 
   @override
@@ -49,7 +76,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
       return;
     }
     setState(() {
-      widget.knowledgeSource.name = nameController.text;
+      widget.knowledgeSource.knowledgeName = nameController.text;
       widget.knowledgeSource.description = descriptionController.text;
       widget.knowledgeSource.units = units;
     });
@@ -57,19 +84,23 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
     Navigator.of(context).pop(widget.knowledgeSource);
   }
 
-  void _showLocalFileDialog() {
-    showDialog(
+  Future<void> _showLocalFileDialog() async {
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return LocalFileDialog(
           onConnect: (name, file) {
-            setState(() {
-              units.add(Unit(
-                id: DateTime.now().toString(),
-                name: name,
-                unitType: UnitType.localfile,
-              ));
-            });
+            if (mounted) {
+              if (mounted) {
+                setState(() {
+                  units.add(Unit(
+                    id: DateTime.now().toString(),
+                    name: name,
+                    unitType: UnitType.localfile,
+                  ));
+                });
+              }
+            }
           },
         );
       },
@@ -96,18 +127,39 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
   }
 
   void _showWebsiteDialog() {
+    final kbProvider =
+        Provider.of<KnowledgeBaseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     showDialog(
-      context: context,
+      context: Navigator.of(context).context,
       builder: (BuildContext context) {
         return WebsiteDialog(
-          onConnect: (name, url) {
-            setState(() {
-              units.add(Unit(
-                id: DateTime.now().toString(),
-                name: name,
-                unitType: UnitType.website,
-              ));
-            });
+          onConnect: (name, url) async {
+            try {
+              print(name);
+              print(url);
+              // Gọi hàm addUnit với ID từ knowledgeSource
+              await kbProvider.addUnit(
+                token: authProvider.kbToken!,
+                id: widget.knowledgeSource.id,
+                unitName: name,
+                unitType: "web",
+                unitData: {'webUrl': url},
+              );
+              print('Website Unit added successfully!');
+              // Lấy lại danh sách units sau khi thêm
+              await _fetchKnowledgeUnits();
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Website Unit added successfully!")),
+                );
+              }
+            } catch (e) {
+              DialogUtils.showErrorDialog(context, e.toString());
+            }
           },
         );
       },
@@ -386,7 +438,7 @@ class _EditKnowledgeSourceScreenState extends State<EditKnowledgeSourceScreen> {
                             ? Icons.drive_folder_upload
                             : unit.unitType == UnitType.slack
                                 ? Icons.folder
-                                : unit.unitType == UnitType.website
+                                : unit.unitType == UnitType.web
                                     ? Icons.language
                                     : unit.unitType == UnitType.confluence
                                         ? Icons.code

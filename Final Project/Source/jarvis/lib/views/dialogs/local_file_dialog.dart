@@ -85,38 +85,35 @@ class LocalFileDialogState extends State<LocalFileDialog> {
               ),
               child: Center(
                 child: selectedFile != null
-                    ? Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Selected file: ${selectedFile!.name}',
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.black54)),
-                            const SizedBox(height: 8),
-                            Text(
-                                'Type: ${selectedFile!.extension?.toUpperCase() ?? "Unknown"}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black45)),
-                            Text('Size: ${_formatFileSize(selectedFile!.size)}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black45)),
-                          ],
-                        ),
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Selected file: ${selectedFile!.name}',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black54)),
+                          const SizedBox(height: 8),
+                          Text(
+                              'Type: ${selectedFile!.extension?.toUpperCase() ?? "Unknown"}',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black45)),
+                          Text('Size: ${_formatFileSize(selectedFile!.size)}',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black45)),
+                        ],
                       )
-                    : const Expanded(
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.upload_file,
-                              color: Colors.black45,
-                            ),
-                            Text(
-                              'Click or drag file to upload',
-                              style: TextStyle(
-                                  fontSize: 16, color: Colors.black54),
-                            ),
-                          ],
-                        ),
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.upload_file,
+                            color: Colors.black45,
+                          ),
+                          Text(
+                            'Click or drag file to upload',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.black54),
+                          ),
+                        ],
                       ),
               ),
             ),

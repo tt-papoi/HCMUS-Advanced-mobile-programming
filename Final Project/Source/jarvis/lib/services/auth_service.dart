@@ -5,6 +5,31 @@ import 'package:jarvis/utils/constants.dart';
 class AuthService {
   final String baseUrl = "${ProjectConstants.baseUrl}/api/v1/auth";
 
+  Future<Map<String, dynamic>> externalSignInToKnowledgeBase(
+      String token) async {
+    final headers = {
+      'x-jarvis-guid': '',
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      "token": token,
+    });
+
+    final response = await http.post(
+      Uri.parse('${ProjectConstants.kbUrl}/kb-core/v1/auth/external-sign-in'),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+          'Failed to sign in to Knowledge Base: ${response.reasonPhrase}');
+    }
+  }
+
   Future<Map<String, dynamic>> getCurrentUser(String token) async {
     final response = await http.get(
       Uri.parse('$baseUrl/me'),
