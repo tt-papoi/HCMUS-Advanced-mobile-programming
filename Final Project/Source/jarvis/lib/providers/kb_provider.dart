@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-
+import 'package:jarvis/models/Unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/services/kb_service.dart';
 import 'package:jarvis/providers/auth_provider.dart';
@@ -7,9 +7,11 @@ import 'package:jarvis/providers/auth_provider.dart';
 class KnowledgeBaseProvider with ChangeNotifier {
   final KnowledgeBaseService _knowledgeBaseService = KnowledgeBaseService();
   List<KnowledgeSource> _knowledgeSources = [];
+  List<Unit> _units = [];
   bool _isLoading = false;
 
   List<KnowledgeSource> get knowledgeSources => _knowledgeSources;
+  List<Unit> get units => _units;
   bool get isLoading => _isLoading;
 
   Future<void> createKnowledgeBase({
@@ -135,11 +137,16 @@ class KnowledgeBaseProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final respond = await _knowledgeBaseService.getUnitKnowledge(
+      final response = await _knowledgeBaseService.getUnitKnowledge(
         token: accessToken,
         id: id,
       );
-      print(respond);
+      print(response);
+      _units = response['units'] as List<Unit>;
+
+      for (var unit in _units) {
+        print('Unit Name: ${unit.name}');
+      }
     } catch (e) {
       throw Exception('Error getting unit knowledge: $e');
     } finally {

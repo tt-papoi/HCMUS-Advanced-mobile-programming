@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:jarvis/models/Unit.dart';
 import 'package:jarvis/models/knowledge_source.dart';
 import 'package:jarvis/utils/constants.dart';
 
@@ -145,7 +146,16 @@ class KnowledgeBaseService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      final units = (jsonResponse['data'] as List<dynamic>)
+          .map((item) => Unit.fromJson(item))
+          .toList();
+      final metaData = jsonResponse['meta'];
+      return {
+        'units': units,
+        'meta': metaData,
+      };
     } else {
       throw Exception(
           'Failed to fetch Unit Knowledge: ${response.reasonPhrase}');
